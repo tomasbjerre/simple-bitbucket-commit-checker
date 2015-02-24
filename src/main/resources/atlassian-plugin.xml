@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+
+  <resource type="i18n" name="i18n" location="sscc"/>
+
+  <web-resource key="sscc-resources" name="sscc Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="sscc.css" location="/css/sscc.css"/>
+    <resource type="download" name="sscc.js" location="/js/sscc.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>sscc</context>
+  </web-resource>
+
+  <component key="changeSetsService" class="se.bjurr.sscc.ChangeSetsServiceImpl" public="true">
+    <interface>se.bjurr.sscc.ChangeSetsService</interface>
+  </component>
+  
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+
+  <repository-hook name="Pre Receive Repository Hook" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
+    <description key="pre-receive-repository-hook.description">The Pre Receive Repository Hook Plugin</description>
+    <icon>images/pluginIcon.png</icon>
+    <config-form name="SSCC Hook Config" key="ssccHook-config">
+      <view>com.atlassian.stash.repository.hook.ref.formContents</view>
+      <directory location="/static/" />
+    </config-form>
+    <validator>se.bjurr.sscc.ConfigValidator</validator>
+  </repository-hook>
+</atlassian-plugin>
