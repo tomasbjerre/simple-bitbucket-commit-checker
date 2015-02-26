@@ -29,7 +29,7 @@
     <description key="pre-receive-repository-hook.description">The Pre Receive Repository Hook Plugin</description>
     <icon>images/pluginIcon.png</icon>
     <config-form name="SSCC Hook Config" key="ssccHook-config">
-      <view>com.atlassian.stash.repository.hook.ref.formContents</view>
+      <view>se.bjurr.sscc</view>
       <directory location="/static/" />
     </config-form>
     <validator>se.bjurr.sscc.ConfigValidator</validator>

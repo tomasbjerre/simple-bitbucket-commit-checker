@@ -1,0 +1,4 @@
+textarea, input {
+    width: 100%;
+    max-width: 250px;
+}

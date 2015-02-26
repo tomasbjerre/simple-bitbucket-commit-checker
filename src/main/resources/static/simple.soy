@@ -1,0 +1,124 @@
+{namespace se.bjurr}
+
+/**
+ * @param config
+ * @param errors
+ */
+{template .sscc}
+	{call aui.form.textField}
+		{param id: 'branches' /}
+		{param labelContent: 'Branches' /}
+		{param value: $config['brances'] /}
+		{param descriptionText: 'Reg exp to match branches that will be checked, leave empty to check all.' /}
+		{param errorTexts: $errors ? $errors['branches'] : null /}
+	{/call}
+
+	{call aui.form.checkboxField}
+		{param legendContent: 'Exclude Merge Commits' /}
+		{param fields: [[
+			'id' : 'excludeMergeCommits',
+			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+			'isChecked' : $config['excludeMergeCommits']
+		]] /}
+		{param descriptionText: 'Exclude merge commits from commit requirements.' /}
+	{/call}
+	
+	{call aui.form.checkboxField}
+		{param legendContent: 'Require Matching Author Email' /}
+		{param fields: [[
+			'id' : 'requireMatchingAuthorEmail',
+			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+			'isChecked' : $config['requireMatchingAuthorEmail']
+		]] /}
+		{param descriptionText: 'Require that the commit author\'s email matches the Stash user\'s email.' /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'requireMatchingAuthorEmailMessage' /}
+		{param labelContent: 'Reject message' /}
+		{param value: $config['requireMatchingAuthorEmailMessage'] /}
+		{param rows: 3 /}
+		{param descriptionText: 'Reject message, if email not matching authors email.' /}
+		{param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
+	{/call}
+
+	{call aui.form.checkboxField}
+		{param legendContent: 'Require Matching Author Name' /}
+		{param fields: [[
+			'id' : 'requireMatchingAuthorName',
+			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+			'isChecked' : $config['requireMatchingAuthorName']
+		]] /}
+		{param descriptionText: 'Require that the commit author\'s name matches the Stash user\'s name.' /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'requireMatchingAuthorNameMessage' /}
+		{param labelContent: 'Reject message' /}
+		{param value: $config['requireMatchingAuthorNameMessage'] /}
+		{param rows: 3 /}
+		{param descriptionText: 'Reject message, if author not matching authors email.' /}
+		{param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
+	{/call}
+
+	{call aui.form.checkboxField}
+		{param legendContent: 'Allow only one issue per push' /}
+		{param fields: [[
+			'id' : 'requireOnlyOneMatchingIssue',
+			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+			'isChecked' : $config['requireOnlyOneMatchingIssue']
+		]] /}
+		{param descriptionText: 'Require that the same issue is not matching for more then 1 commit among the pushed commits.' /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'requireOnlyOneMatchingIssueMessage' /}
+		{param labelContent: 'Reject message' /}
+		{param value: $config['requireOnlyOneMatchingIssueMessage'] /}
+		{param rows: 3 /}
+		{param descriptionText: 'Reject message, if same issue is matching more then 1 commit.' /}
+		{param errorTexts: $errors ? $errors['requireOnlyOneMatchingIssueMessage'] : null /}
+	{/call}
+
+	{call aui.form.checkboxField}
+		{param legendContent: 'Dry run' /}
+		{param fields: [[
+			'id' : 'dryRun',
+			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+			'isChecked' : $config['dryRun']
+		]] /}
+		{param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit.' /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'dryRunMessage' /}
+		{param labelContent: 'Dry run message' /}
+		{param value: $config['dryRunMessage'] /}
+		{param rows: 5 /}
+		{param descriptionText: 'Message to append to response, if in dry-run and commits are not successfully validating.' /}
+		{param errorTexts: $errors ? $errors['dryRunMessage'] : null /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'rejectMessage' /}
+		{param labelContent: 'Reject message' /}
+		{param value: $config['rejectMessage'] /}
+		{param rows: 10 /}
+		{param descriptionText: 'Message to be shown to committer when push is rejected.' /}
+		{param errorTexts: $errors ? $errors['rejectMessage'] : null /}
+	{/call}
+
+	{call aui.form.textareaField}
+		{param id: 'acceptMessage' /}
+		{param labelContent: 'Accept message' /}
+		{param value: $config['acceptMessage'] /}
+		{param rows: 10 /}
+		{param descriptionText: 'Message to be shown to committer when push is accepted.' /}
+		{param errorTexts: $errors ? $errors['acceptMessage'] : null /}
+	{/call}
+
+	<h3>Issue validation</h3>
+
+
+{/template}
+
