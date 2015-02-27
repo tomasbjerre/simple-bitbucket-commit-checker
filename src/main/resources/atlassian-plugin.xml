@@ -16,7 +16,7 @@
     <resource type="download" name="sscc.css" location="/css/sscc.css"/>
     <resource type="download" name="sscc.js" location="/js/sscc.js"/>
     <resource type="download" name="images/" location="/images"/>
-    <context>sscc</context>
+    <context>stash.page.repository.settings.hooks</context>
   </web-resource>
 
   <component key="changeSetsService" class="se.bjurr.sscc.ChangeSetsServiceImpl" public="true">

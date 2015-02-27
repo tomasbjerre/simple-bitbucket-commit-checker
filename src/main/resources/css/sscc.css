@@ -1,4 +1,3 @@
-textarea, input {
-    width: 100%;
-    max-width: 250px;
+textarea, input[type=text] {
+    max-width: 100% !important;
 }
