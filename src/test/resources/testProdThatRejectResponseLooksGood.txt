@@ -23,6 +23,26 @@
           /             |               \ 
        ,-'              |               / 
       /                 |             -'
-REJECTING: 1 fixing stuff
-REJECTING: 2 fix
+refs/heads/master e2bc4ed003 -> af35d5c1a4
 
+10fe5ad13bbd9c180a4668334cda9c83cd92dd46 Tomas <my@email.com>
+>>> Fixing review
+Unwanted words in commit
+* Fixing review
+  Dont mention that you are fixing a review, say what you are changing!
+No issue specified
+* ((?<!([A-Z]{1,10})-?)[A-Z]+-\d+)
+  JIRA
+* INC[0-9]*
+  Incident
+
+26094a0739ed397b0d475f4a8d3af35f33a6a0cf Tomas <my@email.com>
+>>> fix
+No issue specified
+* ((?<!([A-Z]{1,10})-?)[A-Z]+-\d+)
+  JIRA
+* INC[0-9]*
+  Incident
+
+*** We are currently running commit checker in dry run mode. Your commits are
+*** being accepted. On 2015-10-10 we will start blocking this kind of commits.

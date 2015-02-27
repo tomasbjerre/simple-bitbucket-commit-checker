@@ -25,9 +25,9 @@
   
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 
-  <repository-hook name="Pre Receive Repository Hook" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
-    <description key="pre-receive-repository-hook.description">The Pre Receive Repository Hook Plugin</description>
-    <icon>images/pluginIcon.png</icon>
+  <repository-hook name="Simple Stash Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
+    <description key="pre-receive-repository-hook.description">Simple Stash Commit Checker</description>
+    <icon>images/pluginLogo.png</icon>
     <config-form name="SSCC Hook Config" key="ssccHook-config">
       <view>se.bjurr.sscc</view>
       <directory location="/static/" />

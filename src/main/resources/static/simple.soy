@@ -5,120 +5,275 @@
  * @param errors
  */
 {template .sscc}
-	{call aui.form.textField}
-		{param id: 'branches' /}
-		{param labelContent: 'Branches' /}
-		{param value: $config['brances'] /}
-		{param descriptionText: 'Reg exp to match branches that will be checked, leave empty to check all.' /}
-		{param errorTexts: $errors ? $errors['branches'] : null /}
-	{/call}
+<div class="sscc">
+    {call aui.form.textField}
+        {param id: 'branches' /}
+        {param labelContent: 'Branches' /}
+        {param value: $config['branches'] /}
+        {param descriptionText: 'Regular expression to match branches that will be checked, leave empty to check all.' /}
+        {param errorTexts: $errors ? $errors['branches'] : null /}
+    {/call}
 
-	{call aui.form.checkboxField}
-		{param legendContent: 'Exclude Merge Commits' /}
-		{param fields: [[
-			'id' : 'excludeMergeCommits',
-			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-			'isChecked' : $config['excludeMergeCommits']
-		]] /}
-		{param descriptionText: 'Exclude merge commits from commit requirements.' /}
-	{/call}
-	
-	{call aui.form.checkboxField}
-		{param legendContent: 'Require Matching Author Email' /}
-		{param fields: [[
-			'id' : 'requireMatchingAuthorEmail',
-			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-			'isChecked' : $config['requireMatchingAuthorEmail']
-		]] /}
-		{param descriptionText: 'Require that the commit author\'s email matches the Stash user\'s email.' /}
-	{/call}
+    {call aui.form.checkboxField}
+        {param legendContent: 'Exclude Merge Commits' /}
+        {param fields: [[
+            'id' : 'excludeMergeCommits',
+            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'isChecked' : $config['excludeMergeCommits']
+        ]] /}
+        {param descriptionText: 'Exclude merge commits from commit requirements.' /}
+    {/call}
+    
+    {call aui.form.checkboxField}
+        {param legendContent: 'Exclude Tags Commits' /}
+        {param fields: [[
+            'id' : 'excludeTagCommits',
+            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'isChecked' : $config['excludeTagCommits']
+        ]] /}
+        {param descriptionText: 'Exclude merge commits from commit requirements.' /}
+    {/call}
+    
+    <div class="fieldGroup">
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Matching Author Email' /}
+            {param fields: [[
+                'id' : 'requireMatchingAuthorEmail',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireMatchingAuthorEmail']
+            ]] /}
+            {param descriptionText: 'Require that the commit author\'s email matches the Stash user\'s email.' /}
+        {/call}
+    
+        {call aui.form.textareaField}
+            {param id: 'requireMatchingAuthorEmailMessage' /}
+            {param labelContent: 'Reject message' /}
+            {param value: $config['requireMatchingAuthorEmailMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Reject message, if email not matching authors email.' /}
+            {param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
+        {/call}
+    </div>
 
-	{call aui.form.textareaField}
-		{param id: 'requireMatchingAuthorEmailMessage' /}
-		{param labelContent: 'Reject message' /}
-		{param value: $config['requireMatchingAuthorEmailMessage'] /}
-		{param rows: 3 /}
-		{param descriptionText: 'Reject message, if email not matching authors email.' /}
-		{param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
-	{/call}
+    <div class="fieldGroup">
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Matching Author Name' /}
+            {param fields: [[
+                'id' : 'requireMatchingAuthorName',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireMatchingAuthorName']
+            ]] /}
+            {param descriptionText: 'Require that the commit author\'s name matches the Stash user\'s name.' /}
+        {/call}
+    
+        {call aui.form.textareaField}
+            {param id: 'requireMatchingAuthorNameMessage' /}
+            {param labelContent: 'Reject message' /}
+            {param value: $config['requireMatchingAuthorNameMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Reject message, if author not matching authors email.' /}
+            {param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
+        {/call}
+    </div>
 
-	{call aui.form.checkboxField}
-		{param legendContent: 'Require Matching Author Name' /}
-		{param fields: [[
-			'id' : 'requireMatchingAuthorName',
-			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-			'isChecked' : $config['requireMatchingAuthorName']
-		]] /}
-		{param descriptionText: 'Require that the commit author\'s name matches the Stash user\'s name.' /}
-	{/call}
+    <div class="fieldGroup">
+        {call aui.form.checkboxField}
+            {param legendContent: 'Allow only one commit per issue' /}
+            {param fields: [[
+                'id' : 'requireOnlyOneMatchingIssue',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireOnlyOneMatchingIssue']
+            ]] /}
+            {param descriptionText: 'Require that the same issue is not matching for more then 1 commit among the pushed commits.' /}
+        {/call}
+    
+        {call aui.form.textareaField}
+            {param id: 'requireOnlyOneMatchingIssueMessage' /}
+            {param labelContent: 'Reject message' /}
+            {param value: $config['requireOnlyOneMatchingIssueMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Reject message, if same issue is matching more then 1 commit.' /}
+            {param errorTexts: $errors ? $errors['requireOnlyOneMatchingIssueMessage'] : null /}
+        {/call}
+    </div>
 
-	{call aui.form.textareaField}
-		{param id: 'requireMatchingAuthorNameMessage' /}
-		{param labelContent: 'Reject message' /}
-		{param value: $config['requireMatchingAuthorNameMessage'] /}
-		{param rows: 3 /}
-		{param descriptionText: 'Reject message, if author not matching authors email.' /}
-		{param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
-	{/call}
+    <div class="fieldGroup">
+        {call aui.form.checkboxField}
+            {param legendContent: 'Dry run' /}
+            {param fields: [[
+                'id' : 'dryRun',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['dryRun']
+            ]] /}
+            {param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit.' /}
+        {/call}
+    
+        {call aui.form.textareaField}
+            {param id: 'dryRunMessage' /}
+            {param labelContent: 'Dry run message' /}
+            {param value: $config['dryRunMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Message to append to response, if in dry-run and commits are not successfully validating.' /}
+            {param errorTexts: $errors ? $errors['dryRunMessage'] : null /}
+        {/call}
+    </div>
 
-	{call aui.form.checkboxField}
-		{param legendContent: 'Allow only one issue per push' /}
-		{param fields: [[
-			'id' : 'requireOnlyOneMatchingIssue',
-			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-			'isChecked' : $config['requireOnlyOneMatchingIssue']
-		]] /}
-		{param descriptionText: 'Require that the same issue is not matching for more then 1 commit among the pushed commits.' /}
-	{/call}
+    {call aui.form.textareaField}
+        {param id: 'rejectMessage' /}
+        {param labelContent: 'Reject message' /}
+        {param value: $config['rejectMessage'] /}
+        {param rows: 5 /}
+        {param descriptionText: 'Message to be shown to committer when push is rejected.' /}
+        {param errorTexts: $errors ? $errors['rejectMessage'] : null /}
+    {/call}
 
-	{call aui.form.textareaField}
-		{param id: 'requireOnlyOneMatchingIssueMessage' /}
-		{param labelContent: 'Reject message' /}
-		{param value: $config['requireOnlyOneMatchingIssueMessage'] /}
-		{param rows: 3 /}
-		{param descriptionText: 'Reject message, if same issue is matching more then 1 commit.' /}
-		{param errorTexts: $errors ? $errors['requireOnlyOneMatchingIssueMessage'] : null /}
-	{/call}
+    {call aui.form.textareaField}
+        {param id: 'acceptMessage' /}
+        {param labelContent: 'Accept message' /}
+        {param value: $config['acceptMessage'] /}
+        {param rows: 5 /}
+        {param descriptionText: 'Message to be shown to committer when push is accepted.' /}
+        {param errorTexts: $errors ? $errors['acceptMessage'] : null /}
+    {/call}
+    
+    <h3>Issue validation</h3>
+    <div class="issues">
+        <div class="left">
+            <div class="buttons">
+                {call aui.form.input}
+                    {param extraClasses: 'newGroup' /}
+                    {param value: 'New rule group' /}
+                    {param type: 'button' /}
+                {/call}
+            </div>
+        </div>
+        <div class="groups">
+            {for $i in range(100)}
+                {if $config['groupAccept['+$i+']']}
+                    {call .group}
+                        {param config: $config /}
+                        {param errors: $errors /}
+                        {param group: $i /}
+                    {/call}
+                {/if}
+            {/for}
+        </div>
+    </div>
+</div>
+{/template}
 
-	{call aui.form.checkboxField}
-		{param legendContent: 'Dry run' /}
-		{param fields: [[
-			'id' : 'dryRun',
-			'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-			'isChecked' : $config['dryRun']
-		]] /}
-		{param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit.' /}
-	{/call}
+/**
+ * @param config
+ * @param errors
+ * @param group
+ */
+{template .group}
+<div class="group fieldGroup" data-index="{$group}">
+    <h4>Group #{$group}</h4>
+    <div class="left">
+        {call aui.form.input}
+            {param extraClasses: 'removeGroup' /}
+            {param value: 'Remove group' /}
+            {param type: 'button' /}
+        {/call}
+    </div>
+    {call aui.form.radioField}
+        {param legendContent: 'Matching commits are' /}
+        {param fields: [
+          [ 'id' : 'groupAccept['+$group+']',
+            'value': 'ACCEPT',
+            'labelText': 'Accepted',
+            'isChecked' : $config['groupAccept['+$group+']'] == 'yes'
+            ],
+          [ 'id' : 'groupAccept['+$group+']',
+            'value': 'SHOW_MESSAGE',
+            'labelText': 'Dont accept or reject. Just show configured message to committers.',
+            'isChecked' : $config['groupAccept['+$group+']'] == 'maby'
+            ]
+        ] /}
+        {param descriptionText: 'Other groups may still reject the commit if this rule accepts it.' /}
+    {/call}
 
-	{call aui.form.textareaField}
-		{param id: 'dryRunMessage' /}
-		{param labelContent: 'Dry run message' /}
-		{param value: $config['dryRunMessage'] /}
-		{param rows: 5 /}
-		{param descriptionText: 'Message to append to response, if in dry-run and commits are not successfully validating.' /}
-		{param errorTexts: $errors ? $errors['dryRunMessage'] : null /}
-	{/call}
+    {call aui.form.radioField}
+        {param legendContent: 'The group matches a commit if' /}
+        {param fields: [
+          [ 'id' : 'groupMatch['+$group+']',
+            'value': 'one',
+            'labelText': '1 rule matches',
+            'isChecked' : $config['groupMatch['+$group+']'] == 'one'
+            ],
+          [ 'id' : 'groupMatch['+$group+']',
+            'value': 'none',
+            'labelText': 'no rules match',
+            'isChecked' : $config['groupMatch['+$group+']'] == 'none'
+            ],
+          [ 'id' : 'groupMatch['+$group+']',
+            'value': 'all',
+            'labelText': 'all rules match',
+            'isChecked' : $config['groupMatch['+$group+']'] == 'all'
+            ]
+        ] /}
+    {/call}
+    {call aui.form.textareaField}
+        {param id: 'groupMessage['+$group+']' /}
+        {param labelContent: 'Message' /}
+        {param value: $config['groupMessage['+$group+']'] /}
+        {param rows: 2 /}
+        {param descriptionText: 'Message to to committer, explaining the group.' /}
+        {param errorTexts: $errors ? $errors['groupMessage['+$group+']'] : null /}
+    {/call}
+    <div class="left">
+        {call aui.form.input}
+            {param extraClasses: 'newRule' /}
+            {param value: 'New rule' /}
+            {param type: 'button' /}
+        {/call}
+    </div>
+    <div class="rules">
+        {for $g in range(100)}
+            {for $r in range(100)}
+                {if $config['ruleRegexp['+$g+']['+$r+']']}
+                    {call .rule}
+                        {param config: $config /}
+                        {param errors: $errors /}
+                        {param group: $g /}
+                        {param rule: $r /}
+                    {/call}
+                {/if}
+            {/for}
+        {/for}
+    </div>
+</div>
+{/template}
 
-	{call aui.form.textareaField}
-		{param id: 'rejectMessage' /}
-		{param labelContent: 'Reject message' /}
-		{param value: $config['rejectMessage'] /}
-		{param rows: 10 /}
-		{param descriptionText: 'Message to be shown to committer when push is rejected.' /}
-		{param errorTexts: $errors ? $errors['rejectMessage'] : null /}
-	{/call}
-
-	{call aui.form.textareaField}
-		{param id: 'acceptMessage' /}
-		{param labelContent: 'Accept message' /}
-		{param value: $config['acceptMessage'] /}
-		{param rows: 10 /}
-		{param descriptionText: 'Message to be shown to committer when push is accepted.' /}
-		{param errorTexts: $errors ? $errors['acceptMessage'] : null /}
-	{/call}
-
-	<h3>Issue validation</h3>
-
-
+/**
+ * @param config
+ * @param errors
+ * @param group
+ * @param rule
+ */
+{template .rule}
+<div class="rule" data-index="{$rule}">
+    <h5>Group #{$group}, Rule #{$rule}</h5>
+    <div class="buttons">
+        {call aui.form.input}
+            {param extraClasses: 'removeRule' /}
+            {param value: 'Remove rule' /}
+            {param type: 'button' /}
+        {/call}
+    </div>
+    {call aui.form.textField}
+        {param id: 'ruleRegexp['+$group+']['+$rule+']' /}
+        {param value: $config['ruleRegexp['+$group+']['+$rule+']'] /}
+        {param descriptionText: 'Regular expression to match commit message. A Jira issue would match "\\b[a-zA-Z]([a-zA-Z]+)-([0-9]+)\\b".' /}
+        {param errorTexts: $errors ? $errors['ruleRegexp['+$group+']['+$rule+']'] : null /}
+    {/call}
+    {call aui.form.textField}
+        {param id: 'ruleMessage['+$group+']['+$rule+']' /}
+        {param value: $config['ruleMessage['+$group+']['+$rule+']'] /}
+        {param descriptionText: 'Message to to committer, explaining the rule.' /}
+        {param errorTexts: $errors ? $errors['ruleMessage['+$group+']['+$rule+']'] : null /}
+    {/call}
+</div>
 {/template}
 

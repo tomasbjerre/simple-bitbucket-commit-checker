@@ -1,22 +1,21 @@
 package se.bjurr.sscc.data;
 
-
 public class SSCCPerson {
 
-	private final String emailAddress;
+ private final String emailAddress;
 
-	private final String name;
+ private final String name;
 
-	public SSCCPerson(String name, String emailAddress) {
-		this.name = name;
-		this.emailAddress = emailAddress;
-	}
+ public SSCCPerson(String name, String emailAddress) {
+  this.name = name;
+  this.emailAddress = emailAddress;
+ }
 
-	public String getEmailAddress() {
-		return emailAddress;
-	}
+ public String getEmailAddress() {
+  return emailAddress;
+ }
 
-	public String getName() {
-		return name;
-	}
+ public String getName() {
+  return name;
+ }
 }

@@ -1,5 +1,5 @@
 # Simple Stash Commit Checker [![Build Status](https://travis-ci.org/tomasbjerre/simple-stash-commit-checker.svg?branch=master)](https://travis-ci.org/tomasbjerre/simple-stash-commit-checker)
-Simple, and easy to use, commit checker for Atlassian Stash. There are many commit checkers out there. This plugin aims at being simple and user friendly. Less is more! The included features should:
+Simple, and easy to use, commit checker for Atlassian Stash. There are many commit checkers out there. This plugin aims at being simple and user friendly. The [admin GUI](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/admin_gui.png) allows the Stash administrator to add custom messages for each rejection reason. And [here](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt) is a sample reject message. The included features should:
 
 * Be easy to configure as an administrator of Stash. Any possible message, delivered to a committer, should be configurable.
 * Be easy to use as a committer. With user friendly error messages that clearly explains what was wrong and how to fix it.

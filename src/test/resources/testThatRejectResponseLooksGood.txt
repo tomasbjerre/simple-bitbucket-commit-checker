@@ -1,4 +1,8 @@
-R
-REJECTING: 1 fixing stuff
-REJECTING: 2 fix
+/refs/master e2bc4ed003 -> af35d5c1a4
+
+1 Tomas <my@email.com>
+* TODO Some custom erro message from settings
+
+2 Tomas <my@email.com>
+* TODO Some custom erro message from settings
 
