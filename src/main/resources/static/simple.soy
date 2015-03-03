@@ -6,6 +6,10 @@
  */
 {template .sscc}
 <div class="sscc">
+    <div class="aui-message aui-message-info">
+        You can use <a target="_blank" href="http://jex.im/regulex/">http://jex.im/regulex/</a> to fiddle with regular expressions.<br>
+        You may want some <a target="_blank" href="http://lmgtfy.com/?q=ascii+art">ASCII art</a> in accept and reject messages.
+    </div>
     {call aui.form.textField}
         {param id: 'branches' /}
         {param labelContent: 'Branches' /}
@@ -21,7 +25,7 @@
             'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
             'isChecked' : $config['excludeMergeCommits']
         ]] /}
-        {param descriptionText: 'Exclude merge commits from commit requirements.' /}
+        {param descriptionText: 'Exclude merge commits from being checked.' /}
     {/call}
     
     {call aui.form.checkboxField}
@@ -31,7 +35,7 @@
             'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
             'isChecked' : $config['excludeTagCommits']
         ]] /}
-        {param descriptionText: 'Exclude merge commits from commit requirements.' /}
+        {param descriptionText: 'Exclude tag commits from being checked.' /}
     {/call}
     
     <div class="fieldGroup">
@@ -42,7 +46,7 @@
                 'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
                 'isChecked' : $config['requireMatchingAuthorEmail']
             ]] /}
-            {param descriptionText: 'Require that the commit author\'s email matches the Stash user\'s email.' /}
+            {param descriptionText: 'Require that the commit authors email matches the Stash users email.' /}
         {/call}
     
         {call aui.form.textareaField}
@@ -50,7 +54,7 @@
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorEmailMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message, if email not matching authors email.' /}
+            {param descriptionText: 'Reject message to show if email not matching authors email. Like: git config --global user.email user@name.com' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
         {/call}
     </div>
@@ -63,7 +67,7 @@
                 'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
                 'isChecked' : $config['requireMatchingAuthorName']
             ]] /}
-            {param descriptionText: 'Require that the commit author\'s name matches the Stash user\'s name.' /}
+            {param descriptionText: 'Require that the commit authors name matches the Stash users name.' /}
         {/call}
     
         {call aui.form.textareaField}
@@ -71,7 +75,7 @@
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorNameMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message, if author not matching authors name.' /}
+            {param descriptionText: 'Reject message to show if author not matching authors name. Like: git config --global user.name "User Name"' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
         {/call}
     </div>
@@ -84,7 +88,7 @@
                 'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
                 'isChecked' : $config['dryRun']
             ]] /}
-            {param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit.' /}
+            {param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit. This can be used when introducing the commit checker, there can be a dry run period of a few days so that committers will have time to learn how to adjust there commits.' /}
         {/call}
     
         {call aui.form.textareaField}
@@ -92,7 +96,7 @@
             {param labelContent: 'Dry run message' /}
             {param value: $config['dryRunMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Message to append to response, if in dry-run and commits are not successfully validating.' /}
+            {param descriptionText: 'Message to append to response, if in dry-run and commits are not successfully validating. This message could, for example, state a date when dry run will be disabled and the committs will actually have to be correct.' /}
             {param errorTexts: $errors ? $errors['dryRunMessage'] : null /}
         {/call}
     </div>
@@ -102,7 +106,7 @@
         {param labelContent: 'Reject message' /}
         {param value: $config['rejectMessage'] /}
         {param rows: 5 /}
-        {param descriptionText: 'Message to be shown to committer when push is rejected.' /}
+        {param descriptionText: 'Message to be shown to committer when push is rejected. Like a link to wiki page explaining how to work with "amend" and "rebase".' /}
         {param errorTexts: $errors ? $errors['rejectMessage'] : null /}
     {/call}
 
@@ -162,29 +166,29 @@
           [ 'id' : 'groupAccept['+$group+']',
             'value': 'ACCEPT',
             'labelText': 'Accepted',
-            'isChecked' : $config['groupAccept['+$group+']'] == 'yes'
+            'isChecked' : $config['groupAccept['+$group+']'] == 'ACCEPT'
             ],
           [ 'id' : 'groupAccept['+$group+']',
             'value': 'SHOW_MESSAGE',
-            'labelText': 'Dont accept or reject. Just show configured message to committers.',
-            'isChecked' : $config['groupAccept['+$group+']'] == 'maby'
+            'labelText': 'Dont accept or reject. Just show configured message when any rule matches.',
+            'isChecked' : $config['groupAccept['+$group+']'] == 'SHOW_MESSAGE'
             ]
         ] /}
-        {param descriptionText: 'Other groups may still reject the commit if this rule accepts it.' /}
+        {param descriptionText: 'Any commit that is not accepted, will be rejected.' /}
     {/call}
 
     {call aui.form.radioField}
         {param legendContent: 'The group matches a commit if' /}
         {param fields: [
           [ 'id' : 'groupMatch['+$group+']',
-            'value': 'one',
+            'value': 'ONE',
             'labelText': '1 rule matches',
-            'isChecked' : $config['groupMatch['+$group+']'] == 'one'
+            'isChecked' : $config['groupMatch['+$group+']'] == 'ONE'
             ],
           [ 'id' : 'groupMatch['+$group+']',
-            'value': 'none',
+            'value': 'NONE',
             'labelText': 'no rules match',
-            'isChecked' : $config['groupMatch['+$group+']'] == 'none'
+            'isChecked' : $config['groupMatch['+$group+']'] == 'NONE'
             ],
           [ 'id' : 'groupMatch['+$group+']',
             'value': 'all',
@@ -198,7 +202,7 @@
         {param labelContent: 'Message' /}
         {param value: $config['groupMessage['+$group+']'] /}
         {param rows: 2 /}
-        {param descriptionText: 'Message to to committer, explaining the group.' /}
+        {param descriptionText: 'Message to to committer, explaining the group. Like "An issue needs to be specified" or "Dont mention \'fixing review comments\', mention what you actually changed instead."' /}
         {param errorTexts: $errors ? $errors['groupMessage['+$group+']'] : null /}
     {/call}
     <div class="left">
@@ -250,9 +254,8 @@
     {call aui.form.textField}
         {param id: 'ruleMessage['+$group+']['+$rule+']' /}
         {param value: $config['ruleMessage['+$group+']['+$rule+']'] /}
-        {param descriptionText: 'Message to to committer, explaining the rule.' /}
+        {param descriptionText: 'Message to to committer, explaining the rule. Like "If this is just refactoring or fixing toggling test case, you can always use AB-1234."' /}
         {param errorTexts: $errors ? $errors['ruleMessage['+$group+']['+$rule+']'] : null /}
     {/call}
 </div>
 {/template}
-
