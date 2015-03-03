@@ -1,9 +1,10 @@
 refs/heads/master e2bc4ed003 -> af35d5c1a4
 
+
 1 Tomas <my@email.com>
 >>> fixing stuff
-You need to specity an issue
-* ((?<!([A-Z]{1,10})-?)[A-Z]+-\d+)
-  JIRA
+
+- You need to specity an issue
+  JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\d+)
 
 In dry run mode!

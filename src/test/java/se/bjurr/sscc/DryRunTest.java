@@ -22,7 +22,7 @@ public class DryRunTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> fixing stuff You need to specity an issue * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
     .wasAccepted();
  }
 
@@ -36,7 +36,7 @@ public class DryRunTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> fixing stuff You need to specity an issue * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA  In dry run mode!")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)  In dry run mode!")
     .wasAccepted();
  }
 

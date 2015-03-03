@@ -34,7 +34,7 @@ public class GroupOneRuleOneMatchingAllAcceptTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> SB-5678 fixing stuff You need to specity JIRA and INC * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA * INC   Incident, INC")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - You need to specity JIRA and INC   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   Incident, INC: INC")
     .wasRejected();
  }
 
@@ -48,7 +48,7 @@ public class GroupOneRuleOneMatchingAllAcceptTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> fixing stuff You need to specity JIRA and INC * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA * INC   Incident, INC  3 Tomas <my@email.com> >>> fixing stuff INC3 You need to specity JIRA and INC * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA * INC   Incident, INC")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity JIRA and INC   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   Incident, INC: INC   3 Tomas <my@email.com> >>> fixing stuff INC3  - You need to specity JIRA and INC   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   Incident, INC: INC")
     .wasRejected();
  }
 }

@@ -34,7 +34,7 @@ public class GroupOneRuleOneMatchingOneAcceptTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> fixing stuff You need to specity an issue * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
     .wasRejected();
  }
 
@@ -48,7 +48,7 @@ public class GroupOneRuleOneMatchingOneAcceptTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> fixing stuff You need to specity an issue * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA  3 Tomas <my@email.com> >>> fixing stuff 3 You need to specity an issue * ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   JIRA")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   3 Tomas <my@email.com> >>> fixing stuff 3  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
     .wasRejected();
  }
 }

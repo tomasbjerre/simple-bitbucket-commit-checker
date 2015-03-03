@@ -30,7 +30,7 @@ public class MatchingEmailTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff * Stash: 'tomas.bjerre@two.site' != Commit: 'tomas.bjerre@one.site' Email in Stash not same as in commit")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff  - Stash: 'tomas.bjerre@two.site' != Commit: 'tomas.bjerre@one.site'   Email in Stash not same as in commit")
     .wasRejected();
  }
 
@@ -50,7 +50,7 @@ public class MatchingEmailTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4  2 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff * Stash: 'tomas.bjerre@two.site' != Commit: 'tomas.bjerre@one.site' Email in Stash not same as in commit")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff  - Stash: 'tomas.bjerre@two.site' != Commit: 'tomas.bjerre@one.site'   Email in Stash not same as in commit")
     .wasRejected();
  }
 

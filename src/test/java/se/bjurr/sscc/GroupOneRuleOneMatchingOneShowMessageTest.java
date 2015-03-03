@@ -34,7 +34,7 @@ public class GroupOneRuleOneMatchingOneShowMessageTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> SB-5678 fixing stuff Thanks for specifying a Jira =)")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Thanks for specifying a Jira =)")
     .wasAccepted();
  }
 
@@ -48,7 +48,7 @@ public class GroupOneRuleOneMatchingOneShowMessageTest {
   .build()
   .run()
   .hasTrimmedFlatOutput(
-    "refs/heads/master e2bc4ed003 -> af35d5c1a4  1 Tomas <my@email.com> >>> SB-5678 fixing stuff Thanks for specifying a Jira =)  3 Tomas <my@email.com> >>> SB-5678 fixing stuff 3 Thanks for specifying a Jira =)")
+    "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Thanks for specifying a Jira =)   3 Tomas <my@email.com> >>> SB-5678 fixing stuff 3  - Thanks for specifying a Jira =)")
     .wasAccepted();
  }
 }
