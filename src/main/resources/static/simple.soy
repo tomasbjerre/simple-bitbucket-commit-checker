@@ -71,29 +71,8 @@
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorNameMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message, if author not matching authors email.' /}
+            {param descriptionText: 'Reject message, if author not matching authors name.' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
-        {/call}
-    </div>
-
-    <div class="fieldGroup">
-        {call aui.form.checkboxField}
-            {param legendContent: 'Allow only one commit per issue' /}
-            {param fields: [[
-                'id' : 'requireOnlyOneMatchingIssue',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-                'isChecked' : $config['requireOnlyOneMatchingIssue']
-            ]] /}
-            {param descriptionText: 'Require that the same issue is not matching for more then 1 commit among the pushed commits.' /}
-        {/call}
-    
-        {call aui.form.textareaField}
-            {param id: 'requireOnlyOneMatchingIssueMessage' /}
-            {param labelContent: 'Reject message' /}
-            {param value: $config['requireOnlyOneMatchingIssueMessage'] /}
-            {param rows: 3 /}
-            {param descriptionText: 'Reject message, if same issue is matching more then 1 commit.' /}
-            {param errorTexts: $errors ? $errors['requireOnlyOneMatchingIssueMessage'] : null /}
         {/call}
     </div>
 

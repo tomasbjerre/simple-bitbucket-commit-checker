@@ -103,8 +103,8 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.6.2.201501210735-r</version>
-            <scope>compile</scope>
+            <!-- Getting ClassNotFoundExceptions on atlas-run with newer versions //-->
+            <version>3.0.0.201306101825-r</version>
         </dependency>
     </dependencies>
     <build>
