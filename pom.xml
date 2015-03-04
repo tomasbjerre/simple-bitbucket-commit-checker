@@ -6,18 +6,40 @@
     <artifactId>sscc</artifactId>
     <version>1.0-SNAPSHOT</version>
     <organization>
-        <name>Example Company</name>
-        <url>http://www.example.com/</url>
+        <name>Tomas Bjerre</name>
+        <url>http://bjurr.se/</url>
     </organization>
     <name>sscc</name>
     <description>This is the Simple Stash Commit Checker plugin for Atlassian Stash. See https://github.com/tomasbjerre/simple-stash-commit-checker for documentation and source code.</description>
     <packaging>atlassian-plugin</packaging>
     <scm>
-        <developerConnection>scm:git:https://github.com/tomasbjerre/simple-stash-commit-checker.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:tomasbjerre/simple-stash-commit-checker.git</developerConnection>
         <url>https://github.com/tomasbjerre/simple-stash-commit-checker</url>
         <tag>HEAD</tag>
     </scm>
-        <dependencyManagement>
+    <distributionManagement>
+        <repository>
+            <id>local-repo</id>
+            <name>LocalDir</name>
+            <url>file://${project.basedir}/dist-maven</url>
+        </repository>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>atlassian-public</id>
+            <url>https://maven.atlassian.com/repository/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.atlassian.stash</groupId>
@@ -131,6 +153,16 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
             </plugin>
         </plugins>
     </build>
