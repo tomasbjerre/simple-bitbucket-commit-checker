@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class EdgeCaseTest {
+public class ExceptionTest {
 
  @Test
  public void testThatRefChangesAreAcceptedIfAnUnexpectedExceptionIsThrown() throws IOException {

@@ -8,6 +8,7 @@ import static com.google.common.io.Resources.getResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
@@ -90,6 +91,11 @@ public class RefChangeBuilder {
 
  public String getOutputAll() {
   return outputAll.toString();
+ }
+
+ public RefChangeBuilder hasNoOutput() {
+  assertTrue("Expected output to be empty, but was\"" + getOutputAll() + "\"", getOutputAll().isEmpty());
+  return this;
  }
 
  public RefChangeBuilder hasOutput(String output) {
@@ -178,30 +184,25 @@ public class RefChangeBuilder {
   return this;
  }
 
- public RefChangeBuilder withAllAcceptGroup() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA and INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+ public RefChangeBuilder withChangeSet(SSCCChangeSet changeSet) {
+  newChangesets.add(changeSet);
+  return this;
  }
 
- public RefChangeBuilder withAllAcceptInTwoGroups() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_GROUP_ACCEPT + "[1]", SSCCGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[1]", SSCCGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[1]", "You need to specity INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
+ public RefChangeBuilder withFromHash(String fromHash) {
+  this.fromHash = fromHash;
+  return this;
  }
 
- public RefChangeBuilder withAllAcceptJIRANoneAcceptINC() {
+ public RefChangeBuilder withGroupAcceptingAtLeastOneJira() {
+  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
+    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
+    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity an issue") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
+ }
+
+ public RefChangeBuilder withGroupAcceptingJirasAndAnotherRejectingInc() {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
@@ -214,27 +215,30 @@ public class RefChangeBuilder {
     .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
  }
 
- public RefChangeBuilder withAllShowMessageGroup() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
+ public RefChangeBuilder withGroupAcceptingOnlyBothJiraAndIncInEachCommit() {
+  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira and INC =)") //
+    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA and INC") //
     .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
  }
 
- public RefChangeBuilder withChangeSet(SSCCChangeSet changeSet) {
-  newChangesets.add(changeSet);
-  return this;
+ public RefChangeBuilder withGroupAcceptingOnlyJiraAndAnotherGroupAcceptingOnlyInc() {
+  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
+    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
+    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+    .withSetting(SETTING_GROUP_ACCEPT + "[1]", SSCCGroup.Accept.ACCEPT.toString()) //
+    .withSetting(SETTING_GROUP_MATCH + "[1]", SSCCGroup.Match.ALL.toString()) //
+    .withSetting(SETTING_GROUP_MESSAGE + "[1]", "You need to specity INC") //
+    .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
+    .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
  }
 
- public RefChangeBuilder withFromHash(String fromHash) {
-  this.fromHash = fromHash;
-  return this;
- }
-
- public RefChangeBuilder withNoneAcceptGroup() {
+ public RefChangeBuilder withGroupRejectingAnyCommitContainingJiraOrInc() {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.NONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Do not specify issues") //
@@ -244,7 +248,15 @@ public class RefChangeBuilder {
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
  }
 
- public RefChangeBuilder withNoneShowMessageGroup() {
+ public RefChangeBuilder withGroupShowingMessageForAnyCommitContainingAtLeastOneJira() {
+  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
+    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
+    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira =)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
+ }
+
+ public RefChangeBuilder withGroupShowingMessageToAllCommitsNotContainingJiraOrInc() {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.NONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
@@ -254,20 +266,14 @@ public class RefChangeBuilder {
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
  }
 
- public RefChangeBuilder withOneAcceptGroup() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity an issue") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
- }
-
- public RefChangeBuilder withOneShowMessageGroup() {
+ public RefChangeBuilder withGroupShowingMessageToEveryCommitContainingJiraOrInc() {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira =)") //
+    .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
+    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira and INC =)") //
     .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
+    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
+    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
  }
 
  public RefChangeBuilder withRefChange(RefChange refChange) {

@@ -94,7 +94,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    changesets.add(changeset);
   } else {
    final ChangesetsBetweenRequest request = new ChangesetsBetweenRequest.Builder(repository)
-   .exclude(getBranches(repository)).include(refChange.getToHash()).build();
+     .exclude(getBranches(repository)).include(refChange.getToHash()).build();
 
    final Iterable<Changeset> changes = new PagedIterable<Changeset>(new PageProvider<Changeset>() {
     @Override

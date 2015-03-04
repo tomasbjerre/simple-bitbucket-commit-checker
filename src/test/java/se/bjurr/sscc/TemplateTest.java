@@ -48,7 +48,7 @@ public class TemplateTest {
   refChangeBuilder()
   .withStashEmail("the@correct.email")
   .withStashName("Tommy Boy")
-    .withOneAcceptGroup()
+    .withGroupAcceptingAtLeastOneJira()
     .withSetting(SETTING_BRANCHES, "master")
     .withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString())
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString())

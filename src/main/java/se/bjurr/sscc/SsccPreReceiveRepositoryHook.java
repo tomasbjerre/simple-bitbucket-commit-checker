@@ -52,6 +52,22 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   this.stashAuthenticationContext = stashAuthenticationContext;
  }
 
+ private String getStashEmail() {
+  if (stashAuthenticationContext == null || stashAuthenticationContext.getCurrentUser() == null
+    || stashAuthenticationContext.getCurrentUser().getEmailAddress() == null) {
+   return "Unset";
+  }
+  return stashAuthenticationContext.getCurrentUser().getEmailAddress();
+ }
+
+ private String getStashName() {
+  if (stashAuthenticationContext == null || stashAuthenticationContext.getCurrentUser() == null
+    || stashAuthenticationContext.getCurrentUser().getName() == null) {
+   return "Unset";
+  }
+  return stashAuthenticationContext.getCurrentUser().getName();
+ }
+
  @Override
  public boolean onReceive(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    HookResponse hookResponse) {
@@ -80,6 +96,20 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   }
  }
 
+ private void printAcceptMessages(HookResponse hookResponse, final SSCCGroup ssccVerificationResult) {
+  if (ssccVerificationResult.getAccept().equals(ACCEPT)) {
+   hookResponse.out().println();
+   if (ssccVerificationResult.getMessage().isPresent()) {
+    hookResponse.out().println("- " + ssccVerificationResult.getMessage().get());
+   }
+   for (final SSCCRule ssccRule : ssccVerificationResult.getRules()) {
+    if (ssccRule.getMessage().isPresent()) {
+     hookResponse.out().println("  " + ssccRule.getMessage().get() + ": " + ssccRule.getRegexp());
+    }
+   }
+  }
+ }
+
  private void printCommit(HookResponse hookResponse, final SSCCChangeSet ssccChangeSet) {
   hookResponse.out().println();
   hookResponse.out().println();
@@ -94,7 +124,7 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailResult()) {
    hookResponse.out().println();
    hookResponse.out().println(
-     "- Stash: '" + stashEmail() + "' != Commit: '" + ssccChangeSet.getCommitter().getEmailAddress() + "'");
+     "- Stash: '" + getStashEmail() + "' != Commit: '" + ssccChangeSet.getCommitter().getEmailAddress() + "'");
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
     hookResponse.out().println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
    }
@@ -106,8 +136,7 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameResult()) {
    hookResponse.out().println();
    hookResponse.out().println(
-     "- Stash: '" + this.stashAuthenticationContext.getCurrentUser().getName() + "' != Commit: '"
-       + ssccChangeSet.getCommitter().getName() + "'");
+     "- Stash: '" + getStashName() + "' != Commit: '" + ssccChangeSet.getCommitter().getName() + "'");
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
     hookResponse.out().println("  " + settings.getRequireMatchingAuthorNameMessage().get());
    }
@@ -118,6 +147,15 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   hookResponse.out().println(
     refChange.getRefId() + " " + refChange.getFromHash().substring(0, 10) + " -> "
       + refChange.getToHash().substring(0, 10));
+ }
+
+ private void printRuleMessage(HookResponse hookResponse, final SSCCGroup ssccVerificationResult) {
+  if (ssccVerificationResult.getAccept().equals(SHOW_MESSAGE)) {
+   if (ssccVerificationResult.getMessage().isPresent()) {
+    hookResponse.out().println();
+    hookResponse.out().println("- " + ssccVerificationResult.getMessage().get());
+   }
+  }
  }
 
  private void printVerificationResults(Collection<RefChange> refChanges, SSCCVerificationResult verificationResult,
@@ -147,12 +185,15 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
     printEmailVerification(hookResponse, settings, refChangeVerificationResult, ssccChangeSet);
     printNameVerification(hookResponse, settings, refChangeVerificationResult, ssccChangeSet);
     for (final SSCCGroup ssccVerificationResult : changeSetVerificationResult.getGroupsResult().keySet()) {
-     showAcceptMessages(hookResponse, ssccVerificationResult);
-     showRuleMessage(hookResponse, ssccVerificationResult);
+     printAcceptMessages(hookResponse, ssccVerificationResult);
+     printRuleMessage(hookResponse, ssccVerificationResult);
     }
    }
   }
-  hookResponse.out().println();
+
+  if (settings.getAcceptMessage().isPresent() || !verificationResult.isAccepted()) {
+   hookResponse.out().println();
+  }
  }
 
  @VisibleForTesting
@@ -160,42 +201,11 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   this.changesetsService = changesetsService;
  }
 
- private void showAcceptMessages(HookResponse hookResponse, final SSCCGroup ssccVerificationResult) {
-  if (ssccVerificationResult.getAccept().equals(ACCEPT)) {
-   hookResponse.out().println();
-   if (ssccVerificationResult.getMessage().isPresent()) {
-    hookResponse.out().println("- " + ssccVerificationResult.getMessage().get());
-   }
-   for (final SSCCRule ssccRule : ssccVerificationResult.getRules()) {
-    if (ssccRule.getMessage().isPresent()) {
-     hookResponse.out().println("  " + ssccRule.getMessage().get() + ": " + ssccRule.getRegexp());
-    }
-   }
-  }
- }
-
- private void showRuleMessage(HookResponse hookResponse, final SSCCGroup ssccVerificationResult) {
-  if (ssccVerificationResult.getAccept().equals(SHOW_MESSAGE)) {
-   if (ssccVerificationResult.getMessage().isPresent()) {
-    hookResponse.out().println();
-    hookResponse.out().println("- " + ssccVerificationResult.getMessage().get());
-   }
-  }
- }
-
- private String stashEmail() {
-  if (stashAuthenticationContext == null || stashAuthenticationContext.getCurrentUser() == null
-    || stashAuthenticationContext.getCurrentUser().getEmailAddress() == null) {
-   return "Unset";
-  }
-  return stashAuthenticationContext.getCurrentUser().getEmailAddress();
- }
-
  private boolean validateChangeSetForEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
   if (!settings.shouldRequireMatchingAuthorEmail()) {
    return TRUE;
   }
-  if (stashEmail().equals(ssccChangeSet.getCommitter().getEmailAddress())) {
+  if (getStashEmail().equals(ssccChangeSet.getCommitter().getEmailAddress())) {
    return TRUE;
   }
   return FALSE;
@@ -241,7 +251,7 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   if (!settings.shouldRequireMatchingAuthorName()) {
    return TRUE;
   }
-  if (stashAuthenticationContext.getCurrentUser().getName().equals(ssccChangeSet.getCommitter().getName())) {
+  if (getStashName().equals(ssccChangeSet.getCommitter().getName())) {
    return TRUE;
   }
   return FALSE;

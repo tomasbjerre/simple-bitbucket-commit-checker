@@ -14,7 +14,7 @@ public class GroupOneRuleOneMatchingNoneShowMessageTest {
  @Test
  public void testThatItCanAcceptACommit() throws IOException {
   refChangeBuilder()
-    .withNoneShowMessageGroup()
+    .withGroupShowingMessageToAllCommitsNotContainingJiraOrInc()
     .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
     .build()
     .run()
@@ -26,7 +26,7 @@ public class GroupOneRuleOneMatchingNoneShowMessageTest {
  @Test
  public void testThatItCanAcceptMultipleCommits() throws IOException {
   refChangeBuilder()
-    .withNoneShowMessageGroup()
+    .withGroupShowingMessageToAllCommitsNotContainingJiraOrInc()
     .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
     .withChangeSet(changeSetBuilder().withId("2").withMessage(COMMIT_MESSAGE_NO_ISSUE + " 2").build())
     .build()
@@ -38,7 +38,7 @@ public class GroupOneRuleOneMatchingNoneShowMessageTest {
 
  @Test
  public void testThatItCanRejectACommit() throws IOException {
-  refChangeBuilder().withNoneShowMessageGroup()
+  refChangeBuilder().withGroupShowingMessageToAllCommitsNotContainingJiraOrInc()
     .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_JIRA).build()).build().run()
     .hasTrimmedFlatOutput("").wasAccepted();
  }
@@ -46,7 +46,7 @@ public class GroupOneRuleOneMatchingNoneShowMessageTest {
  @Test
  public void testThatItCanRejectSomeOfMultipleCommits() throws IOException {
   refChangeBuilder()
-    .withNoneShowMessageGroup()
+    .withGroupShowingMessageToAllCommitsNotContainingJiraOrInc()
     .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(changeSetBuilder().withId("2").withMessage(COMMIT_MESSAGE_NO_ISSUE + " 2").build())
     .withChangeSet(changeSetBuilder().withId("3").withMessage(COMMIT_MESSAGE_JIRA + " 3").build())

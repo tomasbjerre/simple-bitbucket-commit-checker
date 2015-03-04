@@ -11,21 +11,9 @@ import org.junit.Test;
 
 public class BranchesTest {
  @Test
- public void testThatBranchMatchingBranchSettingIsNotIgnored() throws IOException {
+ public void testThatEmptyIsNotIgnoringRefsMaster() throws IOException {
   refChangeBuilder() //
-    .withOneAcceptGroup() //
-    .withChangeSet(changeSetBuilder() //
-      .withId("1") //
-      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
-      .build()) //
-    .withSetting(SETTING_BRANCHES, ".*master.*") //
-    .withRefId("/refs/master").build().run().wasRejected();
- }
-
- @Test
- public void testThatEmptyBranchSettingIsNotIgnoringAnyBranches() throws IOException {
-  refChangeBuilder() //
-    .withOneAcceptGroup() //
+    .withGroupAcceptingAtLeastOneJira() //
     .withChangeSet(changeSetBuilder() //
       .withId("1") //
       .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
@@ -35,14 +23,50 @@ public class BranchesTest {
  }
 
  @Test
- public void testThatNoneBranchMatchingBranchSettingIsIgnored() throws IOException {
+ public void testThatRegexpAnyMasterAnyIsIgnoredForRefsFeature() throws IOException {
   refChangeBuilder() //
-    .withOneAcceptGroup() //
+    .withGroupAcceptingAtLeastOneJira() //
     .withChangeSet(changeSetBuilder() //
       .withId("1") //
       .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
       .build()) //
     .withSetting(SETTING_BRANCHES, ".*master.*") //
-    .withRefId("/refs/feature_x").build().run().wasAccepted();
+    .withRefId("/refs/feature").build().run().wasAccepted();
+ }
+
+ @Test
+ public void testThatRegexpAnyMasterAnyIsNotIgnoredForRefsMaster() throws IOException {
+  refChangeBuilder() //
+    .withGroupAcceptingAtLeastOneJira() //
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCHES, ".*master.*") //
+    .withRefId("/refs/master").build().run().wasRejected();
+ }
+
+ @Test
+ public void testThatRegexpAnythingButRelAnyIsIgnoredForRefsRel() throws IOException {
+  refChangeBuilder() //
+    .withGroupAcceptingAtLeastOneJira() //
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCHES, "^/refs/((?!rel).).*") //
+    .withRefId("/refs/rel_20150101").build().run().wasAccepted();
+ }
+
+ @Test
+ public void testThatRegexpAnythingButRelAnyIsNotIgnoredForRefsDev() throws IOException {
+  refChangeBuilder() //
+    .withGroupAcceptingAtLeastOneJira() //
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCHES, "^/refs/((?!rel).).*") //
+    .withRefId("/refs/dev_20150101").build().run().wasRejected();
  }
 }

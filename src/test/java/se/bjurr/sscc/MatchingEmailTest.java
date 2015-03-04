@@ -18,14 +18,14 @@ public class MatchingEmailTest {
  public void testCommitEmailMustMatchEmailInStashAndOnlyOneOfTwoCommitsIsOk() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-    changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
-    .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
+        .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-      .withMessage(COMMIT_MESSAGE_JIRA).build())
-      .withStashEmail("tomas.bjerre@two.site")
-      .withStashName("Tompa B")
-      .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+        .withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withStashEmail("tomas.bjerre@two.site")
+    .withStashName("Tompa B")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit")
     .build()
     .run()
@@ -37,15 +37,15 @@ public class MatchingEmailTest {
  @Test
  public void testCommitEmailMustMatchEmailInStashAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
   refChangeBuilder()
-  .withChangeSet(
-    changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-    .withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
+        .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
-      .withMessage(COMMIT_MESSAGE_JIRA).build())
-      .withStashEmail("tomas.bjerre@two.site")
-      .withStashName("Tompa B")
-      .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+        .withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withStashEmail("tomas.bjerre@two.site")
+    .withStashName("Tompa B")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit")
     .build()
     .run()
@@ -59,13 +59,13 @@ public class MatchingEmailTest {
    throws IOException {
   refChangeBuilder()
     .withChangeSet(
-    changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@two.site"))
-    .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@two.site"))
+        .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-      .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site").withStashName("Tompa B")
-      .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site").withStashName("Tompa B")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit").build().run()
-    .hasTrimmedFlatOutput("").wasAccepted();
+    .hasNoOutput().wasAccepted();
  }
 }

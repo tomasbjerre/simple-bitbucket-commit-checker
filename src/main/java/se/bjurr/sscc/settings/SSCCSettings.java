@@ -32,27 +32,23 @@ public class SSCCSettings {
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE = "requireMatchingAuthorEmailMessage";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME = "requireMatchingAuthorName";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE = "requireMatchingAuthorNameMessage";
- public static final String SETTING_REQUIRE_ONLY_ONE_MATCHING_ISSUE = "requireOnlyOneMatchingIssue";
- public static final String SETTING_REQUIRE_ONLY_ONE_MATCHING_ISSUE_MESSAGE = "requireOnlyOneMatchingIssueMessage";
  public static final String SETTING_RULE_MESSAGE = "ruleMessage";
  public static final String SETTING_RULE_REGEXP = "ruleRegexp";
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
   ssccSettings //
-  .withAcceptMessage(settings.getString(SETTING_ACCEPT_MESSAGE)) //
-  .withBranches(validate(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES))) //
-  .withDryRun(settings.getBoolean(SETTING_DRY_RUN)) //
-  .withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE)) //
-  .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS)) //
-  .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS)) //
-  .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE)) //
-  .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL)) //
-  .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE)) //
-  .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME)) //
-  .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE)) //
-  .withRequireOnlyOneIssue(settings.getBoolean(SETTING_REQUIRE_ONLY_ONE_MATCHING_ISSUE)) //
-  .withRequireOnlyOneIssueMessage(settings.getString(SETTING_REQUIRE_ONLY_ONE_MATCHING_ISSUE_MESSAGE));
+    .withAcceptMessage(settings.getString(SETTING_ACCEPT_MESSAGE)) //
+    .withBranches(validate(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES))) //
+    .withDryRun(settings.getBoolean(SETTING_DRY_RUN)) //
+    .withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE)) //
+    .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS)) //
+    .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS)) //
+    .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE)) //
+    .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL)) //
+    .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE)) //
+    .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME)) //
+    .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE));
   for (int g = 0; g < 1000; g++) {
    final Optional<String> accept = fromNullable(settings.getString(SETTING_GROUP_ACCEPT + "[" + g + "]"));
    final Optional<String> match = fromNullable(settings.getString(SETTING_GROUP_MATCH + "[" + g + "]"));
@@ -82,10 +78,10 @@ public class SSCCSettings {
 
     ssccSettings.withGroup( //
       ssccGroup() //
-      .withAccept(accept.get()) //
-      .withMatch(match.get()) //
-      .withMessage(message) //
-      .withRules(rules));
+        .withAccept(accept.get()) //
+        .withMatch(match.get()) //
+        .withMessage(message) //
+        .withRules(rules));
    }
   }
   return ssccSettings;
@@ -240,16 +236,6 @@ public class SSCCSettings {
 
  private SSCCSettings withRequireMatchingAuthorNameMessage(String requireMatchingAuthorNameMessage) {
   this.requireMatchingAuthorNameMessage = emptyToNull(requireMatchingAuthorNameMessage);
-  return this;
- }
-
- private SSCCSettings withRequireOnlyOneIssue(Boolean requireOnlyOneIssue) {
-  this.requireOnlyOneIssue = firstNonNull(requireOnlyOneIssue, FALSE);
-  return this;
- }
-
- private SSCCSettings withRequireOnlyOneIssueMessage(String requireOnlyOneIssueMessage) {
-  this.requireOnlyOneIssueMessage = emptyToNull(requireOnlyOneIssueMessage);
   return this;
  }
 }
