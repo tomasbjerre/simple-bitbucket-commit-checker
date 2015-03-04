@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>se.bjurr.sscc</groupId>
     <artifactId>sscc</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <organization>
         <name>Tomas Bjerre</name>
         <url>http://bjurr.se/</url>
@@ -15,7 +15,7 @@
     <scm>
         <developerConnection>scm:git:git@github.com:tomasbjerre/simple-stash-commit-checker.git</developerConnection>
         <url>https://github.com/tomasbjerre/simple-stash-commit-checker</url>
-        <tag>HEAD</tag>
+        <tag>sscc-1.0</tag>
     </scm>
     <distributionManagement>
         <repository>
