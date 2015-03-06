@@ -1,6 +1,5 @@
 package se.bjurr.sscc;
 
-import static se.bjurr.sscc.SsccPreReceiveRepositoryHook.getHookNameVersion;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
@@ -10,9 +9,9 @@ import org.junit.Test;
 
 public class NameVersionTest {
  @Test
- public void testThatNameAndVersionCanBeReadFromProperties() throws IOException {
-  refChangeBuilder().withHookNameVersion(getHookNameVersion())
+ public void testThatNameAndVersionIsPrinted() throws IOException {
+  refChangeBuilder().withHookNameVersion("Simple Stash Commit Checker")
     .withChangeSet(changeSetBuilder().withId("1").withMessage("SB-5678 fixing stuff").build()).build().run()
-    .getOutputAll().startsWith("Simple Stash Commit Checker 1");
+    .getOutputAll().startsWith("Simple Stash Commit Checker");
  }
 }

@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,19 +36,9 @@ import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Resources;
 
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  private static final Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
-
- private static final String SSCC_PROPERTIES = "sscc.properties";
-
- public static String getHookNameVersion() throws IOException {
-  Properties properties = new Properties();
-  properties.load(Resources.getResource(SSCC_PROPERTIES).openStream());
-  return properties.getProperty("pre-receive-repository-hook.name") + " "
-    + properties.getProperty("se.bjurr.sscc.version");
- }
 
  private ChangeSetsService changesetsService;
 
@@ -59,13 +48,14 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
 
  public SsccPreReceiveRepositoryHook(ChangeSetsService changesetsService,
    StashAuthenticationContext stashAuthenticationContext) {
-  try {
-   this.hookNameVersion = getHookNameVersion();
-  } catch (IOException e) {
-   logger.error("Could not load " + SSCC_PROPERTIES, e);
-  }
+  this.hookNameVersion = "Simple Stash Commit Checker 1.1";
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
+ }
+
+ @VisibleForTesting
+ public String getHookNameVersion() {
+  return hookNameVersion;
  }
 
  private String getStashEmail() {
