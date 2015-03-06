@@ -3,7 +3,23 @@ Simple, and easy to use, commit checker for Atlassian Stash. There are many comm
 
 The [ChangeSetsServiceImpl](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/main/java/se/bjurr/sscc/ChangeSetsServiceImpl.java) is more or less taken from [YACC](https://github.com/sford/yet-another-commit-checker). Which is a great commit checker that you may consider for more advanced features.
 
-# Design goals
+Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
+
+## Features
+* It can check that email in Stash is same as in commit.
+* It can check that name in Stash is same as in commit.
+* Simple configuration of rules that must apply to commit messages. Organized in groups.
+ * A group can be used for matching, for example, issues. It can state that "at least one", "all of" or "none" of the issues can be mentioned in the commit messages.
+ * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
+ * If a group matches a commit, it can reject it or just show a message to the comitter.
+* Check only branches matching a regular expression.
+* Dry run mode, where all commits are accepted. But verification results are shown.
+* Exclude merge commits.
+* Exclude tag commits.
+* Show a general reject message.
+* Show a general accept message.
+
+## Design goals
 The included features should:
 
 * Be easy to configure as an administrator of Stash. Any rejection reason delivered to the committer should be configurable.
@@ -12,7 +28,7 @@ The included features should:
 
 If too much effort is put into restricting commit messages, chances are the checker will grow too complex. It will be hard to maintain and users wont trust its features. For example this checker will never check any referred issues in other systems to make sure their status is correct. Such an integration is just waste of time, committers will find a way around it anyway. Instead the goal here is to inform the committer about any faulty commits and how to correct them.
 
-# Developer instructions
+## Developer instructions
 You will need Atlas SDK to compile the code.
 
 https://developer.atlassian.com/docs/getting-started/set-up-the-atlassian-plugin-sdk-and-build-a-project
