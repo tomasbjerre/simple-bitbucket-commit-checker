@@ -42,9 +42,11 @@ import com.google.common.io.Resources;
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  private static final Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
 
+ private static final String SSCC_PROPERTIES = "sscc.properties";
+
  public static String getHookNameVersion() throws IOException {
   Properties properties = new Properties();
-  properties.load(Resources.getResource("sscc.properties").openStream());
+  properties.load(Resources.getResource(SSCC_PROPERTIES).openStream());
   return properties.getProperty("pre-receive-repository-hook.name") + " "
     + properties.getProperty("se.bjurr.sscc.version");
  }
@@ -60,7 +62,7 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   try {
    this.hookNameVersion = getHookNameVersion();
   } catch (IOException e) {
-   logger.error("Could not load ", e);
+   logger.error("Could not load " + SSCC_PROPERTIES, e);
   }
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
@@ -285,10 +287,9 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
    SSCCSettings settings, HookResponse hookResponse) throws IOException {
   final SSCCRefChangeVerificationResult refChangeVerificationResult = new SSCCRefChangeVerificationResult(refChange);
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
-   logger.info("ssccChangeSet " + ssccChangeSet.getId() + " " + ssccChangeSet.getMessage() + " "
-     + ssccChangeSet.getParentCount());
-   logger.info("ssccChangeSet committer " + ssccChangeSet.getCommitter().getEmailAddress() + " "
-     + ssccChangeSet.getCommitter().getName());
+   logger.info(getStashName() + " " + getStashEmail() + "> ChangeSet " + ssccChangeSet.getId() + " "
+     + ssccChangeSet.getMessage() + " " + ssccChangeSet.getParentCount() + " "
+     + ssccChangeSet.getCommitter().getEmailAddress() + " " + ssccChangeSet.getCommitter().getName());
    refChangeVerificationResult.setGroupsResult(ssccChangeSet, validateChangeSetForGroups(settings, ssccChangeSet));
    refChangeVerificationResult.addEmailValidationResult(ssccChangeSet,
      validateChangeSetForEmail(settings, ssccChangeSet));
@@ -302,8 +303,8 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
    Collection<RefChange> refChanges, SSCCSettings settings, HookResponse hookResponse) throws IOException {
   final SSCCVerificationResult refChangeVerificationResult = new SSCCVerificationResult();
   for (final RefChange refChange : refChanges) {
-   logger.info("refChange " + refChange.getFromHash() + " " + refChange.getRefId() + " " + refChange.getToHash() + " "
-     + refChange.getType());
+   logger.info(getStashName() + " " + getStashEmail() + "> RefChange " + refChange.getFromHash() + " "
+     + refChange.getRefId() + " " + refChange.getToHash() + " " + refChange.getType());
    if (compile(settings.getBranches().or(".*")).matcher(refChange.getRefId()).find()) {
     if (refChange.getType() != DELETE) {
      List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings,

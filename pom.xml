@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <!-- Getting ClassNotFoundExceptions on atlas-run with newer versions //-->
+            <!-- Sometimes getting ClassNotFoundExceptions on atlas-run //-->
             <version>3.0.0.201306101825-r</version>
         </dependency>
          <dependency>
