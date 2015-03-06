@@ -159,6 +159,12 @@
                 <version>2.17</version>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources> 
     </build>
     <properties>
         <stash.version>3.7.0</stash.version>

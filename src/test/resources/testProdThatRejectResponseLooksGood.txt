@@ -1,3 +1,5 @@
+Simple Stash Commit Checker X.X
+
                              __ 
                    _ ,___,-'",-=-. 
        __,-- _ _,-'_)_  (""`'-._\ `. 

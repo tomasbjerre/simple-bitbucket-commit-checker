@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,18 +37,31 @@ import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.io.Resources;
 
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
- private static final String HOOK_NAME = "Simple Stash Commit Checker";
-
  private static final Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
 
+ public static String getHookNameVersion() throws IOException {
+  Properties properties = new Properties();
+  properties.load(Resources.getResource("sscc.properties").openStream());
+  return properties.getProperty("pre-receive-repository-hook.name") + " "
+    + properties.getProperty("se.bjurr.sscc.version");
+ }
+
  private ChangeSetsService changesetsService;
+
+ private String hookNameVersion;
 
  private final StashAuthenticationContext stashAuthenticationContext;
 
  public SsccPreReceiveRepositoryHook(ChangeSetsService changesetsService,
    StashAuthenticationContext stashAuthenticationContext) {
+  try {
+   this.hookNameVersion = getHookNameVersion();
+  } catch (IOException e) {
+   logger.error("Could not load ", e);
+  }
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
  }
@@ -72,6 +86,11 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  public boolean onReceive(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    HookResponse hookResponse) {
   try {
+   if (!hookNameVersion.isEmpty()) {
+    hookResponse.out().println(hookNameVersion);
+    hookResponse.out().println();
+   }
+
    final SSCCSettings settings = sscSettings(repositoryHookContext.getSettings());
    final SSCCVerificationResult refChangeVerificationResults = validateRefChanges(repositoryHookContext, refChanges,
      settings, hookResponse);
@@ -88,8 +107,8 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
 
    return TRUE;
   } catch (final Exception e) {
-   final String message = HOOK_NAME + "> Error while validating reference changes. Will allow all of them. \""
-     + e.getMessage() + "\"";
+   final String message = "Error while validating reference changes. Will allow all of them. \"" + e.getMessage()
+     + "\"";
    logger.error(message, e);
    hookResponse.out().println(message);
    return TRUE;
@@ -199,6 +218,11 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  @VisibleForTesting
  public void setChangesetsService(ChangeSetsService changesetsService) {
   this.changesetsService = changesetsService;
+ }
+
+ @VisibleForTesting
+ public void setHookNameVersion(String hookNameVersion) {
+  this.hookNameVersion = hookNameVersion;
  }
 
  private boolean validateChangeSetForEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {

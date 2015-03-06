@@ -74,6 +74,7 @@ public class RefChangeBuilder {
   this.changeSetService = mock(ChangeSetsService.class);
   this.stashAuthenticationContext = mock(StashAuthenticationContext.class);
   this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext);
+  this.hook.setHookNameVersion("");
   hookResponse = mock(HookResponse.class);
   when(hookResponse.out()).thenReturn(printWriterStandard);
   when(hookResponse.err()).thenReturn(printWriterReject);
@@ -274,6 +275,11 @@ public class RefChangeBuilder {
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+ }
+
+ public RefChangeBuilder withHookNameVersion(String hookNameVersion) {
+  hook.setHookNameVersion(hookNameVersion);
+  return this;
  }
 
  public RefChangeBuilder withRefChange(RefChange refChange) {
