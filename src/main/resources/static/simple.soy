@@ -8,8 +8,14 @@
 <div class="sscc">
     <div class="aui-message aui-message-info">
         You can use <a target="_blank" href="http://jex.im/regulex/">http://jex.im/regulex/</a> to fiddle with regular expressions.<br>
-        You may want some <a target="_blank" href="http://lmgtfy.com/?q=ascii+art">ASCII art</a> in accept and reject messages.
+        You may want some <a target="_blank" href="http://lmgtfy.com/?q=ascii+art">ASCII art</a> in accept and reject messages.<br>
+        You can use variables in messages.<bt>
+        <ul>
+            <li><b>&#36;&#123;STASH_EMAIL&#125;</b> Email of user in Stash.</li>
+            <li><b>&#36;&#123;STASH_NAME&#125;</b> Name of user in Stash.</li>
+        </ul>
     </div>
+
     {call aui.form.textField}
         {param id: 'branches' /}
         {param labelContent: 'Branches' /}
