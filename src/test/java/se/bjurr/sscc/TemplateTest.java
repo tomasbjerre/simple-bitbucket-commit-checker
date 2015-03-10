@@ -48,7 +48,7 @@ public class TemplateTest {
   refChangeBuilder()
     .withHookNameVersion("Simple Stash Commit Checker X.X")
     .withStashEmail("the@correct.email")
-    .withStashName("Tommy Boy")
+    .withStashDisplayName("Tommy Boy")
     .withGroupAcceptingAtLeastOneJira()
     .withSetting(SETTING_BRANCHES, "master")
     .withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString())

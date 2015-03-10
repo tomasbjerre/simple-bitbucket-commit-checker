@@ -14,10 +14,10 @@ public class SSCCCommon {
 
  public static String getStashName(StashAuthenticationContext stashAuthenticationContext) {
   if (stashAuthenticationContext == null || stashAuthenticationContext.getCurrentUser() == null
-    || stashAuthenticationContext.getCurrentUser().getName() == null) {
+    || stashAuthenticationContext.getCurrentUser().getDisplayName() == null) {
    return "Unset";
   }
-  return stashAuthenticationContext.getCurrentUser().getName();
+  return stashAuthenticationContext.getCurrentUser().getDisplayName();
  }
 
 }

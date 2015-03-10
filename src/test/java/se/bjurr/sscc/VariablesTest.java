@@ -24,7 +24,7 @@ public class VariablesTest {
       changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Commit Name", "commit@mail"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withStashEmail("stash@mail")
-    .withStashName("Stash Name")
+    .withStashDisplayName("Stash Name")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(
       SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE,
@@ -44,7 +44,7 @@ public class VariablesTest {
       changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Commit Name", "commit@mail"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withStashEmail("stash@mail")
-    .withStashName("Stash Name")
+    .withStashDisplayName("Stash Name")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
     .withSetting(
       SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE,

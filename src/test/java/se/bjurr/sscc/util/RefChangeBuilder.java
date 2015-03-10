@@ -302,13 +302,13 @@ public class RefChangeBuilder {
   return this;
  }
 
- public RefChangeBuilder withStashEmail(String email) {
-  when(stashUser.getEmailAddress()).thenReturn(email);
+ public RefChangeBuilder withStashDisplayName(String name) {
+  when(stashUser.getDisplayName()).thenReturn(name);
   return this;
  }
 
- public RefChangeBuilder withStashName(String name) {
-  when(stashUser.getName()).thenReturn(name);
+ public RefChangeBuilder withStashEmail(String email) {
+  when(stashUser.getEmailAddress()).thenReturn(email);
   return this;
  }
 

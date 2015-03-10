@@ -24,7 +24,7 @@ public class MatchingEmailTest {
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withStashEmail("tomas.bjerre@two.site")
-    .withStashName("Tompa B")
+    .withStashDisplayName("Tompa B")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit")
     .build()
@@ -44,7 +44,7 @@ public class MatchingEmailTest {
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withStashEmail("tomas.bjerre@two.site")
-    .withStashName("Tompa B")
+    .withStashDisplayName("Tompa B")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit")
     .build()
@@ -63,7 +63,7 @@ public class MatchingEmailTest {
         .withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site").withStashName("Tompa B")
+        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site").withStashDisplayName("Tompa B")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Stash not same as in commit").build().run()
     .hasNoOutput().wasAccepted();
