@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.2
+* Marking it as compatible with Stash Data Center
+
 ## 1.1
 
 * Fixing bugs

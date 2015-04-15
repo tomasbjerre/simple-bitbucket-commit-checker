@@ -24,9 +24,6 @@ The included features should:
 
 * Be easy to configure as an administrator of Stash. Any rejection reason delivered to the committer should be configurable.
 * Be easy to use as a committer. With user friendly rejection messages, that clearly explains what was wrong and how to fix it.
-* Be well tested. If a feature cannot be easily tested, it should not be added.
-
-If too much effort is put into restricting commit messages, chances are the checker will grow too complex. It will be hard to maintain and users wont trust its features. For example this checker will never check any referred issues in other systems to make sure their status is correct. Such an integration is just waste of time, committers will find a way around it anyway. Instead the goal here is to inform the committer about any faulty commits and how to correct them.
 
 ## Developer instructions
 You will need Atlas SDK to compile the code.
