@@ -1,13 +1,30 @@
 package se.bjurr.sscc;
 
+import static org.mockito.Mockito.mock;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCHES;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class ExceptionTest {
+ private Logger beforeLogger;
+
+ @Before
+ public void before() {
+  beforeLogger = SsccPreReceiveRepositoryHook.getLogger();
+  Logger mockLogger = mock(Logger.class);
+  SsccPreReceiveRepositoryHook.setLogger(mockLogger);
+ }
+
+ @After
+ public void after() {
+  SsccPreReceiveRepositoryHook.setLogger(beforeLogger);
+ }
 
  @Test
  public void testThatRefChangesAreAcceptedIfAnUnexpectedExceptionIsThrown() throws IOException {

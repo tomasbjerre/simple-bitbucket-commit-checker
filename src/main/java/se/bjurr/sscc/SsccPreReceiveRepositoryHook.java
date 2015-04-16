@@ -39,7 +39,7 @@ import com.atlassian.stash.user.StashAuthenticationContext;
 import com.google.common.annotations.VisibleForTesting;
 
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
- private static final Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
+ private static Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
 
  private ChangeSetsService changesetsService;
 
@@ -196,5 +196,15 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
    }
   }
   return refChangeVerificationResult;
+ }
+
+ @VisibleForTesting
+ public static Logger getLogger() {
+  return logger;
+ }
+
+ @VisibleForTesting
+ public static void setLogger(Logger logger) {
+  SsccPreReceiveRepositoryHook.logger = logger;
  }
 }
