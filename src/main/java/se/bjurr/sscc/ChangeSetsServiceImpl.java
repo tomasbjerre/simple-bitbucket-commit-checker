@@ -3,19 +3,35 @@ package se.bjurr.sscc;
 import static com.atlassian.stash.repository.RefChangeType.DELETE;
 import static com.atlassian.stash.scm.git.GitRefPattern.TAGS;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.CorruptObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.ObjectLoader;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
 import org.eclipse.jgit.revwalk.RevTag;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.data.SSCCPerson;
@@ -31,9 +47,11 @@ import com.atlassian.stash.util.Page;
 import com.atlassian.stash.util.PageProvider;
 import com.atlassian.stash.util.PageRequest;
 import com.atlassian.stash.util.PagedIterable;
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 public class ChangeSetsServiceImpl implements ChangeSetsService {
+ private static Logger logger = LoggerFactory.getLogger(ChangeSetsServiceImpl.class);
  private final ApplicationPropertiesService applicationPropertiesService;
  private final CommitService commitService;
 
@@ -89,9 +107,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    final PersonIdent ident = tag.getTaggerIdent();
    final String message = tag.getFullMessage();
    final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
-   final SSCCChangeSet changeset = new SSCCChangeSet(refChange.getToHash(), committer, message, 1);
-
-   changesets.add(changeset);
+   changesets.add(new SSCCChangeSet(refChange.getToHash(), committer, message, 1, new HashMap<String, Long>(), ""));
   } else {
    final ChangesetsBetweenRequest request = new ChangesetsBetweenRequest.Builder(repository)
      .exclude(getBranches(repository)).include(refChange.getToHash()).build();
@@ -104,16 +120,69 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    }, 100);
 
    for (final Changeset changeset : changes) {
-    final RevCommit commit = walk.parseCommit(fromString(changeset.getId()));
+    if (changeset.getParents().size() > 1 && settings.shouldExcludeMergeCommits()) {
+     continue;
+    }
 
-    final PersonIdent ident = commit.getCommitterIdent();
-    final String message = commit.getFullMessage();
-    final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
+    try {
+     final RevCommit commit = walk.parseCommit(fromString(changeset.getId()));
+     Optional<RevCommit> firstParentCommit = Optional.absent();
+     if (changeset.getParents().size() > 0) {
+      // If this is not the very first commit in the repo
+      firstParentCommit = Optional.of(walk.parseCommit(fromString(changeset.getParents().iterator().next().getId())));
+     }
 
-    changesets.add(new SSCCChangeSet(changeset.getId(), committer, message, commit.getParentCount()));
+     String diff = getDiffString(jGitRepo, commit, firstParentCommit);
+
+     Map<String, Long> sizePerFile = getSizePerFile(jGitRepo, commit);
+
+     final PersonIdent ident = commit.getCommitterIdent();
+     final String message = commit.getFullMessage();
+     final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
+     changesets
+       .add(new SSCCChangeSet(changeset.getId(), committer, message, commit.getParentCount(), sizePerFile, diff));
+    } catch (GitAPIException e) {
+     logger.error(refChange.getRefId(), e);
+    }
    }
   }
 
   return changesets;
+ }
+
+ private Map<String, Long> getSizePerFile(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit)
+   throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
+  Map<String, Long> fileSizes = newHashMap();
+  RevTree tree = commit.getTree();
+  TreeWalk treeWalk = new TreeWalk(jGitRepo);
+  treeWalk.addTree(tree);
+  treeWalk.setRecursive(true);
+  while (treeWalk.next()) {
+   ObjectLoader loader = jGitRepo.open(treeWalk.getObjectId(0));
+   fileSizes.put(treeWalk.getPathString(), loader.getSize());
+  }
+  return fileSizes;
+ }
+
+ private String getDiffString(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit,
+   Optional<RevCommit> firstParentCommit) throws IncorrectObjectTypeException, IOException, GitAPIException {
+  if (!firstParentCommit.isPresent()) {
+   return "";
+  }
+  ObjectReader reader = jGitRepo.newObjectReader();
+  CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+  oldTreeIter.reset(reader, firstParentCommit.get().getTree().getId());
+  CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+  newTreeIter.reset(reader, commit.getTree().getId());
+
+  final StringBuilder sb = new StringBuilder();
+  OutputStream out = new OutputStream() {
+   @Override
+   public void write(int b) throws IOException {
+    sb.append((char) b);
+   }
+  };
+  new Git(jGitRepo).diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).setOutputStream(out).call();
+  return sb.toString();
  }
 }

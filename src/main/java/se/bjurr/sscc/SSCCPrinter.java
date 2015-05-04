@@ -4,6 +4,7 @@ import static se.bjurr.sscc.settings.SSCCGroup.Accept.ACCEPT;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.SHOW_MESSAGE;
 
 import java.util.Collection;
+import java.util.Map;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.data.SSCCChangeSetVerificationResult;
@@ -14,6 +15,7 @@ import se.bjurr.sscc.settings.SSCCRule;
 import se.bjurr.sscc.settings.SSCCSettings;
 
 import com.atlassian.stash.repository.RefChange;
+import com.google.common.base.Optional;
 
 public class SSCCPrinter {
 
@@ -71,6 +73,28 @@ public class SSCCPrinter {
   }
  }
 
+ private void printRejectedContent(Optional<String> rejectedContent) {
+  if (rejectedContent.isPresent()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- " + settings.getCommitDiffRegexp().get() + ":");
+   ssccRenderer.println(rejectedContent.get().replaceAll("$", "\n  "));
+   if (settings.getCommitDiffRegexpMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getCommitDiffRegexpMessage().get());
+   }
+  }
+ }
+
+ private void printMaximumSizeExceeded(Map<String, Long> map) {
+  for (String file : map.keySet()) {
+   Long sizeKb = map.get(file);
+   ssccRenderer.println();
+   ssccRenderer.println("- " + file + " " + sizeKb + "kb > " + settings.getCommitSizeKb() + "kb");
+   if (settings.getCommitSizeMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getCommitSizeMessage().get());
+   }
+  }
+ }
+
  private void printRefChange(final RefChange refChange) {
   ssccRenderer.println(refChange.getRefId() + " " + refChange.getFromHash().substring(0, 10) + " -> "
     + refChange.getToHash().substring(0, 10));
@@ -110,6 +134,8 @@ public class SSCCPrinter {
     printCommit(ssccChangeSet);
     printEmailVerification(settings, refChangeVerificationResult, ssccChangeSet);
     printNameVerification(settings, refChangeVerificationResult, ssccChangeSet);
+    printMaximumSizeExceeded(changeSetVerificationResult.getExceeding());
+    printRejectedContent(changeSetVerificationResult.getRejectedContent());
     for (final SSCCGroup ssccVerificationResult : changeSetVerificationResult.getGroupsResult().keySet()) {
      printAcceptMessages(ssccVerificationResult);
      printRuleMessage(ssccVerificationResult);

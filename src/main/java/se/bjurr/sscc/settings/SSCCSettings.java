@@ -3,9 +3,13 @@ package se.bjurr.sscc.settings;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Strings.emptyToNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.parseInt;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sscc.settings.SSCCGroup.ssccGroup;
 import static se.bjurr.sscc.settings.SSCCRule.ssccRule;
@@ -34,21 +38,53 @@ public class SSCCSettings {
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE = "requireMatchingAuthorNameMessage";
  public static final String SETTING_RULE_MESSAGE = "ruleMessage";
  public static final String SETTING_RULE_REGEXP = "ruleRegexp";
+ public static final String SETTING_DIFF_REGEXP = "checkCommitDiffRegexp";
+ public static final String SETTING_DIFF_REGEXP_MESSAGE = "checkCommitDiffRegexpMessage";
+ public static final String SETTING_SIZE = "checkCommitSize";
+ public static final String SETTING_SIZE_MESSAGE = "checkCommitSizeMessage";
+
+ private String commitDiffRegexp;
+ private String commitDiffRegexpMessage;
+ private String commitSizeMessage;
+ private int commitSize;
+ private String acceptMessage;
+ private String branches;
+ private boolean dryRun;
+ private String dryRunMessage;
+ private boolean excludeMergeCommits;
+ private Boolean excludeTagCommits;
+ private final List<SSCCGroup> groups = newArrayList();
+ private String rejectMessage;
+ private boolean requireMatchingAuthorEmail;
+ private String requireMatchingAuthorEmailMessage;
+ private boolean requireMatchingAuthorName;
+ private String requireMatchingAuthorNameMessage;
+ private boolean requireOnlyOneIssue;
+ private String requireOnlyOneIssueMessage;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
-  ssccSettings //
-    .withAcceptMessage(settings.getString(SETTING_ACCEPT_MESSAGE)) //
-    .withBranches(validate(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES))) //
-    .withDryRun(settings.getBoolean(SETTING_DRY_RUN)) //
-    .withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE)) //
-    .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS)) //
-    .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS)) //
-    .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE)) //
-    .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL)) //
-    .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE)) //
-    .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME)) //
-    .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE));
+  ssccSettings.withAcceptMessage( //
+    settings.getString(SETTING_ACCEPT_MESSAGE))
+    .withBranches(validateRegExp(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES)))
+    .withDryRun(settings.getBoolean(SETTING_DRY_RUN)).withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE))
+    .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS))
+    .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS))
+    .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE))
+    .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL))
+    .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE))
+    .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME))
+    .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE))
+    .withCheckCommitDiffRegexp(validateRegExp(SETTING_DIFF_REGEXP, settings.getString(SETTING_DIFF_REGEXP)))
+    .withCheckCommitDiffRegexpMessage(settings.getString(SETTING_DIFF_REGEXP_MESSAGE))
+    .withCheckCommitSizeMessage(settings.getString(SETTING_SIZE_MESSAGE));
+  try {
+   if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
+    ssccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
+   }
+  } catch (Exception e) {
+   throw new ValidationException(SETTING_SIZE, "Not an integer!");
+  }
   for (int g = 0; g < 1000; g++) {
    final Optional<String> accept = fromNullable(settings.getString(SETTING_GROUP_ACCEPT + "[" + g + "]"));
    final Optional<String> match = fromNullable(settings.getString(SETTING_GROUP_MATCH + "[" + g + "]"));
@@ -69,7 +105,7 @@ public class SSCCSettings {
        + "]"));
      if (ruleRegexp.isPresent()) {
       rules.add(ssccRule()//
-        .withRegexp(validate(ruleRegexpField, ruleRegexp.get())) //
+        .withRegexp(validateRegExp(ruleRegexpField, ruleRegexp.get())) //
         .withMessage(ruleMessage.orNull()));
      } else if (ruleMessage.isPresent()) {
       throw new ValidationException(ruleRegexpField, "Cannot add a rule without regexp!");
@@ -87,7 +123,27 @@ public class SSCCSettings {
   return ssccSettings;
  }
 
- private static String validate(String field, String regexp) throws ValidationException {
+ private SSCCSettings withCheckCommitDiffRegexp(String string) {
+  this.commitDiffRegexp = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private SSCCSettings withCheckCommitDiffRegexpMessage(String string) {
+  this.commitDiffRegexpMessage = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private SSCCSettings withCheckCommitSize(int commitSize) {
+  this.commitSize = commitSize;
+  return this;
+ }
+
+ private SSCCSettings withCheckCommitSizeMessage(String string) {
+  this.commitSizeMessage = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private static String validateRegExp(String field, String regexp) throws ValidationException {
   if (regexp == null) {
    return regexp;
   }
@@ -98,22 +154,6 @@ public class SSCCSettings {
   }
   return regexp;
  }
-
- private String acceptMessage;
-
- private String branches;
- private boolean dryRun;
- private String dryRunMessage;
- private boolean excludeMergeCommits;
- private Boolean excludeTagCommits;
- private final List<SSCCGroup> groups = newArrayList();
- private String rejectMessage;
- private boolean requireMatchingAuthorEmail;
- private String requireMatchingAuthorEmailMessage;
- private boolean requireMatchingAuthorName;
- private String requireMatchingAuthorNameMessage;
- private boolean requireOnlyOneIssue;
- private String requireOnlyOneIssueMessage;
 
  private SSCCSettings() {
  }
@@ -172,6 +212,26 @@ public class SSCCSettings {
 
  public boolean shouldRequireMatchingAuthorName() {
   return requireMatchingAuthorName;
+ }
+
+ public Optional<String> getCommitDiffRegexp() {
+  return fromNullable(commitDiffRegexp);
+ }
+
+ public Optional<String> getCommitDiffRegexpMessage() {
+  return fromNullable(commitDiffRegexpMessage);
+ }
+
+ public int getCommitSizeKb() {
+  if (commitSize == 0) {
+   return MAX_VALUE;
+  } else {
+   return commitSize;
+  }
+ }
+
+ public Optional<String> getCommitSizeMessage() {
+  return fromNullable(commitSizeMessage);
  }
 
  @Override

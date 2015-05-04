@@ -7,8 +7,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.io.Resources.getResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
 
 import se.bjurr.sscc.ChangeSetsService;
 import se.bjurr.sscc.SsccPreReceiveRepositoryHook;
@@ -85,8 +85,8 @@ public class RefChangeBuilder {
  public RefChangeBuilder build() throws IOException {
   refChange = newRefChange();
   when(
-    changeSetService.getNewChangeSets(Mockito.any(SSCCSettings.class), Mockito.any(Repository.class),
-      Mockito.any(RefChange.class))).thenReturn(newChangesets);
+    changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
+      Matchers.any(RefChange.class))).thenReturn(newChangesets);
   return this;
  }
 
@@ -170,8 +170,8 @@ public class RefChangeBuilder {
  public RefChangeBuilder throwing(IOException ioException) throws IOException {
   refChange = newRefChange();
   when(
-    changeSetService.getNewChangeSets(Mockito.any(SSCCSettings.class), Mockito.any(Repository.class),
-      Mockito.any(RefChange.class))).thenThrow(ioException);
+    changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
+      Matchers.any(RefChange.class))).thenThrow(ioException);
   return this;
  }
 
