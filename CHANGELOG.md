@@ -2,6 +2,12 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.3
+* Ignoring merge commits at lowest level, where tag commits are already ignored.
+* Ability to block commits:
+ * Containing files larger then a configurable size.
+ * With content matching specific regexp, like unresolved merge.
+
 ## 1.2
 * Marking it as compatible with Stash Data Center
 

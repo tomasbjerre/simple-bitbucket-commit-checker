@@ -10,6 +10,7 @@ import se.bjurr.sscc.settings.SSCCGroup;
 import se.bjurr.sscc.settings.SSCCMatch;
 
 import com.atlassian.stash.repository.RefChange;
+import com.google.common.base.Optional;
 
 public class SSCCRefChangeVerificationResult {
  private final RefChange refChange;
@@ -51,11 +52,17 @@ public class SSCCRefChangeVerificationResult {
   return FALSE;
  }
 
- public boolean isEmpty() {
-  return ssccChangeSets.isEmpty();
- }
-
  public void setGroupsResult(SSCCChangeSet ssccChangeSet, Map<SSCCGroup, SSCCMatch> groupsResult) {
   getOrAdd(ssccChangeSet).setGroupsResult(groupsResult);
+ }
+
+ public void addContentSizeValidationResult(SSCCChangeSet ssccChangeSet,
+   Map<String, Long> validateChangeSetForContentSize) {
+  getOrAdd(ssccChangeSet).addContentSizeValidationResult(validateChangeSetForContentSize);
+ }
+
+ public void addContentDiffValidationResult(SSCCChangeSet ssccChangeSet,
+   Optional<String> validateChangeSetForContentDiff) {
+  getOrAdd(ssccChangeSet).addContentDiffValidationResult(validateChangeSetForContentDiff);
  }
 }

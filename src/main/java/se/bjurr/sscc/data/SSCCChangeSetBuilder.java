@@ -1,23 +1,28 @@
 package se.bjurr.sscc.data;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.collect.Maps.newHashMap;
+
+import java.util.Map;
 
 public class SSCCChangeSetBuilder {
- public static SSCCChangeSetBuilder changeSetBuilder() {
-  return new SSCCChangeSetBuilder();
- }
-
  private SSCCPerson committer;
-
  private String id;
  private String message;
  private int parentCount;
+ private final Map<String, Long> fileSizeBytes = newHashMap();
+ private String diff;
+
+ public static SSCCChangeSetBuilder changeSetBuilder() {
+  return new SSCCChangeSetBuilder();
+ }
 
  private SSCCChangeSetBuilder() {
  }
 
  public SSCCChangeSet build() {
-  return new SSCCChangeSet(id, firstNonNull(committer, new SSCCPerson("Tomas", "my@email.com")), message, parentCount);
+  return new SSCCChangeSet(id, firstNonNull(committer, new SSCCPerson("Tomas", "my@email.com")), message, parentCount,
+    fileSizeBytes, diff);
  }
 
  public SSCCChangeSetBuilder withCommitter(SSCCPerson committer) {
@@ -37,6 +42,16 @@ public class SSCCChangeSetBuilder {
 
  public SSCCChangeSetBuilder withParentCount(int parentCount) {
   this.parentCount = parentCount;
+  return this;
+ }
+
+ public SSCCChangeSetBuilder withDiff(String diff) {
+  this.diff = diff;
+  return this;
+ }
+
+ public SSCCChangeSetBuilder withSize(String path, Long fileSizeBytes) {
+  this.fileSizeBytes.put(path, fileSizeBytes);
   return this;
  }
 }
