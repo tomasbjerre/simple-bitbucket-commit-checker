@@ -3,7 +3,7 @@ package se.bjurr.sscc;
 import static com.atlassian.stash.repository.RefChangeType.DELETE;
 import static com.atlassian.stash.scm.git.GitRefPattern.TAGS;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newTreeMap;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
 
 import java.io.File;
@@ -152,7 +152,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
  private Map<String, Long> getSizePerFile(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit)
    throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
-  Map<String, Long> fileSizes = newHashMap();
+  Map<String, Long> fileSizes = newTreeMap();
   RevTree tree = commit.getTree();
   TreeWalk treeWalk = new TreeWalk(jGitRepo);
   treeWalk.addTree(tree);

@@ -1,7 +1,6 @@
 package se.bjurr.sscc.data;
 
 import static com.google.common.base.Optional.absent;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newTreeMap;
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.ACCEPT;
@@ -17,7 +16,7 @@ public class SSCCChangeSetVerificationResult {
  private boolean emailResult;
  private Map<SSCCGroup, SSCCMatch> groupsResult = newTreeMap();
  private boolean nameResult;
- private Map<String, Long> exceeding = newHashMap();
+ private Map<String, Long> exceeding = newTreeMap();
  private Optional<String> rejectedContent = absent();
 
  public Boolean getEmailResult() {

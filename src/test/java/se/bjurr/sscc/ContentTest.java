@@ -69,7 +69,7 @@ public class ContentTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>>   - someOtherFile 16000kb > 10000kb   To large!  - someFile 15000kb > 10000kb   To large!")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>>   - someFile 15000kb > 10000kb   To large!  - someOtherFile 16000kb > 10000kb   To large!")
     .wasRejected();
  }
 

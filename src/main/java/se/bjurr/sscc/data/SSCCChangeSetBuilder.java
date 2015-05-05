@@ -1,7 +1,7 @@
 package se.bjurr.sscc.data;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newTreeMap;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ public class SSCCChangeSetBuilder {
  private String id;
  private String message;
  private int parentCount;
- private final Map<String, Long> fileSizeBytes = newHashMap();
+ private final Map<String, Long> fileSizeBytes = newTreeMap();
  private String diff;
 
  public static SSCCChangeSetBuilder changeSetBuilder() {

@@ -1,6 +1,7 @@
 package se.bjurr.sscc;
 
 import static com.google.common.base.Optional.absent;
+import static com.google.common.collect.Maps.newTreeMap;
 import static java.util.regex.Pattern.DOTALL;
 
 import java.util.Map;
@@ -11,7 +12,6 @@ import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.settings.SSCCSettings;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 
 public class CommitContentValidator {
  private final SSCCSettings settings;
@@ -25,7 +25,7 @@ public class CommitContentValidator {
  }
 
  public Map<String, Long> validateChangeSetForContentSize(SSCCChangeSet ssccChangeSet) {
-  Map<String, Long> exceeding = Maps.newHashMap();
+  Map<String, Long> exceeding = newTreeMap();
   for (String file : ssccChangeSet.getSizePerFile().keySet()) {
    Long sizeKb = ssccChangeSet.getSizePerFile().get(file) / 1024;
    if (sizeKb > settings.getCommitSizeKb()) {
