@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.4
+* Checking author against author instead of committer. Committer is the one pushing the commit.
+
 ## 1.3
 * Ignoring merge commits at lowest level, where tag commits are already ignored.
 * Ability to block commits:

@@ -136,7 +136,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
      Map<String, Long> sizePerFile = getSizePerFile(jGitRepo, commit);
 
-     final PersonIdent ident = commit.getCommitterIdent();
+     final PersonIdent ident = commit.getAuthorIdent();
      final String message = commit.getFullMessage();
      final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
      changesets
