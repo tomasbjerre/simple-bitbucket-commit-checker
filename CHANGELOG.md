@@ -5,6 +5,7 @@ Changelog of Simple Stash Commit Checker
 ## 1.5
 * Reject commits if regexp does not match branch name
 * Check that committer equals Stash user
+* Allow service users to by pass the hook
 
 ## 1.4
 * Checking author against author instead of committer. Committer is the one pushing the commit.

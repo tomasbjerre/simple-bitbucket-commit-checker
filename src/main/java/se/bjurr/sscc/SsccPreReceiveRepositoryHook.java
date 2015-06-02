@@ -1,5 +1,6 @@
 package se.bjurr.sscc;
 
+import static com.atlassian.stash.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
@@ -60,7 +61,8 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
     ssccRenderer.println(settings.getDryRunMessage().get());
    }
 
-   if (!settings.isDryRun()) {
+   if (!settings.isDryRun()
+     && !(settings.allowServiceUsers() && stashAuthenticationContext.getCurrentUser().getType().equals(SERVICE))) {
     return refChangeVerificationResults.isAccepted();
    }
 

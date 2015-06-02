@@ -38,6 +38,7 @@ import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.setting.Settings;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.atlassian.stash.user.StashUser;
+import com.atlassian.stash.user.UserType;
 import com.google.common.io.Resources;
 
 public class RefChangeBuilder {
@@ -309,6 +310,11 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder withStashEmail(String email) {
   when(stashUser.getEmailAddress()).thenReturn(email);
+  return this;
+ }
+
+ public RefChangeBuilder withStashUserType(UserType type) {
+  when(stashUser.getType()).thenReturn(type);
   return this;
  }
 

@@ -46,6 +46,7 @@ public class SSCCSettings {
  public static final String SETTING_SIZE_MESSAGE = "checkCommitSizeMessage";
  public static final String SETTING_BRANCH_REJECTION_REGEXP = "branchRejectionRegexp";
  public static final String SETTING_BRANCH_REJECTION_REGEXP_MESSAGE = "branchRejectionRegexpMessage";
+ public static final String SETTING_ALLOW_SERVICE_USERS = "allowServiceUsers";
 
  private String commitDiffRegexp;
  private String commitDiffRegexpMessage;
@@ -69,6 +70,7 @@ public class SSCCSettings {
  private String requireOnlyOneIssueMessage;
  private String branchRejectionRegexp;
  private String branchRejectionRegexpMessage;
+ private boolean allowServiceUsers;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
@@ -92,7 +94,8 @@ public class SSCCSettings {
     .withCheckCommitSizeMessage(settings.getString(SETTING_SIZE_MESSAGE))
     .withBranchRejectionRegexp(
       validateRegExp(SETTING_BRANCH_REJECTION_REGEXP, settings.getString(SETTING_BRANCH_REJECTION_REGEXP)))
-    .withBranchRejectionRegexpMessage(settings.getString(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE));
+    .withBranchRejectionRegexpMessage(settings.getString(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE))
+    .withAllowServiceUsers(settings.getBoolean(SETTING_ALLOW_SERVICE_USERS));
   try {
    if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
     ssccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
@@ -136,6 +139,10 @@ public class SSCCSettings {
    }
   }
   return ssccSettings;
+ }
+
+ private void withAllowServiceUsers(Boolean allowServiceUsers) {
+  this.allowServiceUsers = firstNonNull(allowServiceUsers, FALSE);
  }
 
  private SSCCSettings withCheckCommitDiffRegexp(String string) {
@@ -348,5 +355,9 @@ public class SSCCSettings {
 
  public Optional<String> getBranchRejectionRegexpMessage() {
   return fromNullable(branchRejectionRegexpMessage);
+ }
+
+ public boolean allowServiceUsers() {
+  return allowServiceUsers;
  }
 }

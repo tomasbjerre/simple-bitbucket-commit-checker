@@ -20,6 +20,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Exclude tag commits.
 * Show a general reject message.
 * Show a general accept message.
+* Optionally accept all commits from service users.
 * Dry run mode, where all commits are accepted. But verification results are shown.
 
 ## Design goals

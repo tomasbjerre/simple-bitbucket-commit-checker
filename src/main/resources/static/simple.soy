@@ -62,6 +62,16 @@
         ]] /}
         {param descriptionText: 'Exclude tag commits from being checked.' /}
     {/call}
+
+    {call aui.form.checkboxField}
+        {param legendContent: 'Accept service users' /}
+        {param fields: [[
+            'id' : 'allowServiceUsers',
+            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'isChecked' : $config['allowServiceUsers']
+        ]] /}
+        {param descriptionText: 'Always accept commits from service users.' /}
+    {/call}
     
     <div class="fieldGroup">
         {call aui.form.checkboxField}
