@@ -18,11 +18,11 @@ import se.bjurr.sscc.data.SSCCPerson;
 public class VariablesTest {
 
  @Test
- public void testStashEmailVariableCanBeUsedInEmailRejectionMessage() throws IOException {
+ public void testStashAuthorEmailVariableCanBeUsedInEmailRejectionMessage() throws IOException {
   refChangeBuilder()
     .withChangeSet(
       changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Commit Name", "commit@mail"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+        .withMessage(COMMIT_MESSAGE_JIRA).withAuthor(new SSCCPerson("Commit Name", "author@mail")).build())
     .withStashEmail("stash@mail")
     .withStashDisplayName("Stash Name")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
@@ -33,12 +33,12 @@ public class VariablesTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Commit Name <commit@mail> >>> SB-5678 fixing stuff  - Stash: 'stash@mail' != Commit: 'commit@mail'   Stash says your email is stash@mail, set it using: git config --global user.email stash@mail")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Commit Name <author@mail> >>> SB-5678 fixing stuff  - Stash: 'stash@mail' != Commit: 'author@mail'   Stash says your email is stash@mail, set it using: git config --global user.email stash@mail")
     .wasRejected();
  }
 
  @Test
- public void testStashNameVariableCanBeUsedInNameRejectionMessage() throws IOException {
+ public void testStashAuthorNameVariableCanBeUsedInNameRejectionMessage() throws IOException {
   refChangeBuilder()
     .withChangeSet(
       changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Commit Name", "commit@mail"))
@@ -53,7 +53,7 @@ public class VariablesTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Commit Name <commit@mail> >>> SB-5678 fixing stuff  - Stash: 'Stash Name' != Commit: 'Commit Name'   Stash says your name is Stash Name, set it using: git config --global user.name \"Stash Name\"")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Stash Name' != Commit: 'Commit Name'   Stash says your name is Stash Name, set it using: git config --global user.name \"Stash Name\"")
     .wasRejected();
  }
 }

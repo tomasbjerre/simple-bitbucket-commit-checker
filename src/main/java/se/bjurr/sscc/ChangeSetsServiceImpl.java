@@ -104,10 +104,11 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
    final RevTag tag = (RevTag) obj;
 
-   final PersonIdent ident = tag.getTaggerIdent();
    final String message = tag.getFullMessage();
+   final PersonIdent ident = tag.getTaggerIdent();
    final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
-   changesets.add(new SSCCChangeSet(refChange.getToHash(), committer, message, 1, new HashMap<String, Long>(), ""));
+   changesets.add(new SSCCChangeSet(refChange.getToHash(), committer, committer, message, 1,
+     new HashMap<String, Long>(), ""));
   } else {
    final ChangesetsBetweenRequest request = new ChangesetsBetweenRequest.Builder(repository)
      .exclude(getBranches(repository)).include(refChange.getToHash()).build();
@@ -136,11 +137,13 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
      Map<String, Long> sizePerFile = getSizePerFile(jGitRepo, commit);
 
-     final PersonIdent ident = commit.getAuthorIdent();
      final String message = commit.getFullMessage();
-     final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
-     changesets
-       .add(new SSCCChangeSet(changeset.getId(), committer, message, commit.getParentCount(), sizePerFile, diff));
+     final PersonIdent authorIdent = commit.getAuthorIdent();
+     final SSCCPerson author = new SSCCPerson(authorIdent.getName(), authorIdent.getEmailAddress());
+     final PersonIdent committerIdent = commit.getCommitterIdent();
+     final SSCCPerson committer = new SSCCPerson(committerIdent.getName(), committerIdent.getEmailAddress());
+     changesets.add(new SSCCChangeSet(changeset.getId(), committer, author, message, commit.getParentCount(),
+       sizePerFile, diff));
     } catch (GitAPIException e) {
      logger.error(refChange.getRefId(), e);
     }

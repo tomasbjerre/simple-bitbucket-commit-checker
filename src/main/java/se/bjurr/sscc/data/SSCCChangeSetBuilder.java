@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class SSCCChangeSetBuilder {
  private SSCCPerson committer;
+ private SSCCPerson author;
  private String id;
  private String message;
  private int parentCount;
@@ -21,12 +22,17 @@ public class SSCCChangeSetBuilder {
  }
 
  public SSCCChangeSet build() {
-  return new SSCCChangeSet(id, firstNonNull(committer, new SSCCPerson("Tomas", "my@email.com")), message, parentCount,
-    fileSizeBytes, diff);
+  return new SSCCChangeSet(id, firstNonNull(committer, new SSCCPerson("Tomas", "my@email.com")), firstNonNull(author,
+    new SSCCPerson("Tomas", "my@email.com")), message, parentCount, fileSizeBytes, diff);
  }
 
  public SSCCChangeSetBuilder withCommitter(SSCCPerson committer) {
   this.committer = committer;
+  return this;
+ }
+
+ public SSCCChangeSetBuilder withAuthor(SSCCPerson author) {
+  this.author = author;
   return this;
  }
 

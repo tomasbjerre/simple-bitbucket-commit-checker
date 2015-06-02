@@ -21,8 +21,12 @@ public class SSCCRefChangeVerificationResult {
   this.refChange = refChange;
  }
 
- public void addEmailValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForEmail) {
-  getOrAdd(ssccChangeSet).setEmailResult(validateChangeSetForEmail);
+ public void addAuthorEmailValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForAuthorEmail) {
+  getOrAdd(ssccChangeSet).setEmailAuthorResult(validateChangeSetForAuthorEmail);
+ }
+
+ public void addCommitterEmailValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForCommitterEmail) {
+  getOrAdd(ssccChangeSet).setEmailCommitterResult(validateChangeSetForCommitterEmail);
  }
 
  public void addNameValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForName) {
@@ -74,4 +78,5 @@ public class SSCCRefChangeVerificationResult {
  public void setBranchValidationResult(boolean branchNameValid) {
   this.branchNameValid = branchNameValid;
  }
+
 }

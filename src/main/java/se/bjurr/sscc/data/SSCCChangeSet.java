@@ -15,9 +15,12 @@ public class SSCCChangeSet implements Comparable<SSCCChangeSet> {
 
  private final String diff;
 
- public SSCCChangeSet(String id, SSCCPerson committer, String message, int parentCount, Map<String, Long> sizePerFile,
-   String diff) {
+ private final SSCCPerson author;
+
+ public SSCCChangeSet(String id, SSCCPerson committer, SSCCPerson author, String message, int parentCount,
+   Map<String, Long> sizePerFile, String diff) {
   this.id = id;
+  this.author = author;
   this.committer = committer;
   this.message = message.trim();
   this.parentCount = parentCount;
@@ -32,6 +35,10 @@ public class SSCCChangeSet implements Comparable<SSCCChangeSet> {
 
  public SSCCPerson getCommitter() {
   return committer;
+ }
+
+ public SSCCPerson getAuthor() {
+  return author;
  }
 
  /**

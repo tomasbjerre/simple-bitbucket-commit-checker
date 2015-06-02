@@ -65,23 +65,38 @@ public class CommitMessageValidator {
   return allMatching;
  }
 
- public boolean validateChangeSetForEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
-  if (!settings.shouldRequireMatchingAuthorEmail()) {
-   return TRUE;
+ public boolean validateChangeSetForCommitterEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+  if (settings.shouldRequireMatchingCommitterEmail()) {
+   if (getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getEmailAddress())) {
+    return TRUE;
+   }
+   return FALSE;
   }
-  if (getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getEmailAddress())) {
-   return TRUE;
+  return TRUE;
+ }
+
+ public boolean validateChangeSetForAuthorEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+  if (settings.shouldRequireMatchingAuthorEmail()) {
+   if (getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getEmailAddress())) {
+    return TRUE;
+   }
+   return FALSE;
   }
-  return FALSE;
+  return TRUE;
  }
 
  public boolean validateChangeSetForName(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
-  if (!settings.shouldRequireMatchingAuthorName()) {
-   return TRUE;
+  if (settings.shouldRequireMatchingCommitterName()) {
+   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getName())) {
+    return TRUE;
+   }
+   return FALSE;
+  } else if (settings.shouldRequireMatchingAuthorName()) {
+   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getName())) {
+    return TRUE;
+   }
+   return FALSE;
   }
-  if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getName())) {
-   return TRUE;
-  }
-  return FALSE;
+  return TRUE;
  }
 }

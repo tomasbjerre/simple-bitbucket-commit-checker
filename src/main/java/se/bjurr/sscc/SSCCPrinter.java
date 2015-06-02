@@ -44,14 +44,22 @@ public class SSCCPrinter {
  private void printCommit(final SSCCChangeSet ssccChangeSet) {
   ssccRenderer.println();
   ssccRenderer.println();
-  ssccRenderer.println(ssccChangeSet.getId() + " " + ssccChangeSet.getCommitter().getName() + " <"
-    + ssccChangeSet.getCommitter().getEmailAddress() + ">");
+  ssccRenderer.println(ssccChangeSet.getId() + " " + ssccChangeSet.getAuthor().getName() + " <"
+    + ssccChangeSet.getAuthor().getEmailAddress() + ">");
   ssccRenderer.println(">>> " + ssccChangeSet.getMessage());
  }
 
  private void printEmailVerification(SSCCSettings settings,
    final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
-  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailResult()) {
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailAuthorResult()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}' != Commit: '"
+     + ssccChangeSet.getAuthor().getEmailAddress() + "'");
+   if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
+   }
+  }
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailCommitterResult()) {
    ssccRenderer.println();
    ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}' != Commit: '"
      + ssccChangeSet.getCommitter().getEmailAddress() + "'");

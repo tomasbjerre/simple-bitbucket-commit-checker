@@ -28,7 +28,7 @@ Simple Stash Commit Checker X.X
 refs/heads/master e2bc4ed003 -> af35d5c1a4
 
 
-10fe5ad13bbd9c180a4668334cda9c83cd92dd46 Tommy Boy <the@correct.email>
+10fe5ad13bbd9c180a4668334cda9c83cd92dd46 Tomas <my@email.com>
 >>> Fixing review comments from previous commits
 
 - Dont mention review
@@ -41,7 +41,7 @@ refs/heads/master e2bc4ed003 -> af35d5c1a4
 - It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.
 
 
-26094a0739ed397b0d475f4a8d3af35f33a6a0cf null <tom@pa.da>
+26094a0739ed397b0d475f4a8d3af35f33a6a0cf Tomas <my@email.com>
 >>> fix
 
 - Stash: 'the@correct.email' != Commit: 'tom@pa.da'
@@ -54,7 +54,7 @@ refs/heads/master e2bc4ed003 -> af35d5c1a4
 - It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.
 
 
-97b0d475f4a8d326094a0739ed3af35f33a6a0cf null <null>
+97b0d475f4a8d326094a0739ed3af35f33a6a0cf Tomas <my@email.com>
 >>> INC123 Solving incident with....
 
 - Stash: 'the@correct.email' != Commit: 'null'
@@ -63,7 +63,7 @@ refs/heads/master e2bc4ed003 -> af35d5c1a4
 - It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.
 
 
-af35f33a6a26094a0739ed397b0d475f4a8d30cf Tompa <null>
+af35f33a6a26094a0739ed397b0d475f4a8d30cf Tomas <my@email.com>
 >>> SB-1234 Implementing feature....
 
 - Stash: 'the@correct.email' != Commit: 'null'

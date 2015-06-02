@@ -74,6 +74,16 @@
             {param descriptionText: 'Require that the commit authors email matches the Stash users email.' /}
         {/call}
     
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Matching Committer Email' /}
+            {param fields: [[
+                'id' : 'requireMatchingCommitterEmail',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireMatchingCommitterEmail']
+            ]] /}
+            {param descriptionText: 'Require that committers email matches the Stash users email.' /}
+        {/call}
+    
         {call aui.form.textareaField}
             {param id: 'requireMatchingAuthorEmailMessage' /}
             {param labelContent: 'Reject message' /}
@@ -93,6 +103,16 @@
                 'isChecked' : $config['requireMatchingAuthorName']
             ]] /}
             {param descriptionText: 'Require that the commit authors name matches the Stash users name.' /}
+        {/call}
+    
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Matching Committer Name' /}
+            {param fields: [[
+                'id' : 'requireMatchingCommitterName',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireMatchingCommitterName']
+            ]] /}
+            {param descriptionText: 'Require that committers name matches the Stash users name.' /}
         {/call}
     
         {call aui.form.textareaField}

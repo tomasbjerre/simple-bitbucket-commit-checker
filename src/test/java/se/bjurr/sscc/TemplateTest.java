@@ -13,10 +13,10 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MATCH;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REJECT_MESSAGE;
-import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE;
-import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_REGEXP;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
@@ -70,10 +70,10 @@ public class TemplateTest {
     .withSetting(SETTING_GROUP_MESSAGE + "[2]",
       "It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.")
     .withSetting(SETTING_RULE_REGEXP + "[2][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE,
       "Please set correct email in your commits. git config --global user.email user@name.com")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, FALSE)
+    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, FALSE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE,
       "Please set correct name in commits. git config --global user.name \"User Name\"")
     .withSetting(SETTING_DRY_RUN, TRUE)

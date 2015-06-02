@@ -13,14 +13,15 @@ import se.bjurr.sscc.settings.SSCCMatch;
 import com.google.common.base.Optional;
 
 public class SSCCChangeSetVerificationResult {
- private boolean emailResult;
+ private boolean emailAuthorResult;
  private Map<SSCCGroup, SSCCMatch> groupsResult = newTreeMap();
  private boolean nameResult;
  private Map<String, Long> exceeding = newTreeMap();
  private Optional<String> rejectedContent = absent();
+ private boolean emailCommitterResult;
 
- public Boolean getEmailResult() {
-  return emailResult;
+ public Boolean getEmailAuthorResult() {
+  return emailAuthorResult;
  }
 
  public Map<SSCCGroup, SSCCMatch> getGroupsResult() {
@@ -37,15 +38,20 @@ public class SSCCChangeSetVerificationResult {
     return TRUE;
    }
   }
-  return getRejectedContent().isPresent() || getExceeding().size() > 0 || !emailResult || !nameResult;
+  return getRejectedContent().isPresent() || getExceeding().size() > 0 || !emailAuthorResult || !emailCommitterResult
+    || !nameResult;
  }
 
  public boolean hasReportables() {
   return !groupsResult.isEmpty() || hasErrors();
  }
 
- public void setEmailResult(Boolean emailResult) {
-  this.emailResult = emailResult;
+ public void setEmailAuthorResult(Boolean emailResult) {
+  this.emailAuthorResult = emailResult;
+ }
+
+ public void setEmailCommitterResult(boolean emailResult) {
+  this.emailCommitterResult = emailResult;
  }
 
  public void setGroupsResult(Map<SSCCGroup, SSCCMatch> groupsResult) {
@@ -70,5 +76,13 @@ public class SSCCChangeSetVerificationResult {
 
  public Optional<String> getRejectedContent() {
   return rejectedContent;
+ }
+
+ public boolean isEmailAuthorResult() {
+  return emailAuthorResult;
+ }
+
+ public boolean getEmailCommitterResult() {
+  return emailCommitterResult;
  }
 }

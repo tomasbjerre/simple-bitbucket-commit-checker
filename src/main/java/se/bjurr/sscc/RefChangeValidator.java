@@ -77,8 +77,10 @@ public class RefChangeValidator {
      + " " + ssccChangeSet.getCommitter().getEmailAddress() + " " + ssccChangeSet.getCommitter().getName());
    refChangeVerificationResult.setGroupsResult(ssccChangeSet,
      commitMessageValidator.validateChangeSetForGroups(settings, ssccChangeSet));
-   refChangeVerificationResult.addEmailValidationResult(ssccChangeSet,
-     commitMessageValidator.validateChangeSetForEmail(settings, ssccChangeSet));
+   refChangeVerificationResult.addAuthorEmailValidationResult(ssccChangeSet,
+     commitMessageValidator.validateChangeSetForAuthorEmail(settings, ssccChangeSet));
+   refChangeVerificationResult.addCommitterEmailValidationResult(ssccChangeSet,
+     commitMessageValidator.validateChangeSetForCommitterEmail(settings, ssccChangeSet));
    refChangeVerificationResult.addNameValidationResult(ssccChangeSet,
      commitMessageValidator.validateChangeSetForName(settings, ssccChangeSet));
    refChangeVerificationResult.addContentSizeValidationResult(ssccChangeSet,

@@ -4,8 +4,10 @@ Simple, and easy to use, commit checker for Atlassian Stash. There are many comm
 Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
 
 ## Features
-* It can check that email in Stash is same as in commit.
-* It can check that name in Stash is same as in commit.
+* Check that author email in Stash is same as in commit.
+* Check that author name in Stash is same as in commit.
+* Check that committer email in Stash is same as in commit.
+* Check that committer name in Stash is same as in commit.
 * Check that changed content does not match a specific regexp, like unresolved merge.
 * Check size of commits, so that large files don't accidently gets pushed.
 * Simple configuration of rules that must apply to commit messages. Organized in groups.
@@ -13,11 +15,12 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
  * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
  * If a group matches a commit, it can reject it or just show a message to the comitter.
 * Check only branches matching a regular expression.
-* Dry run mode, where all commits are accepted. But verification results are shown.
+* Check that branch name matches specific regexp.
 * Exclude merge commits.
 * Exclude tag commits.
 * Show a general reject message.
 * Show a general accept message.
+* Dry run mode, where all commits are accepted. But verification results are shown.
 
 ## Design goals
 The included features should:
