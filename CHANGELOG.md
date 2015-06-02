@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.5
+* Reject commits if regexp does not match branch name
+
 ## 1.4
 * Checking author against author instead of committer. Committer is the one pushing the commit.
 

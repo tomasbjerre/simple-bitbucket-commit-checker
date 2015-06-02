@@ -42,6 +42,8 @@ public class SSCCSettings {
  public static final String SETTING_DIFF_REGEXP_MESSAGE = "checkCommitDiffRegexpMessage";
  public static final String SETTING_SIZE = "checkCommitSize";
  public static final String SETTING_SIZE_MESSAGE = "checkCommitSizeMessage";
+ public static final String SETTING_BRANCH_REJECTION_REGEXP = "branchRejectionRegexp";
+ public static final String SETTING_BRANCH_REJECTION_REGEXP_MESSAGE = "branchRejectionRegexpMessage";
 
  private String commitDiffRegexp;
  private String commitDiffRegexpMessage;
@@ -61,13 +63,17 @@ public class SSCCSettings {
  private String requireMatchingAuthorNameMessage;
  private boolean requireOnlyOneIssue;
  private String requireOnlyOneIssueMessage;
+ private String branchRejectionRegexp;
+ private String branchRejectionRegexpMessage;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
-  ssccSettings.withAcceptMessage( //
-    settings.getString(SETTING_ACCEPT_MESSAGE))
+  ssccSettings
+    .withAcceptMessage( //
+      settings.getString(SETTING_ACCEPT_MESSAGE))
     .withBranches(validateRegExp(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES)))
-    .withDryRun(settings.getBoolean(SETTING_DRY_RUN)).withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE))
+    .withDryRun(settings.getBoolean(SETTING_DRY_RUN))
+    .withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE))
     .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS))
     .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS))
     .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE))
@@ -77,7 +83,10 @@ public class SSCCSettings {
     .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE))
     .withCheckCommitDiffRegexp(validateRegExp(SETTING_DIFF_REGEXP, settings.getString(SETTING_DIFF_REGEXP)))
     .withCheckCommitDiffRegexpMessage(settings.getString(SETTING_DIFF_REGEXP_MESSAGE))
-    .withCheckCommitSizeMessage(settings.getString(SETTING_SIZE_MESSAGE));
+    .withCheckCommitSizeMessage(settings.getString(SETTING_SIZE_MESSAGE))
+    .withBranchRejectionRegexp(
+      validateRegExp(SETTING_BRANCH_REJECTION_REGEXP, settings.getString(SETTING_BRANCH_REJECTION_REGEXP)))
+    .withBranchRejectionRegexpMessage(settings.getString(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE));
   try {
    if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
     ssccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
@@ -133,6 +142,16 @@ public class SSCCSettings {
   return this;
  }
 
+ private SSCCSettings withBranchRejectionRegexp(String string) {
+  this.branchRejectionRegexp = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private SSCCSettings withBranchRejectionRegexpMessage(String string) {
+  this.branchRejectionRegexpMessage = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
  private SSCCSettings withCheckCommitSize(int commitSize) {
   this.commitSize = commitSize;
   return this;
@@ -145,7 +164,7 @@ public class SSCCSettings {
 
  private static String validateRegExp(String field, String regexp) throws ValidationException {
   if (regexp == null) {
-   return regexp;
+   return null;
   }
   try {
    compile(regexp);
@@ -297,5 +316,13 @@ public class SSCCSettings {
  private SSCCSettings withRequireMatchingAuthorNameMessage(String requireMatchingAuthorNameMessage) {
   this.requireMatchingAuthorNameMessage = emptyToNull(requireMatchingAuthorNameMessage);
   return this;
+ }
+
+ public Optional<String> getBranchRejectionRegexp() {
+  return fromNullable(branchRejectionRegexp);
+ }
+
+ public Optional<String> getBranchRejectionRegexpMessage() {
+  return fromNullable(branchRejectionRegexpMessage);
  }
 }

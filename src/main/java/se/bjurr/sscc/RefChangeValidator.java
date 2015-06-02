@@ -85,7 +85,12 @@ public class RefChangeValidator {
      commitContentValidator.validateChangeSetForContentSize(ssccChangeSet));
    refChangeVerificationResult.addContentDiffValidationResult(ssccChangeSet,
      commitContentValidator.validateChangeSetForContentDiff(ssccChangeSet));
+   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refChange.getRefId()));
   }
   return refChangeVerificationResult;
+ }
+
+ private boolean validateBranchName(String branchName) {
+  return compile(settings.getBranchRejectionRegexp().or(".*")).matcher(branchName).find();
  }
 }

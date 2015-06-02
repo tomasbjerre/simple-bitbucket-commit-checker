@@ -15,6 +15,7 @@ import com.google.common.base.Optional;
 public class SSCCRefChangeVerificationResult {
  private final RefChange refChange;
  private final Map<SSCCChangeSet, SSCCChangeSetVerificationResult> ssccChangeSets = newTreeMap();
+ private boolean branchNameValid;
 
  public SSCCRefChangeVerificationResult(RefChange refChange) {
   this.refChange = refChange;
@@ -45,7 +46,7 @@ public class SSCCRefChangeVerificationResult {
 
  public boolean hasReportables() {
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets.keySet()) {
-   if (ssccChangeSets.get(ssccChangeSet).hasReportables()) {
+   if (ssccChangeSets.get(ssccChangeSet).hasReportables() || !branchNameValid) {
     return TRUE;
    }
   }
@@ -64,5 +65,13 @@ public class SSCCRefChangeVerificationResult {
  public void addContentDiffValidationResult(SSCCChangeSet ssccChangeSet,
    Optional<String> validateChangeSetForContentDiff) {
   getOrAdd(ssccChangeSet).addContentDiffValidationResult(validateChangeSetForContentDiff);
+ }
+
+ public boolean isBranchNameValid() {
+  return branchNameValid;
+ }
+
+ public void setBranchValidationResult(boolean branchNameValid) {
+  this.branchNameValid = branchNameValid;
  }
 }

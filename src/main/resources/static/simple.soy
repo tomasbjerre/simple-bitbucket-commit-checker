@@ -24,6 +24,25 @@
         {param errorTexts: $errors ? $errors['branches'] : null /}
     {/call}
 
+    <div class="fieldGroup">
+        {call aui.form.textField}
+            {param id: 'branchRejectionRegexp' /}
+            {param labelContent: 'Check branch name' /}
+            {param value: $config['branchRejectionRegexp'] /}
+            {param descriptionText: 'Reject if branch name does not match this regexp, leave empty to allow all.' /}
+            {param errorTexts: $errors ? $errors['branchRejectionRegexp'] : null /}
+        {/call}
+
+        {call aui.form.textareaField}
+            {param id: 'branchRejectionRegexpMessage' /}
+            {param labelContent: 'Reject message' /}
+            {param value: $config['branchRejectionRegexpMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Reject message to show if branch name not matching regular expression.' /}
+            {param errorTexts: $errors ? $errors['branchRejectionRegexpMessage'] : null /}
+        {/call}
+    </div>
+
     {call aui.form.checkboxField}
         {param legendContent: 'Exclude Merge Commits' /}
         {param fields: [[

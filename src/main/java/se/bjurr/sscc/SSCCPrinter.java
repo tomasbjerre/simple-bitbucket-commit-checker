@@ -61,6 +61,18 @@ public class SSCCPrinter {
   }
  }
 
+ private void printBranchNameVerification(SSCCSettings settings,
+   SSCCRefChangeVerificationResult refChangeVerificationResult) {
+  if (!refChangeVerificationResult.isBranchNameValid()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Branch: " + refChangeVerificationResult.getRefChange().getRefId() + ", "
+     + settings.getBranchRejectionRegexp().get());
+   if (settings.getBranchRejectionRegexpMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getBranchRejectionRegexpMessage().get());
+   }
+  }
+ }
+
  private void printNameVerification(SSCCSettings settings,
    final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameResult()) {
@@ -125,6 +137,7 @@ public class SSCCPrinter {
     continue;
    }
    printRefChange(refChangeVerificationResult.getRefChange());
+   printBranchNameVerification(settings, refChangeVerificationResult);
    for (final SSCCChangeSet ssccChangeSet : refChangeVerificationResult.getSsccChangeSets().keySet()) {
     SSCCChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSsccChangeSets().get(
       ssccChangeSet);
