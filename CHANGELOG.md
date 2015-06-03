@@ -2,6 +2,11 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.7
+* Optionally check email against regular expression instead of equality to email in Stash. Like:
+ * ^${STASH_USER}@.*
+ * ^.*@company.domain$
+
 ## 1.6
 * Correctly reporting if committer or author name was faulty
 

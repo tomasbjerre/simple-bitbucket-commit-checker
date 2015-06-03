@@ -49,28 +49,35 @@ public class SSCCPrinter {
   ssccRenderer.println(">>> " + ssccChangeSet.getMessage());
  }
 
- private void printEmailVerification(SSCCSettings settings,
-   final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
+ private void printEmailVerification(final SSCCRefChangeVerificationResult refChangeVerificationResult,
+   final SSCCChangeSet ssccChangeSet) {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailAuthorResult()) {
    ssccRenderer.println();
-   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}' != Commit: '"
-     + ssccChangeSet.getAuthor().getEmailAddress() + "'");
+   ssccRenderer.println("- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
+     + "' != Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'");
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
     ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
    }
   }
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailCommitterResult()) {
    ssccRenderer.println();
-   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}' != Commit: '"
-     + ssccChangeSet.getCommitter().getEmailAddress() + "'");
+   ssccRenderer.println("- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
+     + "' != Commit: '" + ssccChangeSet.getCommitter().getEmailAddress() + "'");
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
     ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
    }
   }
  }
 
- private void printNameVerification(SSCCSettings settings,
-   final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
+ private String matchedEmail(String emailAddress) {
+  if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+   return ssccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get());
+  }
+  return ssccRenderer.render(emailAddress);
+ }
+
+ private void printNameVerification(final SSCCRefChangeVerificationResult refChangeVerificationResult,
+   final SSCCChangeSet ssccChangeSet) {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameAuthorResult()) {
    ssccRenderer.println();
    ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
@@ -89,8 +96,7 @@ public class SSCCPrinter {
   }
  }
 
- private void printBranchNameVerification(SSCCSettings settings,
-   SSCCRefChangeVerificationResult refChangeVerificationResult) {
+ private void printBranchNameVerification(SSCCRefChangeVerificationResult refChangeVerificationResult) {
   if (!refChangeVerificationResult.isBranchNameValid()) {
    ssccRenderer.println();
    ssccRenderer.println("- Branch: " + refChangeVerificationResult.getRefChange().getRefId() + ", "
@@ -153,7 +159,7 @@ public class SSCCPrinter {
     continue;
    }
    printRefChange(refChangeVerificationResult.getRefChange());
-   printBranchNameVerification(settings, refChangeVerificationResult);
+   printBranchNameVerification(refChangeVerificationResult);
    for (final SSCCChangeSet ssccChangeSet : refChangeVerificationResult.getSsccChangeSets().keySet()) {
     SSCCChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSsccChangeSets().get(
       ssccChangeSet);
@@ -161,8 +167,8 @@ public class SSCCPrinter {
      continue;
     }
     printCommit(ssccChangeSet);
-    printEmailVerification(settings, refChangeVerificationResult, ssccChangeSet);
-    printNameVerification(settings, refChangeVerificationResult, ssccChangeSet);
+    printEmailVerification(refChangeVerificationResult, ssccChangeSet);
+    printNameVerification(refChangeVerificationResult, ssccChangeSet);
     printMaximumSizeExceeded(changeSetVerificationResult.getExceeding());
     printRejectedContent(changeSetVerificationResult.getRejectedContent());
     for (final SSCCGroup ssccVerificationResult : changeSetVerificationResult.getGroupsResult().keySet()) {

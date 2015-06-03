@@ -8,6 +8,9 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check that author name in Stash is same as in commit.
 * Check that committer email in Stash is same as in commit.
 * Check that committer name in Stash is same as in commit.
+* Optionally check email against regular expression instead of equality to email in Stash. Like:
+ * ^${STASH_USER}@.*
+ * ^[^@]*@company.domain$
 * Check that changed content does not match a specific regexp, like unresolved merge.
 * Check size of commits, so that large files don't accidently gets pushed.
 * Simple configuration of rules that must apply to commit messages. Organized in groups.

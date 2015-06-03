@@ -34,9 +34,11 @@ public class RefChangeValidator {
  private final CommitMessageValidator commitMessageValidator;
  private final CommitContentValidator commitContentValidator;
 
+ private final SSCCRenderer ssccRenderer;
+
  public RefChangeValidator(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    SSCCSettings settings, HookResponse hookResponse, ChangeSetsService changesetsService,
-   StashAuthenticationContext stashAuthenticationContext) {
+   StashAuthenticationContext stashAuthenticationContext, SSCCRenderer ssccRenderer) {
   this.repositoryHookContext = repositoryHookContext;
   this.refChanges = refChanges;
   this.settings = settings;
@@ -45,6 +47,7 @@ public class RefChangeValidator {
   this.stashAuthenticationContext = stashAuthenticationContext;
   this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext);
   this.commitContentValidator = new CommitContentValidator(settings);
+  this.ssccRenderer = ssccRenderer;
  }
 
  public SSCCVerificationResult validateRefChanges() throws IOException {
@@ -78,9 +81,9 @@ public class RefChangeValidator {
    refChangeVerificationResult.setGroupsResult(ssccChangeSet,
      commitMessageValidator.validateChangeSetForGroups(settings, ssccChangeSet));
    refChangeVerificationResult.addAuthorEmailValidationResult(ssccChangeSet,
-     commitMessageValidator.validateChangeSetForAuthorEmail(settings, ssccChangeSet));
+     commitMessageValidator.validateChangeSetForAuthorEmail(settings, ssccChangeSet, ssccRenderer));
    refChangeVerificationResult.addCommitterEmailValidationResult(ssccChangeSet,
-     commitMessageValidator.validateChangeSetForCommitterEmail(settings, ssccChangeSet));
+     commitMessageValidator.validateChangeSetForCommitterEmail(settings, ssccChangeSet, ssccRenderer));
    refChangeVerificationResult.addAuthorNameValidationResult(ssccChangeSet,
      commitMessageValidator.validateChangeSetForAuthorName(settings, ssccChangeSet));
    refChangeVerificationResult.addCommitterNameValidationResult(ssccChangeSet,

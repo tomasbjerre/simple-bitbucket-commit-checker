@@ -2,6 +2,7 @@ package se.bjurr.sscc;
 
 import static se.bjurr.sscc.SSCCCommon.getStashEmail;
 import static se.bjurr.sscc.SSCCCommon.getStashName;
+import static se.bjurr.sscc.SSCCCommon.getStashUser;
 
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.user.StashAuthenticationContext;
@@ -22,6 +23,11 @@ public class SSCCRenderer {
    @Override
    public String resolve(StashAuthenticationContext stashAuthenticationContext) {
     return getStashName(stashAuthenticationContext);
+   }
+  }), STASH_USER(new Resolver() {
+   @Override
+   public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+    return getStashUser(stashAuthenticationContext);
    }
   });
 
@@ -52,7 +58,7 @@ public class SSCCRenderer {
   hookResponse.out().println(render(string));
  }
 
- private String render(String string) {
+ public String render(String string) {
   for (SSCCVariable variable : SSCCVariable.values()) {
    string = string.replaceAll("\\$\\{" + variable.name() + "\\}", variable.resolve(stashAuthenticationContext));
   }

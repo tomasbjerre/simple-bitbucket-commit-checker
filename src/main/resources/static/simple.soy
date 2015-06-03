@@ -13,6 +13,7 @@
         <ul>
             <li><b>&#36;&#123;STASH_EMAIL&#125;</b> Email of user in Stash.</li>
             <li><b>&#36;&#123;STASH_NAME&#125;</b> Name of user in Stash.</li>
+            <li><b>&#36;&#123;STASH_USER&#125;</b> Username of user in Stash.</li>
         </ul>
     </div>
 
@@ -94,12 +95,21 @@
             {param descriptionText: 'Require that committers email matches the Stash users email.' /}
         {/call}
     
+        {call aui.form.textField}
+            {param id: 'requireMatchingAuthorEmailRegexp' /}
+            {param labelContent: 'Regular expression' /}
+            {param value: $config['requireMatchingAuthorEmailRegexp'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Optional (leave empty to disable) regular expression to match against email, instead of stash email. Supports variables mentioned above.' /}
+            {param errorTexts: $errors ? $errors['requireMatchingAuthorEmailRegexp'] : null /}
+        {/call}
+    
         {call aui.form.textareaField}
             {param id: 'requireMatchingAuthorEmailMessage' /}
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorEmailMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if email not matching authors email. Like: git config --global user.email user@name.com' /}
+            {param descriptionText: 'Reject message to show if email not matching authors email. Like: git config --global user.email user@name.com . Supports variables mentioned above.' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
         {/call}
     </div>
@@ -130,7 +140,7 @@
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorNameMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if author not matching authors name. Like: git config --global user.name "User Name"' /}
+            {param descriptionText: 'Reject message to show if author not matching authors name. Like: git config --global user.name "User Name" . Supports variables mentioned above.' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
         {/call}
     </div>

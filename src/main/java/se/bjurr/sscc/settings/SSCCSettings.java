@@ -34,6 +34,7 @@ public class SSCCSettings {
  public static final String SETTING_REJECT_MESSAGE = "rejectMessage";
  public static final String SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL = "requireMatchingCommitterEmail";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL = "requireMatchingAuthorEmail";
+ public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP = "requireMatchingAuthorEmailRegexp";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE = "requireMatchingAuthorEmailMessage";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME = "requireMatchingAuthorName";
  public static final String SETTING_REQUIRE_MATCHING_COMMITTER_NAME = "requireMatchingCommitterName";
@@ -71,6 +72,7 @@ public class SSCCSettings {
  private String branchRejectionRegexp;
  private String branchRejectionRegexpMessage;
  private boolean allowServiceUsers;
+ private String requireMatchingAuthorEmailRegexp;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
@@ -86,6 +88,7 @@ public class SSCCSettings {
     .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL))
     .withRequireMatchingCommitterEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL))
     .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE))
+    .withRequireMatchingAuthorEmailRegexp(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP))
     .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME))
     .withRequireMatchingCommitterName(settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_NAME))
     .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE))
@@ -139,6 +142,11 @@ public class SSCCSettings {
    }
   }
   return ssccSettings;
+ }
+
+ private SSCCSettings withRequireMatchingAuthorEmailRegexp(String string) {
+  this.requireMatchingAuthorEmailRegexp = emptyToNull(string);
+  return this;
  }
 
  private void withAllowServiceUsers(Boolean allowServiceUsers) {
@@ -212,6 +220,10 @@ public class SSCCSettings {
 
  public Optional<String> getRequireMatchingAuthorEmailMessage() {
   return fromNullable(requireMatchingAuthorEmailMessage);
+ }
+
+ public Optional<String> getRequireMatchingAuthorEmailRegexp() {
+  return fromNullable(requireMatchingAuthorEmailRegexp);
  }
 
  public Optional<String> getRequireMatchingAuthorNameMessage() {

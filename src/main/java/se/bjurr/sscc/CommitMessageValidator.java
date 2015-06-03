@@ -65,22 +65,26 @@ public class CommitMessageValidator {
   return allMatching;
  }
 
- public boolean validateChangeSetForCommitterEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+ public boolean validateChangeSetForCommitterEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet,
+   SSCCRenderer ssccRenderer) {
   if (settings.shouldRequireMatchingCommitterEmail()) {
-   if (getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getEmailAddress())) {
-    return TRUE;
+   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+    return compile(ssccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
+      ssccChangeSet.getCommitter().getEmailAddress()).find();
    }
-   return FALSE;
+   return getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getEmailAddress());
   }
   return TRUE;
  }
 
- public boolean validateChangeSetForAuthorEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+ public boolean validateChangeSetForAuthorEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet,
+   SSCCRenderer ssccRenderer) {
   if (settings.shouldRequireMatchingAuthorEmail()) {
-   if (getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getEmailAddress())) {
-    return TRUE;
+   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+    return compile(ssccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
+      ssccChangeSet.getAuthor().getEmailAddress()).find();
    }
-   return FALSE;
+   return getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getEmailAddress());
   }
   return TRUE;
  }

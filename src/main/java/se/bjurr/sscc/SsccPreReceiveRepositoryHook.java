@@ -53,7 +53,8 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
 
    final SSCCSettings settings = sscSettings(repositoryHookContext.getSettings());
    final SSCCVerificationResult refChangeVerificationResults = new RefChangeValidator(repositoryHookContext,
-     refChanges, settings, hookResponse, changesetsService, stashAuthenticationContext).validateRefChanges();
+     refChanges, settings, hookResponse, changesetsService, stashAuthenticationContext, ssccRenderer)
+     .validateRefChanges();
 
    new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChanges, refChangeVerificationResults);
 
