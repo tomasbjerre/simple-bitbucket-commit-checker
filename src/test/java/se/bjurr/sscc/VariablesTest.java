@@ -53,7 +53,7 @@ public class VariablesTest {
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Stash Name' != Commit: 'Commit Name'   Stash says your name is Stash Name, set it using: git config --global user.name \"Stash Name\"")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Stash Name' != Commit: 'Tomas'   Stash says your name is Stash Name, set it using: git config --global user.name \"Stash Name\"")
     .wasRejected();
  }
 }

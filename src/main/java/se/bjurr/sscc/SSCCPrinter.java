@@ -69,6 +69,26 @@ public class SSCCPrinter {
   }
  }
 
+ private void printNameVerification(SSCCSettings settings,
+   final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameAuthorResult()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
+     + ssccChangeSet.getAuthor().getName() + "'");
+   if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+   }
+  }
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameCommitterResult()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
+     + ssccChangeSet.getCommitter().getName() + "'");
+   if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+   }
+  }
+ }
+
  private void printBranchNameVerification(SSCCSettings settings,
    SSCCRefChangeVerificationResult refChangeVerificationResult) {
   if (!refChangeVerificationResult.isBranchNameValid()) {
@@ -77,18 +97,6 @@ public class SSCCPrinter {
      + settings.getBranchRejectionRegexp().get());
    if (settings.getBranchRejectionRegexpMessage().isPresent()) {
     ssccRenderer.println("  " + settings.getBranchRejectionRegexpMessage().get());
-   }
-  }
- }
-
- private void printNameVerification(SSCCSettings settings,
-   final SSCCRefChangeVerificationResult refChangeVerificationResult, final SSCCChangeSet ssccChangeSet) {
-  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameResult()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
-     + ssccChangeSet.getCommitter().getName() + "'");
-   if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
    }
   }
  }

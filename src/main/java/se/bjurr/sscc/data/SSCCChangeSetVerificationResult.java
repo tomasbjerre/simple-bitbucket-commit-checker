@@ -13,12 +13,13 @@ import se.bjurr.sscc.settings.SSCCMatch;
 import com.google.common.base.Optional;
 
 public class SSCCChangeSetVerificationResult {
- private boolean emailAuthorResult;
  private Map<SSCCGroup, SSCCMatch> groupsResult = newTreeMap();
- private boolean nameResult;
+ private boolean nameAuthorResult;
+ private boolean nameCommitterResult;
+ private boolean emailAuthorResult;
+ private boolean emailCommitterResult;
  private Map<String, Long> exceeding = newTreeMap();
  private Optional<String> rejectedContent = absent();
- private boolean emailCommitterResult;
 
  public Boolean getEmailAuthorResult() {
   return emailAuthorResult;
@@ -28,8 +29,12 @@ public class SSCCChangeSetVerificationResult {
   return groupsResult;
  }
 
- public boolean getNameResult() {
-  return nameResult;
+ public boolean getNameAuthorResult() {
+  return nameAuthorResult;
+ }
+
+ public boolean getNameCommitterResult() {
+  return nameCommitterResult;
  }
 
  public boolean hasErrors() {
@@ -39,7 +44,7 @@ public class SSCCChangeSetVerificationResult {
    }
   }
   return getRejectedContent().isPresent() || getExceeding().size() > 0 || !emailAuthorResult || !emailCommitterResult
-    || !nameResult;
+    || !nameAuthorResult || !nameCommitterResult;
  }
 
  public boolean hasReportables() {
@@ -58,8 +63,12 @@ public class SSCCChangeSetVerificationResult {
   this.groupsResult = groupsResult;
  }
 
- public void setNameResult(boolean nameResult) {
-  this.nameResult = nameResult;
+ public void setNameAuthorResult(boolean nameResult) {
+  this.nameAuthorResult = nameResult;
+ }
+
+ public void setNameCommitterResult(boolean nameResult) {
+  this.nameCommitterResult = nameResult;
  }
 
  public void addContentSizeValidationResult(Map<String, Long> exceeding) {

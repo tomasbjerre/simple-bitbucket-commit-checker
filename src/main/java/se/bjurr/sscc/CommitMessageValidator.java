@@ -85,14 +85,19 @@ public class CommitMessageValidator {
   return TRUE;
  }
 
- public boolean validateChangeSetForName(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
-  if (settings.shouldRequireMatchingCommitterName()) {
-   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getName())) {
+ public boolean validateChangeSetForAuthorName(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+  if (settings.shouldRequireMatchingAuthorName()) {
+   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getName())) {
     return TRUE;
    }
    return FALSE;
-  } else if (settings.shouldRequireMatchingAuthorName()) {
-   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getName())) {
+  }
+  return TRUE;
+ }
+
+ public boolean validateChangeSetForCommitterName(SSCCSettings settings, SSCCChangeSet ssccChangeSet) {
+  if (settings.shouldRequireMatchingCommitterName()) {
+   if (getStashName(stashAuthenticationContext).equals(ssccChangeSet.getCommitter().getName())) {
     return TRUE;
    }
    return FALSE;

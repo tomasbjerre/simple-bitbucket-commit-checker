@@ -29,8 +29,12 @@ public class SSCCRefChangeVerificationResult {
   getOrAdd(ssccChangeSet).setEmailCommitterResult(validateChangeSetForCommitterEmail);
  }
 
- public void addNameValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForName) {
-  getOrAdd(ssccChangeSet).setNameResult(validateChangeSetForName);
+ public void addAuthorNameValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForName) {
+  getOrAdd(ssccChangeSet).setNameAuthorResult(validateChangeSetForName);
+ }
+
+ public void addCommitterNameValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForName) {
+  getOrAdd(ssccChangeSet).setNameCommitterResult(validateChangeSetForName);
  }
 
  private SSCCChangeSetVerificationResult getOrAdd(SSCCChangeSet ssccChangeSet) {

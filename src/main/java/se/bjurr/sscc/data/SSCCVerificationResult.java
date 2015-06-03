@@ -23,12 +23,6 @@ public class SSCCVerificationResult {
     return FALSE;
    }
    for (SSCCChangeSet ssccChangeSet : c.getSsccChangeSets().keySet()) {
-    if (!c.getSsccChangeSets().get(ssccChangeSet).getEmailAuthorResult()) {
-     return FALSE;
-    }
-    if (!c.getSsccChangeSets().get(ssccChangeSet).getNameResult()) {
-     return FALSE;
-    }
     if (c.getSsccChangeSets().get(ssccChangeSet).hasErrors()) {
      return FALSE;
     }

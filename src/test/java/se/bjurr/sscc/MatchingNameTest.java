@@ -19,19 +19,19 @@ public class MatchingNameTest {
  public void testCommitMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOk() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B")
+    .withStashEmail("committer@one.site")
+    .withStashDisplayName("Tompa Committer")
     .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit")
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Tompa B' != Commit: 'Tomas Bjerre'   Name in Stash not same as in commit")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tompa Committer' != Commit: 'Tomas Committer'   Name in Stash not same as in commit   2 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Tompa Committer' != Commit: 'Tompa B'   Name in Stash not same as in commit")
     .wasRejected();
  }
 
@@ -39,19 +39,19 @@ public class MatchingNameTest {
  public void testCommitMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas B", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
-      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
+      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer", "tomas.bjerre@two.site"))
         .withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B")
+    .withStashEmail("committer@one.site")
+    .withStashDisplayName("Tompa Committer")
     .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit")
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Tompa B' != Commit: 'Tomas Bjerre'   Name in Stash not same as in commit")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tompa Committer' != Commit: 'Tomas B'   Name in Stash not same as in commit   2 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Stash: 'Tompa Committer' != Commit: 'Tomas Committer'   Name in Stash not same as in commit")
     .wasRejected();
  }
 
@@ -59,66 +59,68 @@ public class MatchingNameTest {
  public void testCommitIsAcceptedWhenNameMustMatchNameInStashAndTwoOfTwoCommitsHaveDifferentEmail() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@one.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
-      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B").withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, TRUE)
+      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer", "tomas.bjerre@two.site"))
+        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("committer@one.site")
+    .withStashDisplayName("Tomas Committer").withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit").build().run()
     .hasNoOutput().wasAccepted();
  }
 
  @Test
- public void testAuthorMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOk() throws IOException {
+ public void testCommitAuthorMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOk() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withAuthor(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Diff", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
-      changeSetBuilder().withId("2").withAuthor(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B")
+      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer", "tomas.bjerre@two.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withStashEmail("committer@one.site")
+    .withStashDisplayName("Tomas Author")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit")
     .build()
     .run()
-    .wasRejected()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tompa B' != Commit: 'Tomas'   Name in Stash not same as in commit");
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Diff <author@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tomas Author' != Commit: 'Tomas Diff'   Name in Stash not same as in commit")
+    .wasRejected();
  }
 
  @Test
- public void testAuthorMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
+ public void testCommitAuthorMustMatchNameInStashAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withAuthor(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
-      changeSetBuilder().withId("2").withAuthor(new SSCCPerson("Tomas Bjerre", "tomas.bjerre@one.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B")
+      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer", "tomas.bjerre@two.site"))
+        .withAuthor(new SSCCPerson("Tomas Diff", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withStashEmail("committer@one.site")
+    .withStashDisplayName("Tomas Author")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit")
     .build()
     .run()
-    .wasRejected()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Bjerre <tomas.bjerre@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tompa B' != Commit: 'Tomas'   Name in Stash not same as in commit");
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Diff <author@one.site> >>> SB-5678 fixing stuff  - Stash: 'Tomas Author' != Commit: 'Tomas Diff'   Name in Stash not same as in commit")
+    .wasRejected();
  }
 
  @Test
- public void testAuthorIsAcceptedWhenMustMatchNameInStashAndTwoOfTwoCommitsHaveDifferentEmail() throws IOException {
+ public void testCommitAuthorIsAcceptedWhenNameMustMatchNameInStashAndTwoOfTwoCommitsHaveDifferentEmail()
+   throws IOException {
   refChangeBuilder()
     .withChangeSet(
-      changeSetBuilder().withId("1").withAuthor(new SSCCPerson("Tompa B", "tomas.bjerre@one.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build())
+      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer 1", "committer@one.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
-      changeSetBuilder().withId("2").withAuthor(new SSCCPerson("Tompa B", "tomas.bjerre@two.site"))
-        .withMessage(COMMIT_MESSAGE_JIRA).build()).withStashEmail("tomas.bjerre@two.site")
-    .withStashDisplayName("Tompa B").withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
+      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer 2", "tomas.bjerre@two.site"))
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withStashEmail("committer@one.site").withStashDisplayName("Tomas Author")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit").build().run()
     .hasNoOutput().wasAccepted();
  }
