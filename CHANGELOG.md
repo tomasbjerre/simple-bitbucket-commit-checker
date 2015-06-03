@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.6
+* Correctly reporting if committer or author name was faulty
+
 ## 1.5
 * Reject commits if regexp does not match branch name
 * Check that committer equals Stash user
