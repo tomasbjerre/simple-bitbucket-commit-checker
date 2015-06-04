@@ -143,6 +143,17 @@ public class SSCCPrinter {
   }
  }
 
+ private void printJqlVerification(SSCCRefChangeVerificationResult refChangeVerificationResult,
+   SSCCChangeSet ssccChangeSet) {
+  for (String query : refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getFailingJqls()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- JQL: " + query);
+   if (settings.getJqlCheckMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getJqlCheckMessage().get());
+   }
+  }
+ }
+
  public void printVerificationResults(Collection<RefChange> refChanges, SSCCVerificationResult verificationResult) {
   if (verificationResult.isAccepted()) {
    if (settings.getAcceptMessage().isPresent()) {
@@ -169,6 +180,7 @@ public class SSCCPrinter {
     printCommit(ssccChangeSet);
     printEmailVerification(refChangeVerificationResult, ssccChangeSet);
     printNameVerification(refChangeVerificationResult, ssccChangeSet);
+    printJqlVerification(refChangeVerificationResult, ssccChangeSet);
     printMaximumSizeExceeded(changeSetVerificationResult.getExceeding());
     printRejectedContent(changeSetVerificationResult.getRejectedContent());
     for (final SSCCGroup ssccVerificationResult : changeSetVerificationResult.getGroupsResult().keySet()) {

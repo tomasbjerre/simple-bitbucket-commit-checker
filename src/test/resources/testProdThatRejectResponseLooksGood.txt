@@ -69,5 +69,8 @@ af35f33a6a26094a0739ed397b0d475f4a8d30cf Tomas <my@email.com>
 - Stash: 'the@correct.email' != Commit: 'null'
   Please set correct email in your commits. git config --global user.email user@name.com
 
+- JQL: assignee in ("tomas") AND issue = SB-1234
+  Jira must have assignee!
+
 *** We are currently running commit checker in dry run mode. Your commits are
 *** being accepted. We will soon start blocking this kind of commits.

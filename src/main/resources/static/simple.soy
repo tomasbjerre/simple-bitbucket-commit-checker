@@ -9,6 +9,7 @@
     <div class="aui-message aui-message-info">
         You can use <a target="_blank" href="http://jex.im/regulex/">http://jex.im/regulex/</a> to fiddle with regular expressions.<br>
         You may want some <a target="_blank" href="http://lmgtfy.com/?q=ascii+art">ASCII art</a> in accept and reject messages.<br>
+        JQL functionality requires <a href="https://confluence.atlassian.com/display/STASH/Linking+Stash+with+JIRA" target="_blank">JIRA application link</a> to be configured.<br>
         You can use variables in messages.<bt>
         <ul>
             <li><b>&#36;&#123;STASH_EMAIL&#125;</b> Email of user in Stash.</li>
@@ -223,6 +224,44 @@
     {/call}
     
     <h3>Issue validation</h3>
+
+    <div class="fieldGroup">
+        {call aui.form.checkboxField}
+            {param legendContent: 'JQL' /}
+            {param fields: [[
+                'id' : 'jqlCheck',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['jqlCheck']
+            ]] /}
+            {param descriptionText: 'Evaluate a JQL query and reject if it does not match at least one result.' /}
+        {/call}
+    
+        {call aui.form.textField}
+            {param id: 'commitRegexp' /}
+            {param labelContent: 'REGEXP parameter' /}
+            {param value: $config['commitRegexp'] /}
+            {param descriptionText: 'Optional regular expression that is evaluated in the commit content. The value is available in the JQL query field as REGEXP variable. A Jira issue would match "\\b[a-zA-Z]([a-zA-Z]+)-([0-9]+)\\b".' /}
+            {param errorTexts: $errors ? $errors['commitRegexp'] : null /}
+        {/call}
+
+        {call aui.form.textField}
+            {param id: 'jqlCheckQuery' /}
+            {param labelContent: 'Query' /}
+            {param value: $config['jqlCheckQuery'] /}
+            {param descriptionText: 'Reject the commit if there is not results for this query. You can use variables mentioned above and also the REGEXP variable if you entered a regexp above.' /}
+            {param errorTexts: $errors ? $errors['jqlCheckQuery'] : null /}
+        {/call}
+
+        {call aui.form.textareaField}
+            {param id: 'jqlCheckMessage' /}
+            {param labelContent: 'Reject message' /}
+            {param value: $config['jqlCheckMessage'] /}
+            {param rows: 3 /}
+            {param descriptionText: 'Message to append to response, if JQL query does not match.' /}
+            {param errorTexts: $errors ? $errors['jqlCheckMessage'] : null /}
+        {/call}
+    </div>
+
     <div class="issues">
         <div class="left">
             <div class="buttons">

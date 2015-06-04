@@ -19,13 +19,8 @@ public class SSCCVerificationResult {
 
  public boolean isAccepted() {
   for (final SSCCRefChangeVerificationResult c : refChanges) {
-   if (!c.isBranchNameValid()) {
+   if (c.hasErrors()) {
     return FALSE;
-   }
-   for (SSCCChangeSet ssccChangeSet : c.getSsccChangeSets().keySet()) {
-    if (c.getSsccChangeSets().get(ssccChangeSet).hasErrors()) {
-     return FALSE;
-    }
    }
   }
   return TRUE;

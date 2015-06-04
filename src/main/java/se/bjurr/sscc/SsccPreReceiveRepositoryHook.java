@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import se.bjurr.sscc.data.SSCCVerificationResult;
 import se.bjurr.sscc.settings.SSCCSettings;
 
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.PreReceiveRepositoryHook;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
@@ -24,20 +25,23 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
 
  private ChangeSetsService changesetsService;
 
- private String hookNameVersion;
+ private String hookName;
 
  private final StashAuthenticationContext stashAuthenticationContext;
 
+ private final ApplicationLinkService applicationLinkService;
+
  public SsccPreReceiveRepositoryHook(ChangeSetsService changesetsService,
-   StashAuthenticationContext stashAuthenticationContext) {
-  this.hookNameVersion = "Simple Stash Commit Checker";
+   StashAuthenticationContext stashAuthenticationContext, ApplicationLinkService applicationLinkService) {
+  this.hookName = "Simple Stash Commit Checker";
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
+  this.applicationLinkService = applicationLinkService;
  }
 
  @VisibleForTesting
- public String getHookNameVersion() {
-  return hookNameVersion;
+ public String getHookName() {
+  return hookName;
  }
 
  @Override
@@ -46,15 +50,15 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   try {
    SSCCRenderer ssccRenderer = new SSCCRenderer(this.stashAuthenticationContext, hookResponse);
 
-   if (!hookNameVersion.isEmpty()) {
-    ssccRenderer.println(hookNameVersion);
+   if (!hookName.isEmpty()) {
+    ssccRenderer.println(hookName);
     ssccRenderer.println();
    }
 
    final SSCCSettings settings = sscSettings(repositoryHookContext.getSettings());
    final SSCCVerificationResult refChangeVerificationResults = new RefChangeValidator(repositoryHookContext,
-     refChanges, settings, hookResponse, changesetsService, stashAuthenticationContext, ssccRenderer)
-     .validateRefChanges();
+     refChanges, settings, hookResponse, changesetsService, stashAuthenticationContext, ssccRenderer,
+     applicationLinkService).validateRefChanges();
 
    new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChanges, refChangeVerificationResults);
 
@@ -83,8 +87,8 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  }
 
  @VisibleForTesting
- public void setHookNameVersion(String hookNameVersion) {
-  this.hookNameVersion = hookNameVersion;
+ public void setHookName(String hookName) {
+  this.hookName = hookName;
  }
 
  @VisibleForTesting

@@ -1,0 +1,28 @@
+{
+    "expand": "schema,names",
+    "startAt": 0,
+    "maxResults": 50,
+    "total": 1,
+    "issues": [
+        {
+            "expand": "html",
+            "id": "10230",
+            "self": "http://kelpie9:8081/rest/api/2/issue/BULK-62",
+            "key": "BULK-62",
+            "fields": {
+                "summary": "testing",
+                "timetracking": null,
+                "issuetype": {
+                    "self": "http://kelpie9:8081/rest/api/2/issuetype/5",
+                    "id": "5",
+                    "description": "The sub-task of the issue",
+                    "iconUrl": "http://kelpie9:8081/images/icons/issue_subtask.gif",
+                    "name": "Sub-task",
+                    "subtask": true
+                },
+                "customfield_10071": null
+            },
+            "transitions": "http://kelpie9:8081/rest/api/2/issue/BULK-62/transitions"
+        }
+    ]
+}

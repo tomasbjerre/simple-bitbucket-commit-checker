@@ -1,16 +1,29 @@
 package se.bjurr.sscc;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.regex.Pattern.compile;
 import static se.bjurr.sscc.SSCCCommon.getStashEmail;
 import static se.bjurr.sscc.SSCCCommon.getStashName;
 import static se.bjurr.sscc.SSCCCommon.getStashUser;
+
+import java.util.List;
+import java.util.regex.Matcher;
+
+import se.bjurr.sscc.data.SSCCChangeSet;
 
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.user.StashAuthenticationContext;
 
 public class SSCCRenderer {
 
- public interface Resolver {
-  public String resolve(StashAuthenticationContext stashAuthenticationContext);
+ private static class Resolver {
+  public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+   return "";
+  }
+
+  public List<String> resolveAll(String regexp, SSCCChangeSet changeSet) {
+   return newArrayList();
+  };
  }
 
  public enum SSCCVariable {
@@ -29,6 +42,16 @@ public class SSCCRenderer {
    public String resolve(StashAuthenticationContext stashAuthenticationContext) {
     return getStashUser(stashAuthenticationContext);
    }
+  }), REGEXP(new Resolver() {
+   @Override
+   public List<String> resolveAll(String regexp, SSCCChangeSet changeSet) {
+    List<String> allMatches = newArrayList();
+    Matcher matcher = compile(regexp).matcher(changeSet.getMessage());
+    while (matcher.find()) {
+     allMatches.add(matcher.group());
+    }
+    return allMatches;
+   }
   });
 
   private Resolver resolver;
@@ -39,6 +62,10 @@ public class SSCCRenderer {
 
   public String resolve(StashAuthenticationContext stashAuthenticationContext) {
    return resolver.resolve(stashAuthenticationContext);
+  }
+
+  public List<String> resolveAll(String regexp, SSCCChangeSet changeSet) {
+   return resolver.resolveAll(regexp, changeSet);
   }
  }
 
@@ -63,5 +90,14 @@ public class SSCCRenderer {
    string = string.replaceAll("\\$\\{" + variable.name() + "\\}", variable.resolve(stashAuthenticationContext));
   }
   return string;
+ }
+
+ public List<String> renderAll(SSCCRenderer.SSCCVariable variable, String regexp, SSCCChangeSet ssccChangeSet,
+   String toRender) {
+  List<String> renderedList = newArrayList();
+  for (String resolved : variable.resolveAll(regexp, ssccChangeSet)) {
+   renderedList.add(render(toRender.replaceAll("\\$\\{" + SSCCRenderer.SSCCVariable.REGEXP.name() + "\\}", resolved)));
+  }
+  return renderedList;
  }
 }

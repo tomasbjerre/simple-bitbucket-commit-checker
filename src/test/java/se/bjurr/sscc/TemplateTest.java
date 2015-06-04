@@ -7,11 +7,15 @@ import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_ACCEPT_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCHES;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_COMMIT_REGEXP;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DRY_RUN;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DRY_RUN_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MATCH;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK_QUERY;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REJECT_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
@@ -19,6 +23,8 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMI
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_REGEXP;
+import static se.bjurr.sscc.util.RefChangeBuilder.JIRA_REGEXP;
+import static se.bjurr.sscc.util.RefChangeBuilder.JIRA_RESPONSE_ONE;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
@@ -46,6 +52,12 @@ public class TemplateTest {
   SSCCPerson committerName = new SSCCPerson("Tompa", null);
   SSCCPerson committerNone = new SSCCPerson(null, null);
   refChangeBuilder()
+    .withStashName("tomas")
+    .fakeJiraResponse("assignee in (\"tomas\") AND issue = AB-1234", JIRA_RESPONSE_ONE)
+    .withSetting(SETTING_JQL_CHECK, TRUE)
+    .withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
+    .withSetting(SETTING_JQL_CHECK_QUERY, "assignee in (\"${STASH_USER}\") AND issue = ${REGEXP}")
+    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Jira must have assignee!")
     .withHookNameVersion("Simple Stash Commit Checker X.X")
     .withStashEmail("the@correct.email")
     .withStashDisplayName("Tommy Boy")

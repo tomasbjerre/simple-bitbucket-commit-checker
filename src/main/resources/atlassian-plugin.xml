@@ -20,12 +20,14 @@
     <context>stash.page.repository.settings.hooks</context>
   </web-resource>
 
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+  
+  <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
+
   <component key="changeSetsService" class="se.bjurr.sscc.ChangeSetsServiceImpl" public="true">
     <interface>se.bjurr.sscc.ChangeSetsService</interface>
   </component>
   
-  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
-
   <repository-hook name="Simple Stash Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
     <description key="pre-receive-repository-hook.description">Simple Stash Commit Checker</description>
     <icon>images/pluginLogo.png</icon>

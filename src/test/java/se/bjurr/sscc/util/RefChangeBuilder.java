@@ -4,6 +4,7 @@ import static com.atlassian.stash.repository.RefChangeType.UPDATE;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.io.Resources.getResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static se.bjurr.sscc.JqlValidator.setJiraClient;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MATCH;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_MESSAGE;
@@ -20,16 +22,22 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_REGEXP;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.mockito.Matchers;
 
 import se.bjurr.sscc.ChangeSetsService;
+import se.bjurr.sscc.JiraClient;
 import se.bjurr.sscc.SsccPreReceiveRepositoryHook;
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.settings.SSCCGroup;
 import se.bjurr.sscc.settings.SSCCSettings;
 
+import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.applinks.api.CredentialsRequiredException;
+import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
@@ -42,6 +50,11 @@ import com.atlassian.stash.user.UserType;
 import com.google.common.io.Resources;
 
 public class RefChangeBuilder {
+ public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
+ public static final String JIRA_RESPONSE_EMPTY = "jiraResponseEmpty.json";
+ public static final String JIRA_RESPONSE_ONE = "jiraResponseOne.json";
+ public static final String JIRA_RESPONSE_TWO = "jiraResponseTwo.json";
+
  public static RefChangeBuilder refChangeBuilder() {
   return new RefChangeBuilder();
  }
@@ -59,23 +72,35 @@ public class RefChangeBuilder {
  private RefChange refChange;
  private String refId = "refs/heads/master";
  private final RepositoryHookContext repositoryHookContext;
-
+ private final Map<String, String> jiraJsonResponses = newHashMap();
  private final Settings settings;
  private final StashAuthenticationContext stashAuthenticationContext;
  private final StashUser stashUser;
  private String toHash = "af35d5c1a435d4f323b4e01775fa90a3eae652b3";
  private RefChangeType type = UPDATE;
  private Boolean wasAccepted = null;
+ private ApplicationLinkService applicationLinkService;
 
  private RefChangeBuilder() {
+  setJiraClient(new JiraClient() {
+   @Override
+   protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
+     throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
+    if (jiraJsonResponses.containsKey(jqlCheckQuery)) {
+     return jiraJsonResponses.get(jqlCheckQuery);
+    }
+    throw new RuntimeException("No faked response for: \"" + jqlCheckQuery + "\"");
+   }
+  });
+
   newChangesets = newArrayList();
   settings = mock(Settings.class);
   this.repositoryHookContext = mock(RepositoryHookContext.class);
   when(repositoryHookContext.getSettings()).thenReturn(settings);
   this.changeSetService = mock(ChangeSetsService.class);
   this.stashAuthenticationContext = mock(StashAuthenticationContext.class);
-  this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext);
-  this.hook.setHookNameVersion("");
+  this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext, applicationLinkService);
+  this.hook.setHookName("");
   hookResponse = mock(HookResponse.class);
   when(hookResponse.out()).thenReturn(printWriterStandard);
   when(hookResponse.err()).thenReturn(printWriterReject);
@@ -200,7 +225,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity an issue") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
  }
 
@@ -208,7 +233,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_GROUP_ACCEPT + "[1]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[1]", SSCCGroup.Match.NONE.toString()) //
@@ -221,7 +246,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA and INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
@@ -231,7 +256,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_GROUP_ACCEPT + "[1]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[1]", SSCCGroup.Match.ALL.toString()) //
@@ -244,7 +269,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.NONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Do not specify issues") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
@@ -254,7 +279,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
  }
 
@@ -262,7 +287,7 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.NONE.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
@@ -272,14 +297,14 @@ public class RefChangeBuilder {
   return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.SHOW_MESSAGE.toString()) //
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ALL.toString()) //
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira and INC =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)") //
+    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
     .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
     .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
  }
 
  public RefChangeBuilder withHookNameVersion(String hookNameVersion) {
-  hook.setHookNameVersion(hookNameVersion);
+  hook.setHookName(hookNameVersion);
   return this;
  }
 
@@ -330,6 +355,11 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder withType(RefChangeType type) {
   this.type = type;
+  return this;
+ }
+
+ public RefChangeBuilder fakeJiraResponse(String jqlQuery, String responseFileName) throws IOException {
+  jiraJsonResponses.put(jqlQuery, Resources.toString(getResource(responseFileName), UTF_8));
   return this;
  }
 }

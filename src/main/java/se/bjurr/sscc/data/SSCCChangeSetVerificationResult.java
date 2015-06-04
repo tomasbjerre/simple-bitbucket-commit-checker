@@ -1,10 +1,12 @@
 package se.bjurr.sscc.data;
 
 import static com.google.common.base.Optional.absent;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newTreeMap;
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.ACCEPT;
 
+import java.util.List;
 import java.util.Map;
 
 import se.bjurr.sscc.settings.SSCCGroup;
@@ -20,6 +22,7 @@ public class SSCCChangeSetVerificationResult {
  private boolean emailCommitterResult;
  private Map<String, Long> exceeding = newTreeMap();
  private Optional<String> rejectedContent = absent();
+ private List<String> failingJqls = newArrayList();
 
  public Boolean getEmailAuthorResult() {
   return emailAuthorResult;
@@ -44,7 +47,7 @@ public class SSCCChangeSetVerificationResult {
    }
   }
   return getRejectedContent().isPresent() || getExceeding().size() > 0 || !emailAuthorResult || !emailCommitterResult
-    || !nameAuthorResult || !nameCommitterResult;
+    || !nameAuthorResult || !nameCommitterResult || !failingJqls.isEmpty();
  }
 
  public boolean hasReportables() {
@@ -93,5 +96,13 @@ public class SSCCChangeSetVerificationResult {
 
  public boolean getEmailCommitterResult() {
   return emailCommitterResult;
+ }
+
+ public void setFailingJql(List<String> queries) {
+  this.failingJqls = queries;
+ }
+
+ public List<String> getFailingJqls() {
+  return failingJqls;
  }
 }

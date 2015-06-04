@@ -2,6 +2,10 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.8
+* Check JQL query. Can be used to check that any JIRA is in a specific state. There is an extra variable, ${REGEXP}, available for use in the query.
+ * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${STASH_USER}")
+
 ## 1.7
 * Optionally check email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*

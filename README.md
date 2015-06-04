@@ -4,15 +4,17 @@ Simple, and easy to use, commit checker for Atlassian Stash. There are many comm
 Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
 
 ## Features
-* Check that author email in Stash is same as in commit.
-* Check that author name in Stash is same as in commit.
-* Check that committer email in Stash is same as in commit.
-* Check that committer name in Stash is same as in commit.
+* Check that email in Stash is same as author in commit.
+* Check that name in Stash is same as author in commit.
+* Check that email in Stash is same as committer in commit.
+* Check that name in Stash is same as committer in commit.
 * Optionally check email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*
  * ^[^@]*@company.domain$
 * Check that changed content does not match a specific regexp, like unresolved merge.
 * Check size of commits, so that large files don't accidently gets pushed.
+* Check JQL query. Can be used to check that any JIRA is in a specific state. There is an extra variable, ${REGEXP}, available for use in the query.
+ * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${STASH_USER}")
 * Simple configuration of rules that must apply to commit messages. Organized in groups.
  * A group can be used for matching, for example, issues. It can state that "at least one", "all of" or "none" of the issues can be mentioned in the commit messages.
  * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".

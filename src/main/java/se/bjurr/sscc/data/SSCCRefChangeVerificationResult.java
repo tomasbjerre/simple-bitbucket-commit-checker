@@ -4,6 +4,7 @@ import static com.google.common.collect.Maps.newTreeMap;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import java.util.List;
 import java.util.Map;
 
 import se.bjurr.sscc.settings.SSCCGroup;
@@ -53,8 +54,23 @@ public class SSCCRefChangeVerificationResult {
  }
 
  public boolean hasReportables() {
+  if (hasErrors()) {
+   return TRUE;
+  }
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets.keySet()) {
-   if (ssccChangeSets.get(ssccChangeSet).hasReportables() || !branchNameValid) {
+   if (ssccChangeSets.get(ssccChangeSet).hasReportables()) {
+    return TRUE;
+   }
+  }
+  return FALSE;
+ }
+
+ public boolean hasErrors() {
+  if (!branchNameValid) {
+   return TRUE;
+  }
+  for (final SSCCChangeSet ssccChangeSet : ssccChangeSets.keySet()) {
+   if (ssccChangeSets.get(ssccChangeSet).hasErrors()) {
     return TRUE;
    }
   }
@@ -75,6 +91,10 @@ public class SSCCRefChangeVerificationResult {
   getOrAdd(ssccChangeSet).addContentDiffValidationResult(validateChangeSetForContentDiff);
  }
 
+ public void setFailingJql(SSCCChangeSet ssccChangeSet, List<String> failingJqlQueries) {
+  getOrAdd(ssccChangeSet).setFailingJql(failingJqlQueries);
+ }
+
  public boolean isBranchNameValid() {
   return branchNameValid;
  }
@@ -82,5 +102,4 @@ public class SSCCRefChangeVerificationResult {
  public void setBranchValidationResult(boolean branchNameValid) {
   this.branchNameValid = branchNameValid;
  }
-
 }

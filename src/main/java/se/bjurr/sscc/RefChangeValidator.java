@@ -17,6 +17,9 @@ import se.bjurr.sscc.data.SSCCRefChangeVerificationResult;
 import se.bjurr.sscc.data.SSCCVerificationResult;
 import se.bjurr.sscc.settings.SSCCSettings;
 
+import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.applinks.api.CredentialsRequiredException;
+import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
@@ -36,9 +39,12 @@ public class RefChangeValidator {
 
  private final SSCCRenderer ssccRenderer;
 
+ private final JqlValidator jqlValidator;
+
  public RefChangeValidator(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    SSCCSettings settings, HookResponse hookResponse, ChangeSetsService changesetsService,
-   StashAuthenticationContext stashAuthenticationContext, SSCCRenderer ssccRenderer) {
+   StashAuthenticationContext stashAuthenticationContext, SSCCRenderer ssccRenderer,
+   ApplicationLinkService applicationLinkService) {
   this.repositoryHookContext = repositoryHookContext;
   this.refChanges = refChanges;
   this.settings = settings;
@@ -48,9 +54,10 @@ public class RefChangeValidator {
   this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext);
   this.commitContentValidator = new CommitContentValidator(settings);
   this.ssccRenderer = ssccRenderer;
+  this.jqlValidator = new JqlValidator(applicationLinkService, settings, ssccRenderer);
  }
 
- public SSCCVerificationResult validateRefChanges() throws IOException {
+ public SSCCVerificationResult validateRefChanges() throws IOException, CredentialsRequiredException, ResponseException {
   final SSCCVerificationResult refChangeVerificationResult = new SSCCVerificationResult();
   for (final RefChange refChange : refChanges) {
    logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
@@ -72,7 +79,8 @@ public class RefChangeValidator {
  }
 
  private SSCCRefChangeVerificationResult validateRefChange(RefChange refChange, List<SSCCChangeSet> ssccChangeSets,
-   SSCCSettings settings, HookResponse hookResponse) throws IOException {
+   SSCCSettings settings, HookResponse hookResponse) throws IOException, CredentialsRequiredException,
+   ResponseException {
   final SSCCRefChangeVerificationResult refChangeVerificationResult = new SSCCRefChangeVerificationResult(refChange);
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
    logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
@@ -93,6 +101,7 @@ public class RefChangeValidator {
    refChangeVerificationResult.addContentDiffValidationResult(ssccChangeSet,
      commitContentValidator.validateChangeSetForContentDiff(ssccChangeSet));
    refChangeVerificationResult.setBranchValidationResult(validateBranchName(refChange.getRefId()));
+   refChangeVerificationResult.setFailingJql(ssccChangeSet, jqlValidator.validateJql(ssccChangeSet));
   }
   return refChangeVerificationResult;
  }

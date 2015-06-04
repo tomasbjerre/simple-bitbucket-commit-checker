@@ -48,6 +48,10 @@ public class SSCCSettings {
  public static final String SETTING_BRANCH_REJECTION_REGEXP = "branchRejectionRegexp";
  public static final String SETTING_BRANCH_REJECTION_REGEXP_MESSAGE = "branchRejectionRegexpMessage";
  public static final String SETTING_ALLOW_SERVICE_USERS = "allowServiceUsers";
+ public static final String SETTING_JQL_CHECK = "jqlCheck";
+ public static final String SETTING_JQL_CHECK_MESSAGE = "jqlCheckMessage";
+ public static final String SETTING_COMMIT_REGEXP = "commitRegexp";
+ public static final String SETTING_JQL_CHECK_QUERY = "jqlCheckQuery";
 
  private String commitDiffRegexp;
  private String commitDiffRegexpMessage;
@@ -73,6 +77,10 @@ public class SSCCSettings {
  private String branchRejectionRegexpMessage;
  private boolean allowServiceUsers;
  private String requireMatchingAuthorEmailRegexp;
+ private Boolean jqlCheck;
+ private String jqlCheckMessage;
+ private String jqlCheckQuery;
+ private String commitRegexp;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
@@ -98,7 +106,11 @@ public class SSCCSettings {
     .withBranchRejectionRegexp(
       validateRegExp(SETTING_BRANCH_REJECTION_REGEXP, settings.getString(SETTING_BRANCH_REJECTION_REGEXP)))
     .withBranchRejectionRegexpMessage(settings.getString(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE))
-    .withAllowServiceUsers(settings.getBoolean(SETTING_ALLOW_SERVICE_USERS));
+    .withAllowServiceUsers(settings.getBoolean(SETTING_ALLOW_SERVICE_USERS))
+    .withJqlCheck(settings.getBoolean(SETTING_JQL_CHECK))
+    .withJqlCheckMessage(settings.getString(SETTING_JQL_CHECK_MESSAGE))
+    .withCommitRegexp(settings.getString(SETTING_COMMIT_REGEXP))
+    .withJqlCheckQuery(settings.getString(SETTING_JQL_CHECK_QUERY));
   try {
    if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
     ssccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
@@ -144,13 +156,50 @@ public class SSCCSettings {
   return ssccSettings;
  }
 
+ private SSCCSettings withJqlCheck(Boolean b) {
+  this.jqlCheck = firstNonNull(b, FALSE);
+  return this;
+ }
+
+ private SSCCSettings withJqlCheckMessage(String string) {
+  this.jqlCheckMessage = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private SSCCSettings withCommitRegexp(String string) {
+  this.commitRegexp = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ private SSCCSettings withJqlCheckQuery(String string) {
+  this.jqlCheckQuery = nullToEmpty(string).trim();
+  return this;
+ }
+
+ public Boolean shouldCheckJql() {
+  return jqlCheck;
+ }
+
+ public Optional<String> getJqlCheckMessage() {
+  return fromNullable(jqlCheckMessage);
+ }
+
+ public Optional<String> getCommitRegexp() {
+  return fromNullable(commitRegexp);
+ }
+
+ public String getJqlCheckQuery() {
+  return jqlCheckQuery;
+ }
+
  private SSCCSettings withRequireMatchingAuthorEmailRegexp(String string) {
   this.requireMatchingAuthorEmailRegexp = emptyToNull(string);
   return this;
  }
 
- private void withAllowServiceUsers(Boolean allowServiceUsers) {
+ private SSCCSettings withAllowServiceUsers(Boolean allowServiceUsers) {
   this.allowServiceUsers = firstNonNull(allowServiceUsers, FALSE);
+  return this;
  }
 
  private SSCCSettings withCheckCommitDiffRegexp(String string) {
