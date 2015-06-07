@@ -1,13 +1,15 @@
 # Simple Stash Commit Checker [![Build Status](https://travis-ci.org/tomasbjerre/simple-stash-commit-checker.svg?branch=master)](https://travis-ci.org/tomasbjerre/simple-stash-commit-checker)
-Simple, and easy to use, commit checker for Atlassian Stash. There are many commit checkers out there. This plugin aims at being simple and user friendly. The [admin GUI](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/admin_gui.png) allows the Stash administrator to add custom messages for each rejection reason. [Here](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt) is a sample reject message and [here](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/test/resources/testProdThatSuccessResponseLooksGood.txt) is a sample accept message. [This](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/config_and_reject.png) is a screenshot of a push being rejected.
+Simple, and easy to use, commit checker for Atlassian Stash. There are many commit checkers out there. This plugin aims at being simple and user friendly. The admin GUI ([here](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/admin_upper.png) and [here](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/admin_lower.png)) allows the Stash administrator to add custom messages for each rejection reason. [Here](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt) is a sample reject message and [here](https://github.com/tomasbjerre/simple-stash-commit-checker/blob/master/src/test/resources/testProdThatSuccessResponseLooksGood.txt) is a sample accept message. [This](https://raw.githubusercontent.com/tomasbjerre/simple-stash-commit-checker/master/sandbox/config_and_reject.png) is a screenshot of a push being rejected.
 
 Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
 
 ## Features
-* Check that email in Stash is same as author in commit.
-* Check that name in Stash is same as author in commit.
-* Check that email in Stash is same as committer in commit.
-* Check that name in Stash is same as committer in commit.
+* Check author (will not allow cherry-picking, unless those commits are updated with author)
+ * email is same as in Stash.
+ * name is same as in Stash.
+* Check committer (probably what you want)
+ * email is same as in Stash.
+ * name is same as in Stash.
 * Optionally check email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*
  * ^[^@]*@company.domain$

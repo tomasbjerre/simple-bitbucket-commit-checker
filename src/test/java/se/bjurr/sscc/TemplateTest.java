@@ -7,7 +7,11 @@ import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_ACCEPT_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCHES;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCH_REJECTION_REGEXP;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCH_REJECTION_REGEXP_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_COMMIT_REGEXP;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DIFF_REGEXP;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DIFF_REGEXP_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DRY_RUN;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_DRY_RUN_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_GROUP_ACCEPT;
@@ -17,14 +21,18 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK_QUERY;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REJECT_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_RULE_REGEXP;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_SIZE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_SIZE_MESSAGE;
 import static se.bjurr.sscc.util.RefChangeBuilder.JIRA_REGEXP;
-import static se.bjurr.sscc.util.RefChangeBuilder.JIRA_RESPONSE_ONE;
+import static se.bjurr.sscc.util.RefChangeBuilder.JIRA_RESPONSE_EMPTY;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
@@ -47,21 +55,22 @@ public class TemplateTest {
   */
  @Test
  public void testThatRejectResponseLooksGood() throws IOException {
-  SSCCPerson committerFull = new SSCCPerson("Tommy Boy", "the@correct.email");
-  SSCCPerson committerEmail = new SSCCPerson(null, "tom@pa.da");
-  SSCCPerson committerName = new SSCCPerson("Tompa", null);
-  SSCCPerson committerNone = new SSCCPerson(null, null);
+  SSCCPerson identityCorrect = new SSCCPerson("Tomas Stashy", "email@stash.example");
+  SSCCPerson identityWrong = new SSCCPerson("Tomas", "email@other.example");
   refChangeBuilder()
-    .withStashName("tomas")
-    .fakeJiraResponse("assignee in (\"tomas\") AND issue = AB-1234", JIRA_RESPONSE_ONE)
+    .withStashName("tomas.stashy")
+    .withStashDisplayName("Tomas Stashy")
+    .withStashEmail("email@stash.example")
+    .fakeJiraResponse("issue = AB-1234 AND assignee in (\"Tomas Stashy\") AND status = \"In Progress\"",
+      JIRA_RESPONSE_EMPTY)
     .withSetting(SETTING_JQL_CHECK, TRUE)
     .withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
-    .withSetting(SETTING_JQL_CHECK_QUERY, "assignee in (\"${STASH_USER}\") AND issue = ${REGEXP}")
-    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Jira must have assignee!")
-    .withHookNameVersion("Simple Stash Commit Checker X.X")
-    .withStashEmail("the@correct.email")
-    .withStashDisplayName("Tommy Boy")
+    .withSetting(SETTING_JQL_CHECK_QUERY,
+      "issue = ${REGEXP} AND assignee in (\"${STASH_USER}\") AND status = \"In Progress\"")
+    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Jira must be in progress and have assignee!")
+    .withHookNameVersion("Simple Stash Commit Checker")
     .withGroupAcceptingAtLeastOneJira()
+    .withRefId("/ref/master")
     .withSetting(SETTING_BRANCHES, "master")
     .withSetting(SETTING_GROUP_ACCEPT + "[0]", SSCCGroup.Accept.ACCEPT.toString())
     .withSetting(SETTING_GROUP_MATCH + "[0]", SSCCGroup.Match.ONE.toString())
@@ -83,34 +92,57 @@ public class TemplateTest {
       "It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.")
     .withSetting(SETTING_RULE_REGEXP + "[2][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
     .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE,
-      "Please set correct email in your commits. git config --global user.email user@name.com")
+      "Please set correct author and comitter email in your commits. git config --global user.email '${STASH_EMAIL}'")
     .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME, FALSE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, FALSE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE,
-      "Please set correct name in commits. git config --global user.name \"User Name\"")
+      "Please set correct author and comitter name in your commits. git config --global user.email '${STASH_NAME}'")
     .withSetting(SETTING_DRY_RUN, TRUE)
     .withSetting(
       SETTING_DRY_RUN_MESSAGE,
       "*** We are currently running commit checker in dry run mode. Your commits are\n"
         + "*** being accepted. We will soon start blocking this kind of commits.")
     .withSetting(SETTING_REJECT_MESSAGE, Resources.toString(getResource(RESPONSE_REJECT_TXT), UTF_8))
-    .withSetting(SETTING_ACCEPT_MESSAGE, Resources.toString(getResource(RESPONSE_SUCCESS_TXT), UTF_8)) //
+    .withSetting(SETTING_ACCEPT_MESSAGE, Resources.toString(getResource(RESPONSE_SUCCESS_TXT), UTF_8))
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "^/ref/(bugfix|feature)$")
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "Commits are only allowed on bugfix, or feature, branches!")
+    .withSetting(SETTING_SIZE, "500")
+    .withSetting(SETTING_SIZE_MESSAGE, "Commits with files larger then 500kb not allowed!")
+    .withSetting(SETTING_DIFF_REGEXP, "<<<<<<<.*?=======.*?>>>>>>>")
+    .withSetting(SETTING_DIFF_REGEXP_MESSAGE, "Looks like there is an unresolved merge.") //
     .withChangeSet(changeSetBuilder() //
       .withId("10fe5ad13bbd9c180a4668334cda9c83cd92dd46") //
       .withMessage("Fixing review comments from previous commits") //
-      .withCommitter(committerFull).build()) //
+      .withCommitter(identityCorrect) //
+      .withSize("/repo/binaryfile.zip", 501 * 1024L) //
+      .withSize("/repo/other/binary2.zip", 677 * 1024L) //
+      .withDiff("" + //
+        "line 1\n" + //
+        "+line 2\n" + //
+        "+<<<<<<<  HEAD\n" + //
+        "+my cool stuff\n" + //
+        "+=======\n" + //
+        "+master stuff\n" + //
+        "+>>>>>>> master\n" + //
+        "line 3\n" //
+      ).build()) //
     .withChangeSet(changeSetBuilder() //
       .withId("26094a0739ed397b0d475f4a8d3af35f33a6a0cf") //
-      .withMessage("fix") //
-      .withCommitter(committerEmail).build()) //
+      .withMessage("SB-1234 SB-5678 Cleaning some code") //
+      .withCommitter(identityWrong) //
+      .withDiff("").build()) //
     .withChangeSet(changeSetBuilder() //
       .withId("af35f33a6a26094a0739ed397b0d475f4a8d30cf") //
       .withMessage("SB-1234 Implementing feature....") //
-      .withCommitter(committerName).build()) //
+      .withCommitter(identityCorrect) //
+      .withDiff("").build()) //
     .withChangeSet(changeSetBuilder() //
       .withId("97b0d475f4a8d326094a0739ed3af35f33a6a0cf") //
       .withMessage("INC123 Solving incident with....") //
-      .withCommitter(committerNone).build()) //
+      .withCommitter(identityCorrect) //
+      .withDiff("").build()) //
     .build().run().hasOutputFrom("testProdThatRejectResponseLooksGood.txt").wasAccepted();
  }
 
