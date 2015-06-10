@@ -2,9 +2,11 @@ package se.bjurr.sscc;
 
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.SSCCTestConstants.COMMIT_MESSAGE_JIRA;
+import static se.bjurr.sscc.data.SSCCChangeSetBuilder.DEFAULT_COMMITTER;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_STASH;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
@@ -123,5 +125,32 @@ public class MatchingNameTest {
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit").build().run()
     .hasNoOutput().wasAccepted();
+ }
+
+ @Test
+ public void testThatAuthorNameCanBeRejectedIfNotInStash() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(DEFAULT_COMMITTER)
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_STASH, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name not available in Stash")
+    .withUserInStash("Display Name", "user.name", "user@email")
+    .build()
+    .run()
+    .hasTrimmedFlatOutput(
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Commit: 'Tomas Author'   Name not available in Stash")
+    .wasRejected();
+ }
+
+ @Test
+ public void testThatAuthorNameCanBeAcceptedIfInStash() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(DEFAULT_COMMITTER)
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_STASH, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name not available in Stash")
+    .withUserInStash("Tomas Author", "user.name", "user@email").build().run().hasNoOutput().wasAccepted();
  }
 }

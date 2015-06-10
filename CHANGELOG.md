@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.9
+* Check that author name, and/or email, in commit exists for any user in Stash
+
 ## 1.8
 * Check JQL query. Can be used to check that any JIRA is in a specific state. There is an extra variable, ${REGEXP}, available for use in the query.
  * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${STASH_USER}")

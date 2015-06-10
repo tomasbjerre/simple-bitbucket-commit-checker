@@ -8,6 +8,8 @@ import static se.bjurr.sscc.SSCCCommon.getStashName;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,9 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
+import com.atlassian.stash.user.DetailedUser;
 import com.atlassian.stash.user.StashAuthenticationContext;
+import com.google.common.cache.LoadingCache;
 
 public class RefChangeValidator {
  private static Logger logger = LoggerFactory.getLogger(RefChangeValidator.class);
@@ -44,20 +48,21 @@ public class RefChangeValidator {
  public RefChangeValidator(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    SSCCSettings settings, HookResponse hookResponse, ChangeSetsService changesetsService,
    StashAuthenticationContext stashAuthenticationContext, SSCCRenderer ssccRenderer,
-   ApplicationLinkService applicationLinkService) {
+   ApplicationLinkService applicationLinkService, LoadingCache<String, Map<String, DetailedUser>> stashUsers) {
   this.repositoryHookContext = repositoryHookContext;
   this.refChanges = refChanges;
   this.settings = settings;
   this.hookResponse = hookResponse;
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
-  this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext);
+  this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext, stashUsers);
   this.commitContentValidator = new CommitContentValidator(settings);
   this.ssccRenderer = ssccRenderer;
   this.jqlValidator = new JqlValidator(applicationLinkService, settings, ssccRenderer);
  }
 
- public SSCCVerificationResult validateRefChanges() throws IOException, CredentialsRequiredException, ResponseException {
+ public SSCCVerificationResult validateRefChanges() throws IOException, CredentialsRequiredException,
+   ResponseException, ExecutionException {
   final SSCCVerificationResult refChangeVerificationResult = new SSCCVerificationResult();
   for (final RefChange refChange : refChanges) {
    logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
@@ -80,7 +85,7 @@ public class RefChangeValidator {
 
  private SSCCRefChangeVerificationResult validateRefChange(RefChange refChange, List<SSCCChangeSet> ssccChangeSets,
    SSCCSettings settings, HookResponse hookResponse) throws IOException, CredentialsRequiredException,
-   ResponseException {
+   ResponseException, ExecutionException {
   final SSCCRefChangeVerificationResult refChangeVerificationResult = new SSCCRefChangeVerificationResult(refChange);
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
    logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
@@ -100,6 +105,11 @@ public class RefChangeValidator {
      commitContentValidator.validateChangeSetForContentSize(ssccChangeSet));
    refChangeVerificationResult.addContentDiffValidationResult(ssccChangeSet,
      commitContentValidator.validateChangeSetForContentDiff(ssccChangeSet));
+   refChangeVerificationResult.addAuthorEmailInStashValidationResult(ssccChangeSet,
+     commitMessageValidator.validateChangeSetForAuthorEmailInStash(settings, ssccChangeSet));
+   refChangeVerificationResult.addAuthorNameInStashValidationResult(ssccChangeSet,
+     commitMessageValidator.validateChangeSetForAuthorNameInStash(settings, ssccChangeSet));
+
    refChangeVerificationResult.setBranchValidationResult(validateBranchName(refChange.getRefId()));
    refChangeVerificationResult.setFailingJql(ssccChangeSet, jqlValidator.validateJql(ssccChangeSet));
   }

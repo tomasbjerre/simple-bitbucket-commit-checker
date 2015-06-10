@@ -67,6 +67,13 @@ public class SSCCPrinter {
     ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
    }
   }
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).isValidateChangeSetForAuthorEmailInStash()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'");
+   if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
+   }
+  }
  }
 
  private String matchedEmail(String emailAddress) {
@@ -90,6 +97,13 @@ public class SSCCPrinter {
    ssccRenderer.println();
    ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
      + ssccChangeSet.getCommitter().getName() + "'");
+   if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
+    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+   }
+  }
+  if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).isValidateChangeSetForAuthorNameInStash()) {
+   ssccRenderer.println();
+   ssccRenderer.println("- Commit: '" + ssccChangeSet.getAuthor().getName() + "'");
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
     ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
    }

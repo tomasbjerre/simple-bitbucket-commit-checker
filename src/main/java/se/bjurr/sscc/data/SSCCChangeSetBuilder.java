@@ -6,6 +6,8 @@ import static com.google.common.collect.Maps.newTreeMap;
 import java.util.Map;
 
 public class SSCCChangeSetBuilder {
+ public static final SSCCPerson DEFAULT_COMMITTER = new SSCCPerson("Tomas", "my@email.com");
+ public static final SSCCPerson DEFAULT_AUTHOR = new SSCCPerson("Tomas", "my@email.com");
  private SSCCPerson committer;
  private SSCCPerson author;
  private String id;
@@ -22,8 +24,8 @@ public class SSCCChangeSetBuilder {
  }
 
  public SSCCChangeSet build() {
-  return new SSCCChangeSet(id, firstNonNull(committer, new SSCCPerson("Tomas", "my@email.com")), firstNonNull(author,
-    new SSCCPerson("Tomas", "my@email.com")), message, parentCount, fileSizeBytes, diff);
+  return new SSCCChangeSet(id, firstNonNull(committer, DEFAULT_COMMITTER), firstNonNull(author, DEFAULT_AUTHOR),
+    message, parentCount, fileSizeBytes, diff);
  }
 
  public SSCCChangeSetBuilder withCommitter(SSCCPerson committer) {

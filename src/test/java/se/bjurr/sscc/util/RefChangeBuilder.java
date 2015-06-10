@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.mockito.Matchers;
 
@@ -44,9 +46,15 @@ import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.repository.RefChangeType;
 import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.setting.Settings;
+import com.atlassian.stash.user.DetailedUser;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.atlassian.stash.user.StashUser;
+import com.atlassian.stash.user.StashUserVisitor;
+import com.atlassian.stash.user.UserAdminService;
 import com.atlassian.stash.user.UserType;
+import com.atlassian.stash.util.Page;
+import com.atlassian.stash.util.PageRequest;
+import com.google.common.base.Function;
 import com.google.common.io.Resources;
 
 public class RefChangeBuilder {
@@ -80,6 +88,8 @@ public class RefChangeBuilder {
  private RefChangeType type = UPDATE;
  private Boolean wasAccepted = null;
  private ApplicationLinkService applicationLinkService;
+ private UserAdminService userAdminService;
+ private final List<DetailedUser> detailedUsers = newArrayList();
 
  private RefChangeBuilder() {
   setJiraClient(new JiraClient() {
@@ -99,7 +109,9 @@ public class RefChangeBuilder {
   when(repositoryHookContext.getSettings()).thenReturn(settings);
   this.changeSetService = mock(ChangeSetsService.class);
   this.stashAuthenticationContext = mock(StashAuthenticationContext.class);
-  this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext, applicationLinkService);
+  this.userAdminService = mock(UserAdminService.class);
+  this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext, applicationLinkService,
+    userAdminService);
   this.hook.setHookName("");
   hookResponse = mock(HookResponse.class);
   when(hookResponse.out()).thenReturn(printWriterStandard);
@@ -113,6 +125,54 @@ public class RefChangeBuilder {
   when(
     changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
       Matchers.any(RefChange.class))).thenReturn(newChangesets);
+  when(userAdminService.findUsers(Matchers.any(PageRequest.class))).thenReturn(new Page<DetailedUser>() {
+
+   // This method is not available in Sash 3, but in 2.12.0, should not override
+   public String getFilter() {
+    return null;
+   }
+
+   @Override
+   public <E> Page<E> transform(Function<? super DetailedUser, ? extends E> arg0) {
+    getFilter(); // Ensure save-actions does not remove the method
+    return null;
+   }
+
+   @Override
+   public Iterable<DetailedUser> getValues() {
+    return detailedUsers;
+   }
+
+   @Override
+   public int getStart() {
+    return 0;
+   }
+
+   @Override
+   public int getSize() {
+    return detailedUsers.size();
+   }
+
+   @Override
+   public SortedMap<Integer, DetailedUser> getOrdinalIndexedValues() {
+    return null;
+   }
+
+   @Override
+   public PageRequest getNextPageRequest() {
+    return null;
+   }
+
+   @Override
+   public int getLimit() {
+    return 0;
+   }
+
+   @Override
+   public boolean getIsLastPage() {
+    return false;
+   }
+  });
   return this;
  }
 
@@ -360,6 +420,73 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder fakeJiraResponse(String jqlQuery, String responseFileName) throws IOException {
   jiraJsonResponses.put(jqlQuery, Resources.toString(getResource(responseFileName), UTF_8));
+  return this;
+ }
+
+ public RefChangeBuilder withUserInStash(final String displayName, final String name, final String email) {
+  detailedUsers.add(new DetailedUser() {
+
+   @Override
+   public String getName() {
+    return name;
+   }
+
+   @Override
+   public String getEmailAddress() {
+    return email;
+   }
+
+   @Override
+   public boolean isActive() {
+    return false;
+   }
+
+   @Override
+   public UserType getType() {
+    return null;
+   }
+
+   @Override
+   public String getSlug() {
+    return null;
+   }
+
+   @Override
+   public Integer getId() {
+    return null;
+   }
+
+   @Override
+   public String getDisplayName() {
+    return displayName;
+   }
+
+   @Override
+   public <T> T accept(StashUserVisitor<T> arg0) {
+    return null;
+   }
+
+   @Override
+   public boolean isMutableGroups() {
+    return false;
+   }
+
+   @Override
+   public boolean isMutableDetails() {
+    getLastAuthenticationTimestamp(); // Ensure its not removed by save-action
+    return false;
+   }
+
+   // Not available in Stash 2.12.0, should not use @override
+   public Date getLastAuthenticationTimestamp() {
+    return null;
+   }
+
+   @Override
+   public String getDirectoryName() {
+    return null;
+   }
+  });
   return this;
  }
 }

@@ -87,6 +87,16 @@
         {/call}
     
         {call aui.form.checkboxField}
+            {param legendContent: 'Require Author Email in Stash' /}
+            {param fields: [[
+                'id' : 'requireAuthorEmailInStash',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireAuthorEmailInStash']
+            ]] /}
+            {param descriptionText: 'Require that author email exists for at least one user in Stash.' /}
+        {/call}
+    
+        {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Committer Email' /}
             {param fields: [[
                 'id' : 'requireMatchingCommitterEmail',
@@ -127,6 +137,16 @@
         {/call}
     
         {call aui.form.checkboxField}
+            {param legendContent: 'Require Author Name in Stash' /}
+            {param fields: [[
+                'id' : 'requireAuthorNameInStash',
+                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'isChecked' : $config['requireAuthorNameInStash']
+            ]] /}
+            {param descriptionText: 'Require that author name exists for at least one user in Stash.' /}
+        {/call}
+    
+        {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Committer Name' /}
             {param fields: [[
                 'id' : 'requireMatchingCommitterName',
@@ -135,7 +155,7 @@
             ]] /}
             {param descriptionText: 'Require that committers name matches the Stash users name.' /}
         {/call}
-    
+        
         {call aui.form.textareaField}
             {param id: 'requireMatchingAuthorNameMessage' /}
             {param labelContent: 'Reject message' /}

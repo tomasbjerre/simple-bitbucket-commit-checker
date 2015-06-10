@@ -23,6 +23,8 @@ public class SSCCChangeSetVerificationResult {
  private Map<String, Long> exceeding = newTreeMap();
  private Optional<String> rejectedContent = absent();
  private List<String> failingJqls = newArrayList();
+ private boolean validateChangeSetForAuthorEmailInStash;
+ private boolean validateChangeSetForAuthorNameInStash;
 
  public Boolean getEmailAuthorResult() {
   return emailAuthorResult;
@@ -47,7 +49,8 @@ public class SSCCChangeSetVerificationResult {
    }
   }
   return getRejectedContent().isPresent() || getExceeding().size() > 0 || !emailAuthorResult || !emailCommitterResult
-    || !nameAuthorResult || !nameCommitterResult || !failingJqls.isEmpty();
+    || !nameAuthorResult || !nameCommitterResult || !failingJqls.isEmpty() || !validateChangeSetForAuthorEmailInStash
+    || !validateChangeSetForAuthorNameInStash;
  }
 
  public boolean hasReportables() {
@@ -104,5 +107,21 @@ public class SSCCChangeSetVerificationResult {
 
  public List<String> getFailingJqls() {
   return failingJqls;
+ }
+
+ public void addAuthorEmailInStashValidationResult(boolean validateChangeSetForAuthorEmailInStash) {
+  this.validateChangeSetForAuthorEmailInStash = validateChangeSetForAuthorEmailInStash;
+ }
+
+ public boolean isValidateChangeSetForAuthorEmailInStash() {
+  return validateChangeSetForAuthorEmailInStash;
+ }
+
+ public void addAuthorNameInStashValidationResult(boolean validateChangeSetForAuthorNameInStash) {
+  this.validateChangeSetForAuthorNameInStash = validateChangeSetForAuthorNameInStash;
+ }
+
+ public boolean isValidateChangeSetForAuthorNameInStash() {
+  return validateChangeSetForAuthorNameInStash;
  }
 }

@@ -4,12 +4,13 @@ Simple, and easy to use, commit checker for Atlassian Stash. There are many comm
 Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
 
 ## Features
-* Check author (will not allow cherry-picking, unless those commits are updated with author)
- * email is same as in Stash.
- * name is same as in Stash.
-* Check committer (probably what you want)
- * email is same as in Stash.
- * name is same as in Stash.
+* Check author in commit
+ * email is same as users email in Stash.
+ * name is same as users name in Stash.
+* Check that author name, and/or email, in commit exists for any user in Stash
+* Check committer in commit
+ * email is same as users email in Stash.
+ * name is same as users name in Stash.
 * Optionally check email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*
  * ^[^@]*@company.domain$

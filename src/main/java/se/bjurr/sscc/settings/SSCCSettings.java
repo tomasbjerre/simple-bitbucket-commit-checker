@@ -34,9 +34,11 @@ public class SSCCSettings {
  public static final String SETTING_REJECT_MESSAGE = "rejectMessage";
  public static final String SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL = "requireMatchingCommitterEmail";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL = "requireMatchingAuthorEmail";
+ public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH = "requireMatchingAuthorEmailInStash";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP = "requireMatchingAuthorEmailRegexp";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE = "requireMatchingAuthorEmailMessage";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME = "requireMatchingAuthorName";
+ public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_STASH = "requireMatchingAuthorNameInStash";
  public static final String SETTING_REQUIRE_MATCHING_COMMITTER_NAME = "requireMatchingCommitterName";
  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE = "requireMatchingAuthorNameMessage";
  public static final String SETTING_RULE_MESSAGE = "ruleMessage";
@@ -81,6 +83,8 @@ public class SSCCSettings {
  private String jqlCheckMessage;
  private String jqlCheckQuery;
  private String commitRegexp;
+ private Boolean requireMatchingAuthorEmailInStash;
+ private Boolean requireMatchingAuthorNameInStash;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
@@ -94,10 +98,12 @@ public class SSCCSettings {
     .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS))
     .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE))
     .withRequireMatchingAuthorEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL))
+    .withRequireMatchingAuthorEmailInStash(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH))
     .withRequireMatchingCommitterEmail(settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL))
     .withRequireMatchingAuthorEmailMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE))
     .withRequireMatchingAuthorEmailRegexp(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP))
     .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME))
+    .withRequireMatchingAuthorNameInStash(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_STASH))
     .withRequireMatchingCommitterName(settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_NAME))
     .withRequireMatchingAuthorNameMessage(settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE))
     .withCheckCommitDiffRegexp(validateRegExp(SETTING_DIFF_REGEXP, settings.getString(SETTING_DIFF_REGEXP)))
@@ -385,6 +391,15 @@ public class SSCCSettings {
   return this;
  }
 
+ private SSCCSettings withRequireMatchingAuthorEmailInStash(Boolean requireMatchingAuthorEmailInStash) {
+  this.requireMatchingAuthorEmailInStash = firstNonNull(requireMatchingAuthorEmailInStash, FALSE);
+  return this;
+ }
+
+ public Boolean getRequireMatchingAuthorEmailInStash() {
+  return requireMatchingAuthorEmailInStash;
+ }
+
  private SSCCSettings withRequireMatchingCommitterEmail(Boolean requireMatchingCommitterEmail) {
   this.requireMatchingCommitterEmail = firstNonNull(requireMatchingCommitterEmail, FALSE);
   return this;
@@ -398,6 +413,15 @@ public class SSCCSettings {
  private SSCCSettings withRequireMatchingAuthorName(Boolean requireMatchingAuthorName) {
   this.requireMatchingAuthorName = firstNonNull(requireMatchingAuthorName, FALSE);
   return this;
+ }
+
+ private SSCCSettings withRequireMatchingAuthorNameInStash(Boolean requireMatchingAuthorNameInStash) {
+  this.requireMatchingAuthorNameInStash = firstNonNull(requireMatchingAuthorNameInStash, FALSE);
+  return this;
+ }
+
+ public Boolean getRequireMatchingAuthorNameInStash() {
+  return requireMatchingAuthorNameInStash;
  }
 
  private SSCCSettings withRequireMatchingCommitterName(Boolean requireMatchingCommitterName) {

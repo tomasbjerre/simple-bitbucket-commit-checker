@@ -2,10 +2,12 @@ package se.bjurr.sscc;
 
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.SSCCTestConstants.COMMIT_MESSAGE_JIRA;
+import static se.bjurr.sscc.data.SSCCChangeSetBuilder.DEFAULT_COMMITTER;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
@@ -215,5 +217,32 @@ public class MatchingEmailTest {
     .wasRejected()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Author <committer@othercompany.domain> >>> SB-5678 fixing stuff  - Stash: '^[^@]*@company.domain$' != Commit: 'committer@othercompany.domain'   not ok");
+ }
+
+ @Test
+ public void testThatAuthorEmailCanBeRejectedIfNotInStash() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(DEFAULT_COMMITTER)
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email not available in Stash")
+    .withUserInStash("Display Name", "user.email", "user@email")
+    .build()
+    .run()
+    .hasTrimmedFlatOutput(
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Commit: 'author@one.site'   Email not available in Stash")
+    .wasRejected();
+ }
+
+ @Test
+ public void testThatAuthorEmailCanBeAcceptedIfInStash() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(DEFAULT_COMMITTER)
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email not available in Stash")
+    .withUserInStash("Display Name", "author@one.site", "user@email").build().run().hasNoOutput().wasAccepted();
  }
 }

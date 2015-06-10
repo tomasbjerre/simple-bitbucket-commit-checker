@@ -102,4 +102,14 @@ public class SSCCRefChangeVerificationResult {
  public void setBranchValidationResult(boolean branchNameValid) {
   this.branchNameValid = branchNameValid;
  }
+
+ public void addAuthorEmailInStashValidationResult(SSCCChangeSet ssccChangeSet,
+   boolean validateChangeSetForAuthorEmailInStash) {
+  getOrAdd(ssccChangeSet).addAuthorEmailInStashValidationResult(validateChangeSetForAuthorEmailInStash);
+ }
+
+ public void addAuthorNameInStashValidationResult(SSCCChangeSet ssccChangeSet,
+   boolean validateChangeSetForAuthorNameInStash) {
+  getOrAdd(ssccChangeSet).addAuthorNameInStashValidationResult(validateChangeSetForAuthorNameInStash);
+ }
 }
