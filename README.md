@@ -26,6 +26,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check that branch name matches specific regexp.
 * Exclude merge commits.
 * Exclude tag commits.
+* Check commits in pull requests
 * Show a general reject message.
 * Show a general accept message.
 * Optionally accept all commits from service users.

@@ -2,6 +2,9 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.10
+* Check commits in pull requests
+
 ## 1.9
 * Check that author name, and/or email, in commit exists for any user in Stash
 

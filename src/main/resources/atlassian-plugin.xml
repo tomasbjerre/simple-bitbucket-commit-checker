@@ -28,6 +28,14 @@
     <interface>se.bjurr.sscc.ChangeSetsService</interface>
   </component>
   
+  <component key="ssccUserAdminService" class="se.bjurr.sscc.SsccUserAdminServiceImpl" public="true">
+    <interface>se.bjurr.sscc.SsccUserAdminService</interface>
+  </component>
+  
+  <component key="ssccRepositoryMergeRequestCheck" class="se.bjurr.sscc.SsccRepositoryMergeRequestCheck" public="true">
+    <interface>com.atlassian.stash.hook.repository.RepositoryMergeRequestCheck</interface>
+  </component>
+
   <repository-hook name="Simple Stash Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
     <description key="pre-receive-repository-hook.description">Simple Stash Commit Checker</description>
     <icon>images/pluginLogo.png</icon>

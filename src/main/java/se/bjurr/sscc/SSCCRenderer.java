@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
 
-import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.user.StashAuthenticationContext;
 
 public class SSCCRenderer {
@@ -69,20 +68,10 @@ public class SSCCRenderer {
   }
  }
 
- private final HookResponse hookResponse;
  private final StashAuthenticationContext stashAuthenticationContext;
 
- public SSCCRenderer(StashAuthenticationContext stashAuthenticationContext, HookResponse hookResponse) {
+ public SSCCRenderer(StashAuthenticationContext stashAuthenticationContext) {
   this.stashAuthenticationContext = stashAuthenticationContext;
-  this.hookResponse = hookResponse;
- }
-
- public void println() {
-  hookResponse.out().println();
- }
-
- public void println(String string) {
-  hookResponse.out().println(render(string));
  }
 
  public String render(String string) {
@@ -99,5 +88,9 @@ public class SSCCRenderer {
    renderedList.add(render(toRender.replaceAll("\\$\\{" + SSCCRenderer.SSCCVariable.REGEXP.name() + "\\}", resolved)));
   }
   return renderedList;
+ }
+
+ public void append(StringBuilder sb, String renderAndAppend) {
+  sb.append(render(renderAndAppend));
  }
 }

@@ -1,13 +1,10 @@
 package se.bjurr.sscc;
 
 import static com.atlassian.stash.user.UserType.SERVICE;
-import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.Boolean.TRUE;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +17,8 @@ import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.PreReceiveRepositoryHook;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
-import com.atlassian.stash.user.DetailedUser;
 import com.atlassian.stash.user.StashAuthenticationContext;
-import com.atlassian.stash.user.UserAdminService;
-import com.atlassian.stash.util.PageRequest;
-import com.atlassian.stash.util.PageRequestImpl;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  private static Logger logger = LoggerFactory.getLogger(PreReceiveRepositoryHook.class);
@@ -41,54 +31,16 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
 
  private final ApplicationLinkService applicationLinkService;
 
- private final UserAdminService userAdminService;
-
- public static final String STASH_USERS = "STASH_USERS";
-
- private final LoadingCache<String, Map<String, DetailedUser>> stashUsers = CacheBuilder.newBuilder().maximumSize(1)
-   .refreshAfterWrite(5, MINUTES).build(new CacheLoader<String, Map<String, DetailedUser>>() {
-    @Override
-    public Map<String, DetailedUser> load(String key) throws Exception {
-     final Map<String, DetailedUser> map = newHashMap();
-     for (DetailedUser detailedUser : userAdminService.findUsers(new PageRequest() {
-
-      public String getFilter() {
-       // This method is not available in Sash 2.12.0, but in 3
-       return "";
-      }
-
-      @Override
-      public int getStart() {
-       getFilter(); // Ensure save-actions does not remove the method
-       return 0;
-      }
-
-      @Override
-      public int getLimit() {
-       return 1048575;
-      }
-
-      @Override
-      public PageRequest buildRestrictedPageRequest(int arg0) {
-       return new PageRequestImpl(0, 1048575);
-      }
-     }).getValues()) {
-      map.put(detailedUser.getDisplayName(), detailedUser);
-      map.put(detailedUser.getEmailAddress(), detailedUser);
-      map.put(detailedUser.getName(), detailedUser);
-     }
-     return map;
-    }
-   });
+ private final SsccUserAdminService ssccUserAdminService;
 
  public SsccPreReceiveRepositoryHook(ChangeSetsService changesetsService,
    StashAuthenticationContext stashAuthenticationContext, ApplicationLinkService applicationLinkService,
-   UserAdminService userAdminService) {
+   SsccUserAdminService ssccUserAdminService) {
   this.hookName = "Simple Stash Commit Checker";
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
   this.applicationLinkService = applicationLinkService;
-  this.userAdminService = userAdminService;
+  this.ssccUserAdminService = ssccUserAdminService;
  }
 
  @VisibleForTesting
@@ -100,22 +52,21 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
  public boolean onReceive(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
    HookResponse hookResponse) {
   try {
-   SSCCRenderer ssccRenderer = new SSCCRenderer(this.stashAuthenticationContext, hookResponse);
-
    if (!hookName.isEmpty()) {
-    ssccRenderer.println(hookName);
-    ssccRenderer.println();
+    hookResponse.out().println(hookName);
+    hookResponse.out().println();
    }
-
    final SSCCSettings settings = sscSettings(repositoryHookContext.getSettings());
-   final SSCCVerificationResult refChangeVerificationResults = new RefChangeValidator(repositoryHookContext,
-     refChanges, settings, hookResponse, changesetsService, stashAuthenticationContext, ssccRenderer,
-     applicationLinkService, stashUsers).validateRefChanges();
+   SSCCRenderer ssccRenderer = new SSCCRenderer(this.stashAuthenticationContext);
+   final SSCCVerificationResult refChangeVerificationResults = new RefChangeValidator(
+     repositoryHookContext.getRepository(), settings, changesetsService, stashAuthenticationContext, ssccRenderer,
+     applicationLinkService, ssccUserAdminService).validateRefChanges(refChanges);
 
-   new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChanges, refChangeVerificationResults);
+   String printOut = new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChangeVerificationResults);
 
+   hookResponse.out().print(printOut);
    if (settings.isDryRun() && settings.getDryRunMessage().isPresent()) {
-    ssccRenderer.println(settings.getDryRunMessage().get());
+    hookResponse.out().println(settings.getDryRunMessage().get());
    }
 
    if (!settings.isDryRun()

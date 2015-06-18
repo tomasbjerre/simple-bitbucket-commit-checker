@@ -54,6 +54,8 @@ public class SSCCSettings {
  public static final String SETTING_JQL_CHECK_MESSAGE = "jqlCheckMessage";
  public static final String SETTING_COMMIT_REGEXP = "commitRegexp";
  public static final String SETTING_JQL_CHECK_QUERY = "jqlCheckQuery";
+ public static final String SETTING_CHECK_PULLREQUESTS = "shouldCheckPullrequests";
+ public static final String SETTING_CHECK_PULLREQUESTS_MESSAGE = "shouldCheckPullrequestsMessage";
 
  private String commitDiffRegexp;
  private String commitDiffRegexpMessage;
@@ -85,6 +87,8 @@ public class SSCCSettings {
  private String commitRegexp;
  private Boolean requireMatchingAuthorEmailInStash;
  private Boolean requireMatchingAuthorNameInStash;
+ private boolean shouldCheckPullRequests;
+ private String shouldCheckPullRequestsMessage;
 
  public static SSCCSettings sscSettings(Settings settings) throws ValidationException {
   final SSCCSettings ssccSettings = new SSCCSettings();
@@ -116,7 +120,9 @@ public class SSCCSettings {
     .withJqlCheck(settings.getBoolean(SETTING_JQL_CHECK))
     .withJqlCheckMessage(settings.getString(SETTING_JQL_CHECK_MESSAGE))
     .withCommitRegexp(settings.getString(SETTING_COMMIT_REGEXP))
-    .withJqlCheckQuery(settings.getString(SETTING_JQL_CHECK_QUERY));
+    .withJqlCheckQuery(settings.getString(SETTING_JQL_CHECK_QUERY))
+    .withShouldCheckPullRequests(settings.getBoolean(SETTING_CHECK_PULLREQUESTS))
+    .withShouldCheckPullRequestsMessage(settings.getString(SETTING_CHECK_PULLREQUESTS_MESSAGE));
   try {
    if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
     ssccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
@@ -160,6 +166,15 @@ public class SSCCSettings {
    }
   }
   return ssccSettings;
+ }
+
+ private SSCCSettings withShouldCheckPullRequestsMessage(String string) {
+  this.shouldCheckPullRequestsMessage = emptyToNull(nullToEmpty(string).trim());
+  return this;
+ }
+
+ public Optional<String> getShouldCheckPullRequestsMessage() {
+  return fromNullable(shouldCheckPullRequestsMessage);
  }
 
  private SSCCSettings withJqlCheck(Boolean b) {
@@ -444,5 +459,14 @@ public class SSCCSettings {
 
  public boolean allowServiceUsers() {
   return allowServiceUsers;
+ }
+
+ private SSCCSettings withShouldCheckPullRequests(Boolean shouldCheckPullRequests) {
+  this.shouldCheckPullRequests = firstNonNull(shouldCheckPullRequests, FALSE);
+  return this;
+ }
+
+ public boolean shouldCheckPullRequests() {
+  return shouldCheckPullRequests;
  }
 }
