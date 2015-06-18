@@ -8,6 +8,8 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHO
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_STASH;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME;
+import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
@@ -104,11 +106,11 @@ public class MatchingEmailTest {
     .withStashEmail("author@one.site")
     .withStashDisplayName("Tompa Committer")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Name in Stash not same as in commit")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Author email in Stash not same as in commit")
     .build()
     .run()
     .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Stash: 'author@one.site' != Commit: 'author@diff.site'   Name in Stash not same as in commit")
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Stash: 'author@one.site' != Commit: 'author@diff.site'   Author email in Stash not same as in commit")
     .wasRejected();
  }
 
@@ -118,13 +120,13 @@ public class MatchingEmailTest {
   refChangeBuilder()
     .withChangeSet(
       changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer 1", "committer@one.site"))
-        .withAuthor(new SSCCPerson("Tomas Author 1", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site1")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withChangeSet(
       changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer 2", "tomas.bjerre@two.site"))
-        .withAuthor(new SSCCPerson("Tomas Author 2", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site2")).withMessage(COMMIT_MESSAGE_JIRA).build())
     .withStashEmail("author@one.site").withStashDisplayName("Tomas Author")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Name in Stash not same as in commit").build().run()
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Stash not same as in commit").build().run()
     .hasNoOutput().wasAccepted();
  }
 
@@ -137,7 +139,6 @@ public class MatchingEmailTest {
     .withStashEmail("author@one.site")
     .withStashDisplayName("Tompa Committer")
     .withStashName("regexp")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP, "^${STASH_USER}@.*")
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "not ok")
     .build()
@@ -145,50 +146,6 @@ public class MatchingEmailTest {
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Stash: '^regexp@.*' != Commit: 'author@one.site'   not ok")
     .wasRejected();
- }
-
- @Test
- public void testThatCommitterEmailCanBeRejectedByRegexp() throws IOException {
-  refChangeBuilder()
-    .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@one.site"))
-        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("comitter@one.site")
-    .withStashDisplayName("Tompa Committer")
-    .withStashName("regexp")
-    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP, "^${STASH_USER}@.*")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "not ok")
-    .build()
-    .run()
-    .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Stash: '^regexp@.*' != Commit: 'committer@one.site'   not ok")
-    .wasRejected();
- }
-
- @Test
- public void testThatCommitterEmailCanBeRejectedByRegexpWithoutVariables() throws IOException {
-  refChangeBuilder()
-    .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SSCCPerson("Tomas Committer", "committer@company.domain"))
-        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withChangeSet(
-      changeSetBuilder().withId("2").withCommitter(new SSCCPerson("Tomas Committer", "committer@othercompany.domain"))
-        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withChangeSet(
-      changeSetBuilder().withId("3").withCommitter(new SSCCPerson("Tomas Committer", "other.committer@company.domain"))
-        .withAuthor(new SSCCPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withStashEmail("stash@email.site")
-    .withStashDisplayName("Tompa Committer")
-    .withStashName("regexp")
-    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_REGEXP, "^[^@]*@company.domain$")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "not ok")
-    .build()
-    .run()
-    .wasRejected()
-    .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Stash: '^[^@]*@company.domain$' != Commit: 'committer@othercompany.domain'   not ok");
  }
 
  @Test

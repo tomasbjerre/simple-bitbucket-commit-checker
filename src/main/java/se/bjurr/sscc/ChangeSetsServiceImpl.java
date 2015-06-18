@@ -40,7 +40,7 @@ import se.bjurr.sscc.settings.SSCCSettings;
 import com.atlassian.stash.commit.CommitService;
 import com.atlassian.stash.content.Changeset;
 import com.atlassian.stash.content.ChangesetsBetweenRequest;
-import com.atlassian.stash.repository.RefChange;
+import com.atlassian.stash.repository.RefChangeType;
 import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.server.ApplicationPropertiesService;
 import com.atlassian.stash.util.Page;
@@ -81,23 +81,23 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
  }
 
  @Override
- public List<SSCCChangeSet> getNewChangeSets(SSCCSettings settings, Repository repository, RefChange refChange)
-   throws IOException {
-  final org.eclipse.jgit.lib.Repository jGitRepo = getJGitRepo(repository);
+ public List<SSCCChangeSet> getNewChangeSets(SSCCSettings settings, Repository fromRepository, Repository toRepository,
+   String refId, RefChangeType type, String fromHash, String toHash) throws IOException {
+  final org.eclipse.jgit.lib.Repository jGitRepo = getJGitRepo(fromRepository);
 
   final RevWalk walk = new RevWalk(jGitRepo);
 
   final List<SSCCChangeSet> changesets = newArrayList();
 
-  if (refChange.getRefId().startsWith(TAGS.getPath())) {
+  if (refId.startsWith(TAGS.getPath())) {
    if (settings.shouldExcludeTagCommits()) {
     return changesets;
    }
-   if (refChange.getType() == DELETE) {
+   if (type == DELETE) {
     return changesets;
    }
 
-   final RevObject obj = walk.parseAny(fromString(refChange.getToHash()));
+   final RevObject obj = walk.parseAny(fromString(toHash));
    if (!(obj instanceof RevTag)) {
     return changesets;
    }
@@ -107,11 +107,9 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    final String message = tag.getFullMessage();
    final PersonIdent ident = tag.getTaggerIdent();
    final SSCCPerson committer = new SSCCPerson(ident.getName(), ident.getEmailAddress());
-   changesets.add(new SSCCChangeSet(refChange.getToHash(), committer, committer, message, 1,
-     new HashMap<String, Long>(), ""));
+   changesets.add(new SSCCChangeSet(toHash, committer, committer, message, 1, new HashMap<String, Long>(), ""));
   } else {
-   final ChangesetsBetweenRequest request = new ChangesetsBetweenRequest.Builder(repository)
-     .exclude(getBranches(repository)).include(refChange.getToHash()).build();
+   final ChangesetsBetweenRequest request = getChangeSetsBetween(fromRepository, toRepository, toHash);
 
    final Iterable<Changeset> changes = new PagedIterable<Changeset>(new PageProvider<Changeset>() {
     @Override
@@ -145,12 +143,22 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
      changesets.add(new SSCCChangeSet(changeset.getId(), committer, author, message, commit.getParentCount(),
        sizePerFile, diff));
     } catch (GitAPIException e) {
-     logger.error(refChange.getRefId(), e);
+     logger.error(refId, e);
     }
    }
   }
 
   return changesets;
+ }
+
+ private ChangesetsBetweenRequest getChangeSetsBetween(Repository fromRepository, Repository toRepository, String toHash)
+   throws IOException {
+  if (fromRepository.getId() == toRepository.getId()) {
+   return new ChangesetsBetweenRequest.Builder(fromRepository).exclude(getBranches(toRepository)).include(toHash)
+     .build();
+  } else {
+   return new ChangesetsBetweenRequest.Builder(fromRepository).include(toHash).build();
+  }
  }
 
  private Map<String, Long> getSizePerFile(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit)

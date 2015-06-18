@@ -8,7 +8,6 @@ import static se.bjurr.sscc.SSCCCommon.getStashName;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -22,20 +21,15 @@ import se.bjurr.sscc.settings.SSCCSettings;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.sal.api.net.ResponseException;
-import com.atlassian.stash.hook.HookResponse;
-import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
-import com.atlassian.stash.user.DetailedUser;
+import com.atlassian.stash.repository.RefChangeType;
+import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.user.StashAuthenticationContext;
-import com.google.common.cache.LoadingCache;
 
 public class RefChangeValidator {
  private static Logger logger = LoggerFactory.getLogger(RefChangeValidator.class);
 
- private final RepositoryHookContext repositoryHookContext;
- private final Collection<RefChange> refChanges;
  private final SSCCSettings settings;
- private final HookResponse hookResponse;
  private final ChangeSetsService changesetsService;
  private final StashAuthenticationContext stashAuthenticationContext;
  private final CommitMessageValidator commitMessageValidator;
@@ -45,50 +39,58 @@ public class RefChangeValidator {
 
  private final JqlValidator jqlValidator;
 
- public RefChangeValidator(RepositoryHookContext repositoryHookContext, Collection<RefChange> refChanges,
-   SSCCSettings settings, HookResponse hookResponse, ChangeSetsService changesetsService,
-   StashAuthenticationContext stashAuthenticationContext, SSCCRenderer ssccRenderer,
-   ApplicationLinkService applicationLinkService, LoadingCache<String, Map<String, DetailedUser>> stashUsers) {
-  this.repositoryHookContext = repositoryHookContext;
-  this.refChanges = refChanges;
+ private final Repository fromRepository;
+ private final Repository toRepository;
+
+ public RefChangeValidator(Repository fromRepository, Repository toRepository, SSCCSettings settings,
+   ChangeSetsService changesetsService, StashAuthenticationContext stashAuthenticationContext,
+   SSCCRenderer ssccRenderer, ApplicationLinkService applicationLinkService, SsccUserAdminService ssccUserAdminService) {
+  this.fromRepository = fromRepository;
+  this.toRepository = toRepository;
   this.settings = settings;
-  this.hookResponse = hookResponse;
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
-  this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext, stashUsers);
+  this.commitMessageValidator = new CommitMessageValidator(stashAuthenticationContext, ssccUserAdminService);
   this.commitContentValidator = new CommitContentValidator(settings);
   this.ssccRenderer = ssccRenderer;
   this.jqlValidator = new JqlValidator(applicationLinkService, settings, ssccRenderer);
  }
 
- public SSCCVerificationResult validateRefChanges() throws IOException, CredentialsRequiredException,
-   ResponseException, ExecutionException {
+ public SSCCVerificationResult validateRefChanges(Collection<RefChange> refChanges) throws IOException,
+   CredentialsRequiredException, ResponseException, ExecutionException {
   final SSCCVerificationResult refChangeVerificationResult = new SSCCVerificationResult();
   for (final RefChange refChange : refChanges) {
-   logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
-     + "> RefChange " + refChange.getFromHash() + " " + refChange.getRefId() + " " + refChange.getToHash() + " "
-     + refChange.getType());
-   if (compile(settings.getBranches().or(".*")).matcher(refChange.getRefId()).find()) {
-    if (refChange.getType() != DELETE) {
-     List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings,
-       repositoryHookContext.getRepository(), refChange);
-     final SSCCRefChangeVerificationResult refChangeVerificationResults = validateRefChange(refChange, refChangeSets,
-       settings, hookResponse);
-     if (refChangeVerificationResults.hasReportables()) {
-      refChangeVerificationResult.add(refChangeVerificationResults);
-     }
-    }
-   }
+   validateRefChange(refChangeVerificationResult, refChange.getType(), refChange.getRefId(), refChange.getFromHash(),
+     refChange.getToHash());
   }
   return refChangeVerificationResult;
  }
 
- private SSCCRefChangeVerificationResult validateRefChange(RefChange refChange, List<SSCCChangeSet> ssccChangeSets,
-   SSCCSettings settings, HookResponse hookResponse) throws IOException, CredentialsRequiredException,
-   ResponseException, ExecutionException {
-  final SSCCRefChangeVerificationResult refChangeVerificationResult = new SSCCRefChangeVerificationResult(refChange);
+ public void validateRefChange(final SSCCVerificationResult refChangeVerificationResult, RefChangeType refChangeType,
+   String refId, String fromHash, String toHash) throws IOException, CredentialsRequiredException, ResponseException,
+   ExecutionException {
+  logger.debug(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
+    + "> RefChange " + fromHash + " " + refId + " " + toHash + " " + refChangeType);
+  if (compile(settings.getBranches().or(".*")).matcher(refId).find()) {
+   if (refChangeType != DELETE) {
+    List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, fromRepository, toRepository,
+      refId, refChangeType, fromHash, toHash);
+    final SSCCRefChangeVerificationResult refChangeVerificationResults = validateRefChange(refChangeSets, settings,
+      refId, fromHash, toHash);
+    if (refChangeVerificationResults.hasReportables()) {
+     refChangeVerificationResult.add(refChangeVerificationResults);
+    }
+   }
+  }
+ }
+
+ private SSCCRefChangeVerificationResult validateRefChange(List<SSCCChangeSet> ssccChangeSets, SSCCSettings settings,
+   String refId, String fromHash, String toHash) throws IOException, CredentialsRequiredException, ResponseException,
+   ExecutionException {
+  final SSCCRefChangeVerificationResult refChangeVerificationResult = new SSCCRefChangeVerificationResult(refId,
+    fromHash, toHash);
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
-   logger.info(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
+   logger.debug(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
      + "> ChangeSet " + ssccChangeSet.getId() + " " + ssccChangeSet.getMessage() + " " + ssccChangeSet.getParentCount()
      + " " + ssccChangeSet.getCommitter().getEmailAddress() + " " + ssccChangeSet.getCommitter().getName());
    refChangeVerificationResult.setGroupsResult(ssccChangeSet,
@@ -110,7 +112,7 @@ public class RefChangeValidator {
    refChangeVerificationResult.addAuthorNameInStashValidationResult(ssccChangeSet,
      commitMessageValidator.validateChangeSetForAuthorNameInStash(settings, ssccChangeSet));
 
-   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refChange.getRefId()));
+   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refId));
    refChangeVerificationResult.setFailingJql(ssccChangeSet, jqlValidator.validateJql(ssccChangeSet));
   }
   return refChangeVerificationResult;

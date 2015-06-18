@@ -3,7 +3,6 @@ package se.bjurr.sscc;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.ACCEPT;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.SHOW_MESSAGE;
 
-import java.util.Collection;
 import java.util.Map;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
@@ -14,64 +13,64 @@ import se.bjurr.sscc.settings.SSCCGroup;
 import se.bjurr.sscc.settings.SSCCRule;
 import se.bjurr.sscc.settings.SSCCSettings;
 
-import com.atlassian.stash.repository.RefChange;
 import com.google.common.base.Optional;
 
 public class SSCCPrinter {
 
  private final SSCCSettings settings;
  private final SSCCRenderer ssccRenderer;
+ public static String NL = System.getProperty("line.separator");
 
  public SSCCPrinter(SSCCSettings settings, SSCCRenderer ssccRenderer) {
   this.settings = settings;
   this.ssccRenderer = ssccRenderer;
  }
 
- private void printAcceptMessages(final SSCCGroup ssccVerificationResult) {
+ private void printAcceptMessages(final SSCCGroup ssccVerificationResult, StringBuilder sb) {
   if (ssccVerificationResult.getAccept().equals(ACCEPT)) {
-   ssccRenderer.println();
+   ssccRenderer.append(sb, NL);
    if (ssccVerificationResult.getMessage().isPresent()) {
-    ssccRenderer.println("- " + ssccVerificationResult.getMessage().get());
+    ssccRenderer.append(sb, "- " + ssccVerificationResult.getMessage().get() + NL);
    }
    for (final SSCCRule ssccRule : ssccVerificationResult.getRules()) {
     if (ssccRule.getMessage().isPresent()) {
-     ssccRenderer.println("  " + ssccRule.getMessage().get() + ": " + ssccRule.getRegexp());
+     ssccRenderer.append(sb, "  " + ssccRule.getMessage().get() + ": " + ssccRule.getRegexp() + NL);
     }
    }
   }
  }
 
- private void printCommit(final SSCCChangeSet ssccChangeSet) {
-  ssccRenderer.println();
-  ssccRenderer.println();
-  ssccRenderer.println(ssccChangeSet.getId() + " " + ssccChangeSet.getAuthor().getName() + " <"
-    + ssccChangeSet.getAuthor().getEmailAddress() + ">");
-  ssccRenderer.println(">>> " + ssccChangeSet.getMessage());
+ private void printCommit(final SSCCChangeSet ssccChangeSet, StringBuilder sb) {
+  ssccRenderer.append(sb, NL);
+  ssccRenderer.append(sb, NL);
+  ssccRenderer.append(sb, ssccChangeSet.getId() + " " + ssccChangeSet.getAuthor().getName() + " <"
+    + ssccChangeSet.getAuthor().getEmailAddress() + ">" + NL);
+  ssccRenderer.append(sb, ">>> " + ssccChangeSet.getMessage() + NL);
  }
 
  private void printEmailVerification(final SSCCRefChangeVerificationResult refChangeVerificationResult,
-   final SSCCChangeSet ssccChangeSet) {
+   final SSCCChangeSet ssccChangeSet, StringBuilder sb) {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailAuthorResult()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
-     + "' != Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
+     + "' != Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'" + NL);
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorEmailMessage().get() + NL);
    }
   }
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getEmailCommitterResult()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
-     + "' != Commit: '" + ssccChangeSet.getCommitter().getEmailAddress() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Stash: '" + matchedEmail("${" + SSCCRenderer.SSCCVariable.STASH_EMAIL + "}")
+     + "' != Commit: '" + ssccChangeSet.getCommitter().getEmailAddress() + "'" + NL);
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorEmailMessage().get() + NL);
    }
   }
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).isValidateChangeSetForAuthorEmailInStash()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Commit: '" + ssccChangeSet.getAuthor().getEmailAddress() + "'" + NL);
    if (settings.getRequireMatchingAuthorEmailMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorEmailMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorEmailMessage().get() + NL);
    }
   }
  }
@@ -84,98 +83,100 @@ public class SSCCPrinter {
  }
 
  private void printNameVerification(final SSCCRefChangeVerificationResult refChangeVerificationResult,
-   final SSCCChangeSet ssccChangeSet) {
+   final SSCCChangeSet ssccChangeSet, StringBuilder sb) {
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameAuthorResult()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
-     + ssccChangeSet.getAuthor().getName() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
+     + ssccChangeSet.getAuthor().getName() + "'" + NL);
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorNameMessage().get() + NL);
    }
   }
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getNameCommitterResult()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
-     + ssccChangeSet.getCommitter().getName() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Stash: '${" + SSCCRenderer.SSCCVariable.STASH_NAME + "}' != Commit: '"
+     + ssccChangeSet.getCommitter().getName() + "'" + NL);
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorNameMessage().get() + NL);
    }
   }
   if (!refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).isValidateChangeSetForAuthorNameInStash()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Commit: '" + ssccChangeSet.getAuthor().getName() + "'");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Commit: '" + ssccChangeSet.getAuthor().getName() + "'" + NL);
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getRequireMatchingAuthorNameMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorNameMessage().get() + NL);
    }
   }
  }
 
- private void printBranchNameVerification(SSCCRefChangeVerificationResult refChangeVerificationResult) {
+ private void printBranchNameVerification(SSCCRefChangeVerificationResult refChangeVerificationResult, StringBuilder sb) {
   if (!refChangeVerificationResult.isBranchNameValid()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- Branch: " + refChangeVerificationResult.getRefChange().getRefId() + ", "
-     + settings.getBranchRejectionRegexp().get());
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- Branch: " + refChangeVerificationResult.getRefId() + ", "
+     + settings.getBranchRejectionRegexp().get() + NL);
    if (settings.getBranchRejectionRegexpMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getBranchRejectionRegexpMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getBranchRejectionRegexpMessage().get() + NL);
    }
   }
  }
 
- private void printRejectedContent(Optional<String> rejectedContent) {
+ private void printRejectedContent(Optional<String> rejectedContent, StringBuilder sb) {
   if (rejectedContent.isPresent()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- " + settings.getCommitDiffRegexp().get() + ":");
-   ssccRenderer.println(rejectedContent.get().replaceAll("$", "\n  "));
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- " + settings.getCommitDiffRegexp().get() + ":" + NL);
+   ssccRenderer.append(sb, rejectedContent.get().replaceAll("$", "\n  ") + NL);
    if (settings.getCommitDiffRegexpMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getCommitDiffRegexpMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getCommitDiffRegexpMessage().get() + NL);
    }
   }
  }
 
- private void printMaximumSizeExceeded(Map<String, Long> map) {
+ private void printMaximumSizeExceeded(Map<String, Long> map, StringBuilder sb) {
   for (String file : map.keySet()) {
    Long sizeKb = map.get(file);
-   ssccRenderer.println();
-   ssccRenderer.println("- " + file + " " + sizeKb + "kb > " + settings.getCommitSizeKb() + "kb");
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- " + file + " " + sizeKb + "kb > " + settings.getCommitSizeKb() + "kb" + NL);
    if (settings.getCommitSizeMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getCommitSizeMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getCommitSizeMessage().get() + NL);
    }
   }
  }
 
- private void printRefChange(final RefChange refChange) {
-  ssccRenderer.println(refChange.getRefId() + " " + refChange.getFromHash().substring(0, 10) + " -> "
-    + refChange.getToHash().substring(0, 10));
+ private void printRefChange(final SSCCRefChangeVerificationResult refChangeVerificationResult, StringBuilder sb) {
+  ssccRenderer.append(sb, refChangeVerificationResult.getRefId() + " "
+    + refChangeVerificationResult.getFromHash().substring(0, 10) + " -> "
+    + refChangeVerificationResult.getToHash().substring(0, 10) + NL);
  }
 
- private void printRuleMessage(final SSCCGroup ssccVerificationResult) {
+ private void printRuleMessage(final SSCCGroup ssccVerificationResult, StringBuilder sb) {
   if (ssccVerificationResult.getAccept().equals(SHOW_MESSAGE)) {
    if (ssccVerificationResult.getMessage().isPresent()) {
-    ssccRenderer.println();
-    ssccRenderer.println("- " + ssccVerificationResult.getMessage().get());
+    ssccRenderer.append(sb, NL);
+    ssccRenderer.append(sb, "- " + ssccVerificationResult.getMessage().get() + NL);
    }
   }
  }
 
  private void printJqlVerification(SSCCRefChangeVerificationResult refChangeVerificationResult,
-   SSCCChangeSet ssccChangeSet) {
+   SSCCChangeSet ssccChangeSet, StringBuilder sb) {
   for (String query : refChangeVerificationResult.getSsccChangeSets().get(ssccChangeSet).getFailingJqls()) {
-   ssccRenderer.println();
-   ssccRenderer.println("- JQL: " + query);
+   ssccRenderer.append(sb, NL);
+   ssccRenderer.append(sb, "- JQL: " + query + NL);
    if (settings.getJqlCheckMessage().isPresent()) {
-    ssccRenderer.println("  " + settings.getJqlCheckMessage().get());
+    ssccRenderer.append(sb, "  " + settings.getJqlCheckMessage().get() + NL);
    }
   }
  }
 
- public void printVerificationResults(Collection<RefChange> refChanges, SSCCVerificationResult verificationResult) {
+ public String printVerificationResults(SSCCVerificationResult verificationResult) {
+  StringBuilder sb = new StringBuilder();
   if (verificationResult.isAccepted()) {
    if (settings.getAcceptMessage().isPresent()) {
-    ssccRenderer.println(settings.getAcceptMessage().get());
+    ssccRenderer.append(sb, ssccRenderer.render(settings.getAcceptMessage().get()) + NL);
    }
   } else {
    if (settings.getRejectMessage().isPresent()) {
-    ssccRenderer.println(settings.getRejectMessage().get());
+    ssccRenderer.append(sb, settings.getRejectMessage().get() + NL);
    }
   }
 
@@ -183,29 +184,30 @@ public class SSCCPrinter {
    if (!refChangeVerificationResult.hasReportables()) {
     continue;
    }
-   printRefChange(refChangeVerificationResult.getRefChange());
-   printBranchNameVerification(refChangeVerificationResult);
+   printRefChange(refChangeVerificationResult, sb);
+   printBranchNameVerification(refChangeVerificationResult, sb);
    for (final SSCCChangeSet ssccChangeSet : refChangeVerificationResult.getSsccChangeSets().keySet()) {
     SSCCChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSsccChangeSets().get(
       ssccChangeSet);
     if (!changeSetVerificationResult.hasReportables()) {
      continue;
     }
-    printCommit(ssccChangeSet);
-    printEmailVerification(refChangeVerificationResult, ssccChangeSet);
-    printNameVerification(refChangeVerificationResult, ssccChangeSet);
-    printJqlVerification(refChangeVerificationResult, ssccChangeSet);
-    printMaximumSizeExceeded(changeSetVerificationResult.getExceeding());
-    printRejectedContent(changeSetVerificationResult.getRejectedContent());
+    printCommit(ssccChangeSet, sb);
+    printEmailVerification(refChangeVerificationResult, ssccChangeSet, sb);
+    printNameVerification(refChangeVerificationResult, ssccChangeSet, sb);
+    printJqlVerification(refChangeVerificationResult, ssccChangeSet, sb);
+    printMaximumSizeExceeded(changeSetVerificationResult.getExceeding(), sb);
+    printRejectedContent(changeSetVerificationResult.getRejectedContent(), sb);
     for (final SSCCGroup ssccVerificationResult : changeSetVerificationResult.getGroupsResult().keySet()) {
-     printAcceptMessages(ssccVerificationResult);
-     printRuleMessage(ssccVerificationResult);
+     printAcceptMessages(ssccVerificationResult, sb);
+     printRuleMessage(ssccVerificationResult, sb);
     }
    }
   }
 
   if (settings.getAcceptMessage().isPresent() || !verificationResult.isAccepted()) {
-   ssccRenderer.println();
+   ssccRenderer.append(sb, NL);
   }
+  return sb.toString();
  }
 }

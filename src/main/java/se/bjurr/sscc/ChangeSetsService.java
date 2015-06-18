@@ -6,10 +6,10 @@ import java.util.List;
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.settings.SSCCSettings;
 
-import com.atlassian.stash.repository.RefChange;
+import com.atlassian.stash.repository.RefChangeType;
 import com.atlassian.stash.repository.Repository;
 
 public interface ChangeSetsService {
- public List<SSCCChangeSet> getNewChangeSets(SSCCSettings settings, Repository repository, RefChange refChange)
-   throws IOException;
+ List<SSCCChangeSet> getNewChangeSets(SSCCSettings settings, Repository fromRepository, Repository toRepository,
+   String refId, RefChangeType type, String fromHash, String toHash) throws IOException;
 }

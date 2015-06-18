@@ -11,7 +11,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check committer in commit
  * email is same as users email in Stash.
  * name is same as users name in Stash.
-* Optionally check email against regular expression instead of equality to email in Stash. Like:
+* Optionally check author email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*
  * ^[^@]*@company.domain$
 * Check that changed content does not match a specific regexp, like unresolved merge.
@@ -26,6 +26,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check that branch name matches specific regexp.
 * Exclude merge commits.
 * Exclude tag commits.
+* Check commits in pull requests
 * Show a general reject message.
 * Show a general accept message.
 * Optionally accept all commits from service users.

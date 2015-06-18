@@ -10,16 +10,19 @@ import java.util.Map;
 import se.bjurr.sscc.settings.SSCCGroup;
 import se.bjurr.sscc.settings.SSCCMatch;
 
-import com.atlassian.stash.repository.RefChange;
 import com.google.common.base.Optional;
 
 public class SSCCRefChangeVerificationResult {
- private final RefChange refChange;
  private final Map<SSCCChangeSet, SSCCChangeSetVerificationResult> ssccChangeSets = newTreeMap();
- private boolean branchNameValid;
+ private boolean branchNameValid = TRUE;
+ private final String refId;
+ private final String toHash;
+ private final String fromHash;
 
- public SSCCRefChangeVerificationResult(RefChange refChange) {
-  this.refChange = refChange;
+ public SSCCRefChangeVerificationResult(String refId, String fromHash, String toHash) {
+  this.refId = refId;
+  this.fromHash = fromHash;
+  this.toHash = toHash;
  }
 
  public void addAuthorEmailValidationResult(SSCCChangeSet ssccChangeSet, boolean validateChangeSetForAuthorEmail) {
@@ -43,10 +46,6 @@ public class SSCCRefChangeVerificationResult {
    ssccChangeSets.put(ssccChangeSet, new SSCCChangeSetVerificationResult());
   }
   return ssccChangeSets.get(ssccChangeSet);
- }
-
- public RefChange getRefChange() {
-  return refChange;
  }
 
  public Map<SSCCChangeSet, SSCCChangeSetVerificationResult> getSsccChangeSets() {
@@ -111,5 +110,17 @@ public class SSCCRefChangeVerificationResult {
  public void addAuthorNameInStashValidationResult(SSCCChangeSet ssccChangeSet,
    boolean validateChangeSetForAuthorNameInStash) {
   getOrAdd(ssccChangeSet).addAuthorNameInStashValidationResult(validateChangeSetForAuthorNameInStash);
+ }
+
+ public String getRefId() {
+  return refId;
+ }
+
+ public String getToHash() {
+  return toHash;
+ }
+
+ public String getFromHash() {
+  return fromHash;
  }
 }
