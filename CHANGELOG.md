@@ -2,6 +2,12 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.10
+* Preparing for checking commits in pull requests
+* Fixing bugs:
+ * Author name and email can be checked in Stash, was using wrong key in GUI to store the setting.
+ * "Require Matching Author Email" does not need to be checked for email regexp matching to work.
+
 ## 1.9
 * Check that author name, and/or email, in commit exists for any user in Stash
 
@@ -10,7 +16,7 @@ Changelog of Simple Stash Commit Checker
  * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${STASH_USER}")
 
 ## 1.7
-* Optionally check email against regular expression instead of equality to email in Stash. Like:
+* Optionally check author email against regular expression instead of equality to email in Stash. Like:
  * ^${STASH_USER}@.*
  * ^.*@company.domain$
 

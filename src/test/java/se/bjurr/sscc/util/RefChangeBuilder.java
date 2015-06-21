@@ -1,6 +1,6 @@
 package se.bjurr.sscc.util;
 
-import static com.atlassian.stash.repository.RefChangeType.UPDATE;
+import static com.atlassian.stash.repository.RefChangeType.ADD;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
@@ -9,6 +9,7 @@ import static com.google.common.io.Resources.getResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -32,7 +34,11 @@ import org.mockito.Matchers;
 
 import se.bjurr.sscc.ChangeSetsService;
 import se.bjurr.sscc.JiraClient;
+import se.bjurr.sscc.ResultsCallable;
 import se.bjurr.sscc.SsccPreReceiveRepositoryHook;
+import se.bjurr.sscc.SsccRepositoryMergeRequestCheck;
+import se.bjurr.sscc.SsccUserAdminService;
+import se.bjurr.sscc.SsccUserAdminServiceImpl;
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.settings.SSCCGroup;
 import se.bjurr.sscc.settings.SSCCSettings;
@@ -40,12 +46,19 @@ import se.bjurr.sscc.settings.SSCCSettings;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.sal.api.net.ResponseException;
+import com.atlassian.sal.api.pluginsettings.PluginSettings;
+import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
+import com.atlassian.stash.hook.repository.RepositoryHookService;
+import com.atlassian.stash.pull.PullRequest;
+import com.atlassian.stash.pull.PullRequestRef;
 import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.repository.RefChangeType;
 import com.atlassian.stash.repository.Repository;
+import com.atlassian.stash.scm.pull.MergeRequest;
 import com.atlassian.stash.setting.Settings;
+import com.atlassian.stash.setting.SettingsBuilder;
 import com.atlassian.stash.user.DetailedUser;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.atlassian.stash.user.StashUser;
@@ -68,8 +81,10 @@ public class RefChangeBuilder {
  }
 
  private final ChangeSetsService changeSetService;
+ private final UserAdminService userAdminService;
  private String fromHash = "e2bc4ed00386fafe00100738f739b9f29c9f4beb";
  private final SsccPreReceiveRepositoryHook hook;
+ private final SsccRepositoryMergeRequestCheck mergeHook;
 
  private final HookResponse hookResponse;
  private final List<SSCCChangeSet> newChangesets;
@@ -85,12 +100,17 @@ public class RefChangeBuilder {
  private final StashAuthenticationContext stashAuthenticationContext;
  private final StashUser stashUser;
  private String toHash = "af35d5c1a435d4f323b4e01775fa90a3eae652b3";
- private RefChangeType type = UPDATE;
+ private RefChangeType type = ADD;
  private Boolean wasAccepted = null;
  private ApplicationLinkService applicationLinkService;
- private UserAdminService userAdminService;
+ private SsccUserAdminService ssccUserAdminService;
  private final List<DetailedUser> detailedUsers = newArrayList();
+ private boolean prWasAccepted;
+ private String prSummary;
+ private String prMessage;
+ private RepositoryHookService repositoryHookService;
 
+ @SuppressWarnings("unchecked")
  private RefChangeBuilder() {
   setJiraClient(new JiraClient() {
    @Override
@@ -110,9 +130,22 @@ public class RefChangeBuilder {
   this.changeSetService = mock(ChangeSetsService.class);
   this.stashAuthenticationContext = mock(StashAuthenticationContext.class);
   this.userAdminService = mock(UserAdminService.class);
+  this.ssccUserAdminService = new SsccUserAdminServiceImpl(userAdminService);
   this.hook = new SsccPreReceiveRepositoryHook(changeSetService, stashAuthenticationContext, applicationLinkService,
-    userAdminService);
+    ssccUserAdminService);
   this.hook.setHookName("");
+  PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
+  repositoryHookService = mock(RepositoryHookService.class);
+  PluginSettings pluginSettings = mock(PluginSettings.class);
+  when(pluginSettingsFactory.createGlobalSettings()).thenReturn(pluginSettings);
+  HashMap<String, Object> map = new HashMap<String, Object>();
+  when(pluginSettingsFactory.createGlobalSettings().get(Matchers.anyString())).thenReturn(map);
+  SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
+  when(repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
+  when(repositoryHookService.createSettingsBuilder().addAll(Matchers.anyMap())).thenReturn(settingsBuilder);
+  when(repositoryHookService.createSettingsBuilder().build()).thenReturn(settings);
+  this.mergeHook = new SsccRepositoryMergeRequestCheck(changeSetService, stashAuthenticationContext,
+    applicationLinkService, ssccUserAdminService, pluginSettingsFactory, repositoryHookService);
   hookResponse = mock(HookResponse.class);
   when(hookResponse.out()).thenReturn(printWriterStandard);
   when(hookResponse.err()).thenReturn(printWriterReject);
@@ -124,7 +157,8 @@ public class RefChangeBuilder {
   refChange = newRefChange();
   when(
     changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
-      Matchers.any(RefChange.class))).thenReturn(newChangesets);
+      Matchers.any(Repository.class), Matchers.eq(refId), Matchers.eq(type), Matchers.eq(fromHash), Matchers.eq(toHash)))
+    .thenReturn(newChangesets);
   when(userAdminService.findUsers(Matchers.any(PageRequest.class))).thenReturn(new Page<DetailedUser>() {
 
    // This method is not available in Sash 3, but in 2.12.0, should not override
@@ -199,7 +233,6 @@ public class RefChangeBuilder {
   checkNotNull(wasAccepted, "do 'run' before.");
   assertEquals(output.trim().replaceAll("\n", " "), getOutputAll().trim().replaceAll("\n", " "));
   return this;
-
  }
 
  private OutputStream newOutputStream() {
@@ -253,11 +286,41 @@ public class RefChangeBuilder {
   return this;
  }
 
+ @SuppressWarnings("deprecation")
+ public RefChangeBuilder runPullRequest() throws IOException {
+  checkNotNull(refChange, "do 'throwing' or 'build' before.");
+  mergeHook.setChangesetsService(changeSetService);
+  this.mergeHook.setResultsCallback(new ResultsCallable() {
+   @Override
+   public void report(boolean isAccepted, String summaryParam, String messageParam) {
+    prWasAccepted = isAccepted;
+    prSummary = summaryParam;
+    prMessage = messageParam;
+   }
+  });
+  when(repositoryHookService.getSettings(Matchers.any(Repository.class), Matchers.anyString())).thenReturn(settings);
+  Repository repository = mock(Repository.class);
+  MergeRequest mergeRequest = mock(MergeRequest.class);
+  PullRequest pullRequest = mock(PullRequest.class);
+  PullRequestRef fromRef = mock(PullRequestRef.class);
+  PullRequestRef toRef = mock(PullRequestRef.class);
+  when(mergeRequest.getPullRequest()).thenReturn(pullRequest);
+  when(mergeRequest.getPullRequest().getFromRef()).thenReturn(fromRef);
+  when(mergeRequest.getPullRequest().getFromRef().getId()).thenReturn(refId);
+  when(mergeRequest.getPullRequest().getFromRef().getLatestChangeset()).thenReturn(fromHash);
+  when(mergeRequest.getPullRequest().getFromRef().getRepository()).thenReturn(repository);
+  when(mergeRequest.getPullRequest().getToRef()).thenReturn(toRef);
+  when(mergeRequest.getPullRequest().getToRef().getLatestChangeset()).thenReturn(toHash);
+  this.mergeHook.check(mergeRequest);
+  return this;
+ }
+
  public RefChangeBuilder throwing(IOException ioException) throws IOException {
   refChange = newRefChange();
   when(
     changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
-      Matchers.any(RefChange.class))).thenThrow(ioException);
+      Matchers.any(Repository.class), Matchers.any(String.class), Matchers.any(RefChangeType.class),
+      Matchers.any(String.class), Matchers.any(String.class))).thenThrow(ioException);
   return this;
  }
 
@@ -268,6 +331,26 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder wasRejected() {
   assertEquals("Expected rejection", FALSE, wasAccepted);
+  return this;
+ }
+
+ public RefChangeBuilder hasTrimmedPrSummary(String summary) {
+  assertEquals(summary.trim().replaceAll("\n", " "), prSummary.trim().replaceAll("\n", " "));
+  return this;
+ }
+
+ public RefChangeBuilder hasTrimmedPrPrintOut(String printOut) {
+  assertEquals(printOut.trim().replaceAll("\n", " "), prMessage.trim().replaceAll("\n", " "));
+  return this;
+ }
+
+ public RefChangeBuilder prWasAccepted() {
+  assertTrue("Pull request was not accepted", prWasAccepted);
+  return this;
+ }
+
+ public RefChangeBuilder prWasRejected() {
+  assertFalse("Pull request was not rejected", prWasAccepted);
   return this;
  }
 

@@ -7,7 +7,6 @@ import static java.lang.Boolean.TRUE;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sscc.SSCCCommon.getStashEmail;
 import static se.bjurr.sscc.SSCCCommon.getStashName;
-import static se.bjurr.sscc.SsccPreReceiveRepositoryHook.STASH_USERS;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.ACCEPT;
 import static se.bjurr.sscc.settings.SSCCGroup.Accept.SHOW_MESSAGE;
 import static se.bjurr.sscc.settings.SSCCGroup.Match.ALL;
@@ -24,19 +23,17 @@ import se.bjurr.sscc.settings.SSCCMatch;
 import se.bjurr.sscc.settings.SSCCRule;
 import se.bjurr.sscc.settings.SSCCSettings;
 
-import com.atlassian.stash.user.DetailedUser;
 import com.atlassian.stash.user.StashAuthenticationContext;
-import com.google.common.cache.LoadingCache;
 
 public class CommitMessageValidator {
 
  private final StashAuthenticationContext stashAuthenticationContext;
- private final LoadingCache<String, Map<String, DetailedUser>> stashUsers;
+ private final SsccUserAdminService ssccUserAdminService;
 
  public CommitMessageValidator(StashAuthenticationContext stashAuthenticationContext,
-   LoadingCache<String, Map<String, DetailedUser>> stashUsers) {
+   SsccUserAdminService ssccUserAdminService) {
   this.stashAuthenticationContext = stashAuthenticationContext;
-  this.stashUsers = stashUsers;
+  this.ssccUserAdminService = ssccUserAdminService;
  }
 
  public Map<SSCCGroup, SSCCMatch> validateChangeSetForGroups(SSCCSettings settings, final SSCCChangeSet ssccChangeSet) {
@@ -86,11 +83,11 @@ public class CommitMessageValidator {
 
  public boolean validateChangeSetForAuthorEmail(SSCCSettings settings, SSCCChangeSet ssccChangeSet,
    SSCCRenderer ssccRenderer) {
+  if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+   return compile(ssccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
+     ssccChangeSet.getAuthor().getEmailAddress()).find();
+  }
   if (settings.shouldRequireMatchingAuthorEmail()) {
-   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
-    return compile(ssccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
-      ssccChangeSet.getAuthor().getEmailAddress()).find();
-   }
    return getStashEmail(stashAuthenticationContext).equals(ssccChangeSet.getAuthor().getEmailAddress());
   }
   return TRUE;
@@ -116,13 +113,13 @@ public class CommitMessageValidator {
  public boolean validateChangeSetForAuthorEmailInStash(SSCCSettings settings, SSCCChangeSet ssccChangeSet)
    throws ExecutionException {
   return !settings.getRequireMatchingAuthorEmailInStash() || settings.getRequireMatchingAuthorEmailInStash()
-    && stashUsers.get(STASH_USERS).containsKey(ssccChangeSet.getAuthor().getEmailAddress());
+    && ssccUserAdminService.getStashUsers().containsKey(ssccChangeSet.getAuthor().getEmailAddress());
  }
 
  public boolean validateChangeSetForAuthorNameInStash(SSCCSettings settings, SSCCChangeSet ssccChangeSet)
    throws ExecutionException {
   return !settings.getRequireMatchingAuthorNameInStash() || settings.getRequireMatchingAuthorNameInStash()
-    && stashUsers.get(STASH_USERS).containsKey(ssccChangeSet.getAuthor().getName());
+    && ssccUserAdminService.getStashUsers().containsKey(ssccChangeSet.getAuthor().getName());
  }
 
 }
