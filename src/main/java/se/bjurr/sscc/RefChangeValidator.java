@@ -21,6 +21,7 @@ import se.bjurr.sscc.settings.SSCCSettings;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.sal.api.net.ResponseException;
+import com.atlassian.stash.pull.PullRequest;
 import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.repository.RefChangeType;
 import com.atlassian.stash.repository.Repository;
@@ -40,13 +41,11 @@ public class RefChangeValidator {
  private final JqlValidator jqlValidator;
 
  private final Repository fromRepository;
- private final Repository toRepository;
 
  public RefChangeValidator(Repository fromRepository, Repository toRepository, SSCCSettings settings,
    ChangeSetsService changesetsService, StashAuthenticationContext stashAuthenticationContext,
    SSCCRenderer ssccRenderer, ApplicationLinkService applicationLinkService, SsccUserAdminService ssccUserAdminService) {
   this.fromRepository = fromRepository;
-  this.toRepository = toRepository;
   this.settings = settings;
   this.changesetsService = changesetsService;
   this.stashAuthenticationContext = stashAuthenticationContext;
@@ -73,14 +72,31 @@ public class RefChangeValidator {
     + "> RefChange " + fromHash + " " + refId + " " + toHash + " " + refChangeType);
   if (compile(settings.getBranches().or(".*")).matcher(refId).find()) {
    if (refChangeType != DELETE) {
-    List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, fromRepository, toRepository,
-      refId, refChangeType, fromHash, toHash);
-    final SSCCRefChangeVerificationResult refChangeVerificationResults = validateRefChange(refChangeSets, settings,
-      refId, fromHash, toHash);
-    if (refChangeVerificationResults.hasReportables()) {
-     refChangeVerificationResult.add(refChangeVerificationResults);
-    }
+    List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, fromRepository, refId,
+      refChangeType, fromHash, toHash);
+    validateRefChange(refChangeVerificationResult, refId, fromHash, toHash, refChangeSets);
    }
+  }
+ }
+
+ public void validateRefChange(SSCCVerificationResult refChangeVerificationResults, PullRequest pullRequest)
+   throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
+  String refId = pullRequest.getFromRef().getId();
+  @SuppressWarnings("deprecation")
+  String fromHash = pullRequest.getFromRef().getLatestChangeset();
+  @SuppressWarnings("deprecation")
+  String toHash = pullRequest.getToRef().getLatestChangeset();
+  List<SSCCChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, pullRequest);
+  validateRefChange(refChangeVerificationResults, refId, fromHash, toHash, refChangeSets);
+ }
+
+ private void validateRefChange(final SSCCVerificationResult refChangeVerificationResult, String refId,
+   String fromHash, String toHash, List<SSCCChangeSet> refChangeSets) throws IOException, CredentialsRequiredException,
+   ResponseException, ExecutionException {
+  SSCCRefChangeVerificationResult refChangeVerificationResults = validateRefChange(refChangeSets, settings, refId,
+    fromHash, toHash);
+  if (refChangeVerificationResults.hasReportables()) {
+   refChangeVerificationResult.add(refChangeVerificationResults);
   }
  }
 

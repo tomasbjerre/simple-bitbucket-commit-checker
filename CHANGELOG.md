@@ -3,7 +3,7 @@
 Changelog of Simple Stash Commit Checker
 
 ## 1.10
-* Preparing for checking commits in pull requests
+* Checking commits in pull requests
 * Fixing bugs:
  * Author name and email can be checked in Stash, was using wrong key in GUI to store the setting.
  * "Require Matching Author Email" does not need to be checked for email regexp matching to work.

@@ -37,7 +37,7 @@ public class PullRequestTest {
     .runPullRequest()
     .prWasRejected()
     .hasTrimmedPrPrintOut(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - You need to specity an issue   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
+      "refs/heads/master e2bc4ed003 -&gt; af35d5c1a4<br> <br> <br> 1 Tomas &lt;my@email.com&gt;<br> &gt;&gt;&gt; fixing stuff<br> <br> - You need to specity an issue<br>   JIRA: ((?&lt;!([A-Z]{1,10})-?)[A-Z]+-\\d+)<br> <br>")
     .hasTrimmedPrSummary(PR_REJECT_DEFAULT_MSG);
  }
 

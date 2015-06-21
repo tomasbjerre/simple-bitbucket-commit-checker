@@ -1,8 +1,8 @@
 package se.bjurr.sscc;
 
-import static com.atlassian.stash.repository.RefChangeType.ADD;
 import static com.atlassian.stash.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
+import static se.bjurr.sscc.SSCCPrinter.NL;
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import com.atlassian.stash.hook.repository.RepositoryHookService;
 import com.atlassian.stash.pull.PullRequest;
 import com.atlassian.stash.scm.pull.MergeRequest;
 import com.atlassian.stash.scm.pull.MergeRequestCheck;
+import com.atlassian.stash.setting.Settings;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -49,8 +50,13 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
  @Override
  public void check(MergeRequest mergeRequest) {
   try {
-   SSCCSettings settings = sscSettings(repositoryHookService.getSettings(mergeRequest.getPullRequest().getToRef()
-     .getRepository(), "se.bjurr.sscc.sscc:pre-receive-repository-hook"));
+   Settings rawSettings = repositoryHookService.getSettings(mergeRequest.getPullRequest().getToRef().getRepository(),
+     "se.bjurr.sscc.sscc:pre-receive-repository-hook");
+   if (rawSettings == null) {
+    logger.debug("No settings found for SSCC");
+    return;
+   }
+   SSCCSettings settings = sscSettings(rawSettings);
    if (settings.isDryRun() || !settings.shouldCheckPullRequests() || settings.allowServiceUsers()
      && stashAuthenticationContext.getCurrentUser().getType().equals(SERVICE)) {
     resultsCallback.report(TRUE, null, null);
@@ -58,22 +64,18 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
    }
    PullRequest pullRequest = mergeRequest.getPullRequest();
    SSCCRenderer ssccRenderer = new SSCCRenderer(this.stashAuthenticationContext);
-   String refId = pullRequest.getFromRef().getId();
-   @SuppressWarnings("deprecation")
-   String fromHash = pullRequest.getFromRef().getLatestChangeset();
-   @SuppressWarnings("deprecation")
-   String toHash = pullRequest.getToRef().getLatestChangeset();
    RefChangeValidator ssccVerificationResult = new RefChangeValidator(pullRequest.getFromRef().getRepository(),
      pullRequest.getToRef().getRepository(), settings, changeSetService, stashAuthenticationContext, ssccRenderer,
      applicationLinkService, ssccUserAdminService);
    SSCCVerificationResult refChangeVerificationResults = new SSCCVerificationResult();
-   ssccVerificationResult.validateRefChange(refChangeVerificationResults, ADD, refId, fromHash, toHash);
+   ssccVerificationResult.validateRefChange(refChangeVerificationResults, pullRequest);
    boolean isAccepted = refChangeVerificationResults.isAccepted();
    if (isAccepted) {
     resultsCallback.report(isAccepted, null, null);
     return;
    }
-   String printOut = new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChangeVerificationResults);
+   String printOut = new SSCCPrinter(settings, ssccRenderer).printVerificationResults(refChangeVerificationResults)
+     .replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll(NL, "<br>\n");
    String summary = settings.getShouldCheckPullRequestsMessage().or(PR_REJECT_DEFAULT_MSG);
    mergeRequest.veto(summary, printOut);
    /**
