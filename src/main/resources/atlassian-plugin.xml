@@ -32,7 +32,7 @@
     <interface>se.bjurr.sscc.SsccUserAdminService</interface>
   </component>
 
-  <!-- merge-check key="sscc-merge-repository-hook.name" class="se.bjurr.sscc.SsccRepositoryMergeRequestCheck" //-->
+  <merge-check key="sscc-merge-repository-hook.name" class="se.bjurr.sscc.SsccRepositoryMergeRequestCheck" />
 
   <repository-hook name="Simple Stash Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
     <description key="pre-receive-repository-hook.description">Simple Stash Commit Checker</description>

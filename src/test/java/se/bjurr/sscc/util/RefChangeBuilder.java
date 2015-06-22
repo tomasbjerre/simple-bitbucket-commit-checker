@@ -157,7 +157,8 @@ public class RefChangeBuilder {
   refChange = newRefChange();
   when(
     changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
-      Matchers.any(Repository.class), Matchers.eq(refId), Matchers.eq(type), Matchers.eq(fromHash), Matchers.eq(toHash)))
+      Matchers.eq(refId), Matchers.eq(type), Matchers.eq(fromHash), Matchers.eq(toHash))).thenReturn(newChangesets);
+  when(changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(PullRequest.class)))
     .thenReturn(newChangesets);
   when(userAdminService.findUsers(Matchers.any(PageRequest.class))).thenReturn(new Page<DetailedUser>() {
 
@@ -319,8 +320,8 @@ public class RefChangeBuilder {
   refChange = newRefChange();
   when(
     changeSetService.getNewChangeSets(Matchers.any(SSCCSettings.class), Matchers.any(Repository.class),
-      Matchers.any(Repository.class), Matchers.any(String.class), Matchers.any(RefChangeType.class),
-      Matchers.any(String.class), Matchers.any(String.class))).thenThrow(ioException);
+      Matchers.any(String.class), Matchers.any(RefChangeType.class), Matchers.any(String.class),
+      Matchers.any(String.class))).thenThrow(ioException);
   return this;
  }
 
