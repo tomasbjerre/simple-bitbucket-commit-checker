@@ -2,6 +2,10 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.11
+* Fixing bug:
+ * "An error occured" is shown every time users see a Pull Request #41
+
 ## 1.10
 * Checking commits in pull requests
 * Fixing bugs:

@@ -1,6 +1,8 @@
 package se.bjurr.sscc.util;
 
+import static com.atlassian.fugue.Throwables.propagate;
 import static com.atlassian.stash.repository.RefChangeType.ADD;
+import static com.atlassian.stash.user.Permission.REPO_ADMIN;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
@@ -60,11 +62,14 @@ import com.atlassian.stash.scm.pull.MergeRequest;
 import com.atlassian.stash.setting.Settings;
 import com.atlassian.stash.setting.SettingsBuilder;
 import com.atlassian.stash.user.DetailedUser;
+import com.atlassian.stash.user.EscalatedSecurityContext;
+import com.atlassian.stash.user.SecurityService;
 import com.atlassian.stash.user.StashAuthenticationContext;
 import com.atlassian.stash.user.StashUser;
 import com.atlassian.stash.user.StashUserVisitor;
 import com.atlassian.stash.user.UserAdminService;
 import com.atlassian.stash.user.UserType;
+import com.atlassian.stash.util.Operation;
 import com.atlassian.stash.util.Page;
 import com.atlassian.stash.util.PageRequest;
 import com.google.common.base.Function;
@@ -77,7 +82,12 @@ public class RefChangeBuilder {
  public static final String JIRA_RESPONSE_TWO = "jiraResponseTwo.json";
 
  public static RefChangeBuilder refChangeBuilder() {
-  return new RefChangeBuilder();
+  try {
+   return new RefChangeBuilder();
+  } catch (Throwable t) {
+   propagate(t, RuntimeException.class);
+   return null;
+  }
  }
 
  private final ChangeSetsService changeSetService;
@@ -109,9 +119,10 @@ public class RefChangeBuilder {
  private String prSummary;
  private String prMessage;
  private RepositoryHookService repositoryHookService;
+ private SecurityService securityService;
 
  @SuppressWarnings("unchecked")
- private RefChangeBuilder() {
+ private RefChangeBuilder() throws Throwable {
   setJiraClient(new JiraClient() {
    @Override
    protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
@@ -144,8 +155,12 @@ public class RefChangeBuilder {
   when(repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
   when(repositoryHookService.createSettingsBuilder().addAll(Matchers.anyMap())).thenReturn(settingsBuilder);
   when(repositoryHookService.createSettingsBuilder().build()).thenReturn(settings);
+  securityService = mock(SecurityService.class);
+  EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
+  when(escalatedSecurityContext.call(Matchers.any(Operation.class))).thenReturn(settings);
+  when(securityService.withPermission(REPO_ADMIN, "Retrieving settings")).thenReturn(escalatedSecurityContext);
   this.mergeHook = new SsccRepositoryMergeRequestCheck(changeSetService, stashAuthenticationContext,
-    applicationLinkService, ssccUserAdminService, pluginSettingsFactory, repositoryHookService);
+    applicationLinkService, ssccUserAdminService, pluginSettingsFactory, repositoryHookService, securityService);
   hookResponse = mock(HookResponse.class);
   when(hookResponse.out()).thenReturn(printWriterStandard);
   when(hookResponse.err()).thenReturn(printWriterReject);

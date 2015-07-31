@@ -1,5 +1,6 @@
 package se.bjurr.sscc;
 
+import static com.atlassian.stash.user.Permission.REPO_ADMIN;
 import static com.atlassian.stash.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.SSCCPrinter.NL;
@@ -15,13 +16,17 @@ import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.stash.hook.repository.RepositoryHookService;
 import com.atlassian.stash.pull.PullRequest;
+import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.scm.pull.MergeRequest;
 import com.atlassian.stash.scm.pull.MergeRequestCheck;
 import com.atlassian.stash.setting.Settings;
+import com.atlassian.stash.user.SecurityService;
 import com.atlassian.stash.user.StashAuthenticationContext;
+import com.atlassian.stash.util.Operation;
 import com.google.common.annotations.VisibleForTesting;
 
 public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
+ private static final String SSCC_SETTINGS_KEY = "se.bjurr.sscc.sscc:pre-receive-repository-hook";
  public static final String PR_REJECT_DEFAULT_MSG = "At least one commit in Pull Request is not ok";
  private static Logger logger = LoggerFactory.getLogger(SsccRepositoryMergeRequestCheck.class);
  private final StashAuthenticationContext stashAuthenticationContext;
@@ -30,6 +35,7 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
  private final SsccUserAdminService ssccUserAdminService;
  private ResultsCallable resultsCallback = new ResultsCallable();
  private final RepositoryHookService repositoryHookService;
+ private final SecurityService securityService;
 
  @VisibleForTesting
  public void setResultsCallback(ResultsCallable resultsCallback) {
@@ -39,19 +45,20 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
  public SsccRepositoryMergeRequestCheck(ChangeSetsService changeSetService,
    StashAuthenticationContext stashAuthenticationContext, ApplicationLinkService applicationLinkService,
    SsccUserAdminService ssccUserAdminService, PluginSettingsFactory pluginSettingsFactory,
-   RepositoryHookService repositoryHookService) {
+   RepositoryHookService repositoryHookService, SecurityService securityService) {
   this.applicationLinkService = applicationLinkService;
   this.stashAuthenticationContext = stashAuthenticationContext;
   this.ssccUserAdminService = ssccUserAdminService;
   this.changeSetService = changeSetService;
   this.repositoryHookService = repositoryHookService;
+  this.securityService = securityService;
  }
 
  @Override
  public void check(MergeRequest mergeRequest) {
   try {
-   Settings rawSettings = repositoryHookService.getSettings(mergeRequest.getPullRequest().getToRef().getRepository(),
-     "se.bjurr.sscc.sscc:pre-receive-repository-hook");
+   Repository repository = mergeRequest.getPullRequest().getToRef().getRepository();
+   Settings rawSettings = getSettings(repository, SSCC_SETTINGS_KEY);
    if (rawSettings == null) {
     logger.debug("No settings found for SSCC");
     return;
@@ -87,6 +94,15 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
   } catch (Exception e) {
    logger.error("", e);
   }
+ }
+
+ private Settings getSettings(final Repository repository, final String settingsKey) throws Exception {
+  return securityService.withPermission(REPO_ADMIN, "Retrieving settings").call(new Operation<Settings, Exception>() {
+   @Override
+   public Settings perform() throws Exception {
+    return repositoryHookService.getSettings(repository, settingsKey);
+   }
+  });
  }
 
  public void setChangesetsService(ChangeSetsService changeSetService) {
