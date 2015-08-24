@@ -585,6 +585,11 @@ public class RefChangeBuilder {
    public String getDirectoryName() {
     return null;
    }
+
+   // Not available in Stash 2.12.0, should not use @override
+   public boolean isDeletable() {
+    return false;
+   }
   });
   return this;
  }

@@ -2,6 +2,10 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.12
+* Fixing bug:
+ * Checking branch names, even if no commits are pushed.
+
 ## 1.11
 * Fixing bug:
  * "An error occured" is shown every time users see a Pull Request #41
