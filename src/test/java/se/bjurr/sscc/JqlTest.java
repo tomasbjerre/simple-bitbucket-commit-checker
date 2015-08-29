@@ -2,6 +2,7 @@ package se.bjurr.sscc;
 
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sscc.data.SSCCChangeSetBuilder.changeSetBuilder;
+import static se.bjurr.sscc.data.SSCCPersonBuilder.ssccPersonBuilder;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_COMMIT_REGEXP;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK;
 import static se.bjurr.sscc.settings.SSCCSettings.SETTING_JQL_CHECK_MESSAGE;
@@ -54,6 +55,29 @@ public class JqlTest {
     .withChangeSet(changeSetBuilder().withId("1").withMessage("fixing stuff").build())
     .withSetting(SETTING_JQL_CHECK, TRUE).withSetting(SETTING_JQL_CHECK_QUERY, "assignee in (\"${STASH_USER}\")")
     .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must have assignee!").build().run().hasNoOutput().wasAccepted();
+ }
+
+ @Test
+ public void testThatTheJQLQueryCanBeUsedWithChangesetVariables() throws Exception {
+  refChangeBuilder()
+    .fakeJiraResponse("assignee in (\"tomas\")", JIRA_RESPONSE_ONE)
+    .withStashName("tomas")
+    .withChangeSet(
+      changeSetBuilder().withId("1").withMessage("fixing stuff")
+        .withAuthor(ssccPersonBuilder().withName("Author name").withEmailAddress("Author Email").build())
+        .withCommitter(ssccPersonBuilder().withName("Committer name").withEmailAddress("Committer Email").build())
+        .build())
+    .withSetting(SETTING_JQL_CHECK, TRUE)
+    .withSetting(
+      SETTING_JQL_CHECK_QUERY,
+      "assignee in (\"${STASH_USER}\", \"${COMMITTER_NAME}\", \"${COMMITTER_EMAIL}\", \"${AUTHOR_NAME}\", \"${AUTHOR_EMAIL}\")")
+    .withSetting(SETTING_JQL_CHECK_MESSAGE,
+      "Msg... \"${COMMITTER_NAME} \"${COMMITTER_EMAIL}\", \"${AUTHOR_NAME}\", \"${AUTHOR_EMAIL}\"")
+    .build()
+    .run()
+    .hasTrimmedFlatOutput(
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Author name <Author Email> >>> fixing stuff  - JQL: assignee in (\"tomas\", \"Committer name\", \"Committer Email\", \"Author name\", \"Author Email\")   Msg... \"Committer name \"Committer Email\", \"Author name\", \"Author Email\"")
+    .wasRejected();
  }
 
  @Test

@@ -187,6 +187,7 @@ public class SSCCPrinter {
    printRefChange(refChangeVerificationResult, sb);
    printBranchNameVerification(refChangeVerificationResult, sb);
    for (final SSCCChangeSet ssccChangeSet : refChangeVerificationResult.getSsccChangeSets().keySet()) {
+    ssccRenderer.setSsccChangeSet(ssccChangeSet);
     SSCCChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSsccChangeSets().get(
       ssccChangeSet);
     if (!changeSetVerificationResult.hasReportables()) {
@@ -202,6 +203,7 @@ public class SSCCPrinter {
      printAcceptMessages(ssccVerificationResult, sb);
      printRuleMessage(ssccVerificationResult, sb);
     }
+    ssccRenderer.setSsccChangeSet(null);
    }
   }
 

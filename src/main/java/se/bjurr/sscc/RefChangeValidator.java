@@ -107,6 +107,7 @@ public class RefChangeValidator {
     fromHash, toHash);
   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refId));
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
+   ssccRenderer.setSsccChangeSet(ssccChangeSet);
    logger.debug(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
      + "> ChangeSet " + ssccChangeSet.getId() + " " + ssccChangeSet.getMessage() + " " + ssccChangeSet.getParentCount()
      + " " + ssccChangeSet.getCommitter().getEmailAddress() + " " + ssccChangeSet.getCommitter().getName());
@@ -130,6 +131,7 @@ public class RefChangeValidator {
      commitMessageValidator.validateChangeSetForAuthorNameInStash(settings, ssccChangeSet));
 
    refChangeVerificationResult.setFailingJql(ssccChangeSet, jqlValidator.validateJql(ssccChangeSet));
+   ssccRenderer.setSsccChangeSet(null);
   }
   return refChangeVerificationResult;
  }

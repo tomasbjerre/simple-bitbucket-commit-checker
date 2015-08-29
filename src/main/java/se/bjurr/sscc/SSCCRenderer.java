@@ -1,5 +1,7 @@
 package se.bjurr.sscc;
 
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sscc.SSCCCommon.getStashEmail;
@@ -12,11 +14,12 @@ import java.util.regex.Matcher;
 import se.bjurr.sscc.data.SSCCChangeSet;
 
 import com.atlassian.stash.user.StashAuthenticationContext;
+import com.google.common.base.Optional;
 
 public class SSCCRenderer {
 
  private static class Resolver {
-  public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+  public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
    return "";
   }
 
@@ -28,18 +31,50 @@ public class SSCCRenderer {
  public enum SSCCVariable {
   STASH_EMAIL(new Resolver() {
    @Override
-   public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
     return getStashEmail(stashAuthenticationContext);
    }
   }), STASH_NAME(new Resolver() {
    @Override
-   public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
     return getStashName(stashAuthenticationContext);
    }
   }), STASH_USER(new Resolver() {
    @Override
-   public String resolve(StashAuthenticationContext stashAuthenticationContext) {
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
     return getStashUser(stashAuthenticationContext);
+   }
+  }), COMMITTER_NAME(new Resolver() {
+   @Override
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
+    if (ssccChangeSet.isPresent()) {
+     return ssccChangeSet.get().getCommitter().getName();
+    }
+    return "";
+   }
+  }), COMMITTER_EMAIL(new Resolver() {
+   @Override
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
+    if (ssccChangeSet.isPresent()) {
+     return ssccChangeSet.get().getCommitter().getEmailAddress();
+    }
+    return "";
+   }
+  }), AUTHOR_NAME(new Resolver() {
+   @Override
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
+    if (ssccChangeSet.isPresent()) {
+     return ssccChangeSet.get().getAuthor().getName();
+    }
+    return "";
+   }
+  }), AUTHOR_EMAIL(new Resolver() {
+   @Override
+   public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
+    if (ssccChangeSet.isPresent()) {
+     return ssccChangeSet.get().getAuthor().getEmailAddress();
+    }
+    return "";
    }
   }), REGEXP(new Resolver() {
    @Override
@@ -59,8 +94,8 @@ public class SSCCRenderer {
    this.resolver = resolver;
   }
 
-  public String resolve(StashAuthenticationContext stashAuthenticationContext) {
-   return resolver.resolve(stashAuthenticationContext);
+  public String resolve(StashAuthenticationContext stashAuthenticationContext, Optional<SSCCChangeSet> ssccChangeSet) {
+   return resolver.resolve(stashAuthenticationContext, ssccChangeSet);
   }
 
   public List<String> resolveAll(String regexp, SSCCChangeSet changeSet) {
@@ -69,6 +104,7 @@ public class SSCCRenderer {
  }
 
  private final StashAuthenticationContext stashAuthenticationContext;
+ private Optional<SSCCChangeSet> ssccChangeSet = absent();
 
  public SSCCRenderer(StashAuthenticationContext stashAuthenticationContext) {
   this.stashAuthenticationContext = stashAuthenticationContext;
@@ -76,7 +112,8 @@ public class SSCCRenderer {
 
  public String render(String string) {
   for (SSCCVariable variable : SSCCVariable.values()) {
-   string = string.replaceAll("\\$\\{" + variable.name() + "\\}", variable.resolve(stashAuthenticationContext));
+   string = string.replaceAll("\\$\\{" + variable.name() + "\\}",
+     variable.resolve(stashAuthenticationContext, ssccChangeSet));
   }
   return string;
  }
@@ -92,5 +129,9 @@ public class SSCCRenderer {
 
  public void append(StringBuilder sb, String renderAndAppend) {
   sb.append(render(renderAndAppend));
+ }
+
+ public void setSsccChangeSet(SSCCChangeSet ssccChangeSet) {
+  this.ssccChangeSet = fromNullable(ssccChangeSet);
  }
 }

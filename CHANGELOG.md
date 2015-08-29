@@ -2,6 +2,13 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.13
+* Adding new variables
+ * ${COMMITTER_EMAIL}
+ * ${COMMITTER_NAME}
+ * ${AUTHOR_EMAIL}
+ * ${AUTHOR_NAME}
+
 ## 1.12
 * Fixing bug:
  * Checking branch names, even if no commits are pushed.

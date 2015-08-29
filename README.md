@@ -31,6 +31,14 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Show a general accept message.
 * Optionally accept all commits from service users.
 * Dry run mode, where all commits are accepted. But verification results are shown.
+* Supporting variables to be used in error messages and checks.
+ * STASH_EMAIL, Email of user in Stash.
+ * STASH_NAME Name of user in Stash.
+ * COMMITTER_EMAIL, Email of committer name.
+ * COMMITTER_NAME, Name of committer email.
+ * AUTHOR_EMAIL, Email of author email.
+ * AUTHOR_NAME, Name of author name.
+ * STASH_USER, Username of user in Stash.
 
 ## Design goals
 The included features should:
