@@ -18,7 +18,12 @@ public class DryRunTest {
   refChangeBuilder()
     .withSetting(SETTING_DRY_RUN, TRUE)
     .withGroupAcceptingAtLeastOneJira()
-    .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
+    .withChangeSet( //
+      changeSetBuilder() //
+        .withId("1") //
+        .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+        .build() //
+    )
     .build()
     .run()
     .hasTrimmedFlatOutput(
@@ -32,7 +37,12 @@ public class DryRunTest {
     .withSetting(SETTING_DRY_RUN, TRUE)
     .withSetting(SETTING_DRY_RUN_MESSAGE, "In dry run mode!")
     .withGroupAcceptingAtLeastOneJira()
-    .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
+    .withChangeSet( //
+      changeSetBuilder() //
+        .withId("1") //
+        .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+        .build() //
+    )
     .build()
     .run()
     .hasTrimmedFlatOutput(
@@ -42,8 +52,19 @@ public class DryRunTest {
 
  @Test
  public void testThatDryRunCanProvideMessageFromSettings() throws IOException {
-  refChangeBuilder().withSetting(SETTING_DRY_RUN, TRUE).withSetting(SETTING_DRY_RUN_MESSAGE, "In dry run mode!")
-    .withGroupAcceptingAtLeastOneJira().withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
-    .build().run().hasOutputFrom("testThatDryRunCanProvideMessageFromSettings.txt").wasAccepted();
+  refChangeBuilder() //
+    .withSetting(SETTING_DRY_RUN, TRUE) //
+    .withSetting(SETTING_DRY_RUN_MESSAGE, "In dry run mode!") //
+    .withGroupAcceptingAtLeastOneJira() //
+    .withChangeSet( //
+      changeSetBuilder() //
+        .withId("1") //
+        .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+        .build() //
+    ) //
+    .build() //
+    .run() //
+    .hasOutputFrom("testThatDryRunCanProvideMessageFromSettings.txt") //
+    .wasAccepted();
  }
 }
