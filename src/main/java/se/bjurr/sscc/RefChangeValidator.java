@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.data.SSCCRefChangeVerificationResult;
@@ -28,7 +26,7 @@ import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.user.StashAuthenticationContext;
 
 public class RefChangeValidator {
- private static Logger logger = LoggerFactory.getLogger(RefChangeValidator.class);
+ private static Logger logger = Logger.getLogger(RefChangeValidator.class.getName());
 
  private final SSCCSettings settings;
  private final ChangeSetsService changesetsService;
@@ -68,7 +66,7 @@ public class RefChangeValidator {
  public void validateRefChange(final SSCCVerificationResult refChangeVerificationResult, RefChangeType refChangeType,
    String refId, String fromHash, String toHash) throws IOException, CredentialsRequiredException, ResponseException,
    ExecutionException {
-  logger.debug(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
+  logger.fine(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
     + "> RefChange " + fromHash + " " + refId + " " + toHash + " " + refChangeType);
   if (compile(settings.getBranches().or(".*")).matcher(refId).find()) {
    if (refChangeType != DELETE) {
@@ -108,7 +106,7 @@ public class RefChangeValidator {
   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refId));
   for (final SSCCChangeSet ssccChangeSet : ssccChangeSets) {
    ssccRenderer.setSsccChangeSet(ssccChangeSet);
-   logger.debug(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
+   logger.fine(getStashName(stashAuthenticationContext) + " " + getStashEmail(stashAuthenticationContext)
      + "> ChangeSet " + ssccChangeSet.getId() + " " + ssccChangeSet.getMessage() + " " + ssccChangeSet.getParentCount()
      + " " + ssccChangeSet.getCommitter().getEmailAddress() + " " + ssccChangeSet.getCommitter().getName());
    refChangeVerificationResult.setGroupsResult(ssccChangeSet,

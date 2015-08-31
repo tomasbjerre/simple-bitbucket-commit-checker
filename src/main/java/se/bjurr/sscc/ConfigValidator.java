@@ -2,10 +2,9 @@ package se.bjurr.sscc;
 
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
-import javax.annotation.Nonnull;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Nonnull;
 
 import se.bjurr.sscc.settings.SSCCSettings;
 import se.bjurr.sscc.settings.ValidationException;
@@ -16,7 +15,7 @@ import com.atlassian.stash.setting.Settings;
 import com.atlassian.stash.setting.SettingsValidationErrors;
 
 public class ConfigValidator implements RepositorySettingsValidator {
- private static final Logger logger = LoggerFactory.getLogger(RepositorySettingsValidator.class);
+ private static final Logger logger = Logger.getLogger(RepositorySettingsValidator.class.getName());
 
  public ConfigValidator() {
 
@@ -27,7 +26,7 @@ public class ConfigValidator implements RepositorySettingsValidator {
    @Nonnull Repository repository) {
   try {
    final SSCCSettings ssccSettings = sscSettings(settings);
-   logger.debug("Validating:\n" + ssccSettings.toString());
+   logger.fine("Validating:\n" + ssccSettings.toString());
   } catch (final ValidationException e) {
    errors.addFieldError(e.getField(), e.getError());
   }

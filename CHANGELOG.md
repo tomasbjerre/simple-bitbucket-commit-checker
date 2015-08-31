@@ -2,6 +2,10 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.14
+* Removing SLF4J usage to deal with classpath issues.
+ * https://github.com/tomasbjerre/pull-request-notifier-for-stash/issues/60
+
 ## 1.13
 * Adding new variables
  * ${COMMITTER_EMAIL}

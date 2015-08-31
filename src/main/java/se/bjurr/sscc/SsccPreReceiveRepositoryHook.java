@@ -2,12 +2,11 @@ package se.bjurr.sscc;
 
 import static com.atlassian.stash.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
+import static java.util.logging.Level.SEVERE;
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
 import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import se.bjurr.sscc.data.SSCCVerificationResult;
 import se.bjurr.sscc.settings.SSCCSettings;
@@ -21,7 +20,7 @@ import com.atlassian.stash.user.StashAuthenticationContext;
 import com.google.common.annotations.VisibleForTesting;
 
 public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
- private static Logger logger = LoggerFactory.getLogger(SsccPreReceiveRepositoryHook.class);
+ private static Logger logger = Logger.getLogger(SsccPreReceiveRepositoryHook.class.getName());
 
  private ChangeSetsService changesetsService;
 
@@ -79,7 +78,7 @@ public class SsccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
   } catch (final Exception e) {
    final String message = "Error while validating reference changes. Will allow all of them. \"" + e.getMessage()
      + "\"";
-   logger.error(message, e);
+   logger.log(SEVERE, message, e);
    hookResponse.out().println(message);
    return TRUE;
   }

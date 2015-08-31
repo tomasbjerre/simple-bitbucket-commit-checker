@@ -5,11 +5,11 @@ import static se.bjurr.sscc.settings.SSCCSettings.SETTING_BRANCHES;
 import static se.bjurr.sscc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 public class ExceptionTest {
  private Logger beforeLogger;

@@ -3,11 +3,11 @@ package se.bjurr.sscc;
 import static com.atlassian.stash.user.Permission.REPO_ADMIN;
 import static com.atlassian.stash.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
+import static java.util.logging.Level.SEVERE;
 import static se.bjurr.sscc.SSCCPrinter.NL;
 import static se.bjurr.sscc.settings.SSCCSettings.sscSettings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import se.bjurr.sscc.data.SSCCVerificationResult;
 import se.bjurr.sscc.settings.SSCCSettings;
@@ -28,7 +28,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
  private static final String SSCC_SETTINGS_KEY = "se.bjurr.sscc.sscc:pre-receive-repository-hook";
  public static final String PR_REJECT_DEFAULT_MSG = "At least one commit in Pull Request is not ok";
- private static Logger logger = LoggerFactory.getLogger(SsccRepositoryMergeRequestCheck.class);
+ private static Logger logger = Logger.getLogger(SsccRepositoryMergeRequestCheck.class.getName());
  private final StashAuthenticationContext stashAuthenticationContext;
  private final ApplicationLinkService applicationLinkService;
  private ChangeSetsService changeSetService;
@@ -60,7 +60,7 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
    Repository repository = mergeRequest.getPullRequest().getToRef().getRepository();
    Settings rawSettings = getSettings(repository, SSCC_SETTINGS_KEY);
    if (rawSettings == null) {
-    logger.debug("No settings found for SSCC");
+    logger.fine("No settings found for SSCC");
     return;
    }
    SSCCSettings settings = sscSettings(rawSettings);
@@ -92,7 +92,7 @@ public class SsccRepositoryMergeRequestCheck implements MergeRequestCheck {
     */
    resultsCallback.report(isAccepted, summary, printOut);
   } catch (Exception e) {
-   logger.error("", e);
+   logger.log(SEVERE, "", e);
   }
  }
 

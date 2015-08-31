@@ -4,6 +4,7 @@ import static com.atlassian.stash.repository.RefChangeType.DELETE;
 import static com.atlassian.stash.scm.git.GitRefPattern.TAGS;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newTreeMap;
+import static java.util.logging.Level.SEVERE;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -30,8 +32,6 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import se.bjurr.sscc.data.SSCCChangeSet;
 import se.bjurr.sscc.data.SSCCPerson;
@@ -52,7 +52,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 public class ChangeSetsServiceImpl implements ChangeSetsService {
- private static Logger logger = LoggerFactory.getLogger(ChangeSetsServiceImpl.class);
+ private static Logger logger = Logger.getLogger(ChangeSetsServiceImpl.class.getName());
  private final ApplicationPropertiesService applicationPropertiesService;
  private final CommitService commitService;
 
@@ -157,7 +157,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
      changesets.add(new SSCCChangeSet(changeset.getId(), committer, author, message, commit.getParentCount(),
        sizePerFile, diff));
     } catch (GitAPIException e) {
-     logger.error(refId, e);
+     logger.log(SEVERE, refId, e);
     }
    }
   }
