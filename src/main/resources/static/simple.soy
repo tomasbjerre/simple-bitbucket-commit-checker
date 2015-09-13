@@ -4,21 +4,21 @@
  * @param config
  * @param errors
  */
-{template .sscc}
-<div class="sscc">
+{template .sbcc}
+<div class="sbcc">
     <div class="aui-message aui-message-info">
         You can use <a target="_blank" href="http://jex.im/regulex/">http://jex.im/regulex/</a> to fiddle with regular expressions.<br>
         You may want some <a target="_blank" href="http://lmgtfy.com/?q=ascii+art">ASCII art</a> in accept and reject messages.<br>
-        JQL functionality requires <a href="https://confluence.atlassian.com/display/STASH/Linking+Stash+with+JIRA" target="_blank">JIRA application link</a> to be configured.<br>
+        JQL functionality requires <a href="https://confluence.atlassian.com/display/BITBUCKET/Linking+Bitbucket+with+JIRA" target="_blank">JIRA application link</a> to be configured.<br>
         You can use variables in messages.<bt>
         <ul>
-            <li><b>&#36;&#123;STASH_EMAIL&#125;</b> Email of user in Stash.</li>
-            <li><b>&#36;&#123;STASH_NAME&#125;</b> Name of user in Stash.</li>
+            <li><b>&#36;&#123;BITBUCKET_EMAIL&#125;</b> Email of user in Bitbucket.</li>
+            <li><b>&#36;&#123;BITBUCKET_NAME&#125;</b> Name of user in Bitbucket.</li>
             <li><b>&#36;&#123;COMMITTER_EMAIL&#125;</b> Email of committer name.</li>
             <li><b>&#36;&#123;COMMITTER_NAME&#125;</b> Name of committer email.</li>
             <li><b>&#36;&#123;AUTHOR_EMAIL&#125;</b> Email of author email.</li>
             <li><b>&#36;&#123;AUTHOR_NAME&#125;</b> Name of author name.</li>
-            <li><b>&#36;&#123;STASH_USER&#125;</b> Username of user in Stash.</li>
+            <li><b>&#36;&#123;BITBUCKET_USER&#125;</b> Username of user in Bitbucket.</li>
         </ul>
     </div>
 
@@ -53,7 +53,7 @@
         {param legendContent: 'Exclude Merge Commits' /}
         {param fields: [[
             'id' : 'excludeMergeCommits',
-            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'labelText': 'yes',
             'isChecked' : $config['excludeMergeCommits']
         ]] /}
         {param descriptionText: 'Exclude merge commits from being checked.' /}
@@ -63,7 +63,7 @@
         {param legendContent: 'Exclude Tags Commits' /}
         {param fields: [[
             'id' : 'excludeTagCommits',
-            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'labelText': 'yes',
             'isChecked' : $config['excludeTagCommits']
         ]] /}
         {param descriptionText: 'Exclude tag commits from being checked.' /}
@@ -74,7 +74,7 @@
             {param legendContent: 'Check pull requests' /}
             {param fields: [[
                 'id' : 'shouldCheckPullrequests',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['shouldCheckPullrequests']
             ]] /}
             {param descriptionText: 'Check commits in pull requests. The hook may, for example, not be enabled in all forks. This will make sure commits are verified before they get merged with a pull request.' /}
@@ -94,7 +94,7 @@
         {param legendContent: 'Accept service users' /}
         {param fields: [[
             'id' : 'allowServiceUsers',
-            'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+            'labelText': 'yes',
             'isChecked' : $config['allowServiceUsers']
         ]] /}
         {param descriptionText: 'Always accept commits from service users.' /}
@@ -105,30 +105,30 @@
             {param legendContent: 'Require Matching Author Email' /}
             {param fields: [[
                 'id' : 'requireMatchingAuthorEmail',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['requireMatchingAuthorEmail']
             ]] /}
-            {param descriptionText: 'Require that the commit authors email matches the Stash users email.' /}
+            {param descriptionText: 'Require that the commit authors email matches the Bitbucket users email.' /}
         {/call}
     
         {call aui.form.checkboxField}
-            {param legendContent: 'Require Author Email in Stash' /}
+            {param legendContent: 'Require Author Email in Bitbucket' /}
             {param fields: [[
-                'id' : 'requireMatchingAuthorEmailInStash',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-                'isChecked' : $config['requireMatchingAuthorEmailInStash']
+                'id' : 'requireMatchingAuthorEmailInBitbucket',
+                'labelText': 'yes',
+                'isChecked' : $config['requireMatchingAuthorEmailInBitbucket']
             ]] /}
-            {param descriptionText: 'Require that author email exists for at least one user in Stash.' /}
+            {param descriptionText: 'Require that author email exists for at least one user in Bitbucket.' /}
         {/call}
     
         {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Committer Email' /}
             {param fields: [[
                 'id' : 'requireMatchingCommitterEmail',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['requireMatchingCommitterEmail']
             ]] /}
-            {param descriptionText: 'Require that committers email matches the Stash users email.' /}
+            {param descriptionText: 'Require that committers email matches the Bitbucket users email.' /}
         {/call}
     
         {call aui.form.textField}
@@ -155,30 +155,30 @@
             {param legendContent: 'Require Matching Author Name' /}
             {param fields: [[
                 'id' : 'requireMatchingAuthorName',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['requireMatchingAuthorName']
             ]] /}
-            {param descriptionText: 'Require that the commit authors name matches the Stash users name.' /}
+            {param descriptionText: 'Require that the commit authors name matches the Bitbucket users name.' /}
         {/call}
     
         {call aui.form.checkboxField}
-            {param legendContent: 'Require Author Name in Stash' /}
+            {param legendContent: 'Require Author Name in Bitbucket' /}
             {param fields: [[
-                'id' : 'requireMatchingAuthorNameInStash',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
-                'isChecked' : $config['requireMatchingAuthorNameInStash']
+                'id' : 'requireMatchingAuthorNameInBitbucket',
+                'labelText': 'yes',
+                'isChecked' : $config['requireMatchingAuthorNameInBitbucket']
             ]] /}
-            {param descriptionText: 'Require that author name exists for at least one user in Stash.' /}
+            {param descriptionText: 'Require that author name exists for at least one user in Bitbucket.' /}
         {/call}
     
         {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Committer Name' /}
             {param fields: [[
                 'id' : 'requireMatchingCommitterName',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['requireMatchingCommitterName']
             ]] /}
-            {param descriptionText: 'Require that committers name matches the Stash users name.' /}
+            {param descriptionText: 'Require that committers name matches the Bitbucket users name.' /}
         {/call}
         
         {call aui.form.textareaField}
@@ -234,7 +234,7 @@
             {param legendContent: 'Dry run' /}
             {param fields: [[
                 'id' : 'dryRun',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['dryRun']
             ]] /}
             {param descriptionText: 'Dry run the plugin. The commits will be validated, and the committer will see the validation result, but the plugin will never actually reject any commit. This can be used when introducing the commit checker, there can be a dry run period of a few days so that committers will have time to learn how to adjust there commits.' /}
@@ -275,7 +275,7 @@
             {param legendContent: 'JQL' /}
             {param fields: [[
                 'id' : 'jqlCheck',
-                'labelText': stash_i18n('stash.web.stash.enable-ci-radio.button.label', 'Enabled'),
+                'labelText': 'yes',
                 'isChecked' : $config['jqlCheck']
             ]] /}
             {param descriptionText: 'Evaluate a JQL query and reject if it does not match at least one result.' /}

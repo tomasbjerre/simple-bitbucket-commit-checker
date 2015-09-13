@@ -1,6 +1,11 @@
-# Simple Stash Commit Checker Changelog
+# Simple Bitbucket Commit Checker Changelog
 
-Changelog of Simple Stash Commit Checker
+Changelog of Simple Bitbucket Commit Checker.
+
+## 2.0
+* Migrated from Stash 3 to Bitbucket 4.
+ * The release of Bitbucket 4.0 (2015-09-22) broke all backwards compatibility and made it more ore less impossible to maintain a version that is compatible with both Stash 3.x and Bitbucket 4.x. That is why this plugin changed name and started over with a 1.0 release.
+ * Changed name from Simple Stash Commit Checker Changelog to Simple Bitbucket Commit Checker
 
 ## 1.14
 * Removing SLF4J usage to deal with classpath issues.
@@ -72,4 +77,3 @@ Changelog of Simple Stash Commit Checker
 ## 1.0
 
 * Initial Release
-

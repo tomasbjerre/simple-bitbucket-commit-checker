@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+<atlassian-plugin key="se.bjurr.sscc.sscc" name="${project.name}" plugins-version="2">
   <plugin-info>
     <description>${project.description}</description>
     <version>${project.version}</version>
@@ -10,37 +10,37 @@
     <param name="plugin-logo">images/pluginLogo.png</param>
   </plugin-info>
 
-  <resource type="i18n" name="i18n" location="sscc"/>
+  <resource type="i18n" name="i18n" location="sbcc"/>
 
-  <web-resource key="sscc-resources" name="sscc Web Resources">
+  <web-resource key="sbcc-resources" name="sbcc Web Resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
-    <resource type="download" name="sscc.css" location="/css/sscc.css"/>
-    <resource type="download" name="sscc.js" location="/js/sscc.js"/>
+    <resource type="download" name="sbcc.css" location="/css/sbcc.css"/>
+    <resource type="download" name="sbcc.js" location="/js/sbcc.js"/>
     <resource type="download" name="images/" location="/images"/>
-    <context>stash.page.repository.settings.hooks</context>
+    <context>bitbucket.page.repository.settings.hooks</context>
   </web-resource>
 
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 
   <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
 
-  <component key="changeSetsService" class="se.bjurr.sscc.ChangeSetsServiceImpl" public="true">
-    <interface>se.bjurr.sscc.ChangeSetsService</interface>
+  <component key="changeSetsService" class="se.bjurr.sbcc.ChangeSetsServiceImpl" public="true">
+    <interface>se.bjurr.sbcc.ChangeSetsService</interface>
   </component>
 
-  <component key="ssccUserAdminService" class="se.bjurr.sscc.SsccUserAdminServiceImpl" public="true">
-    <interface>se.bjurr.sscc.SsccUserAdminService</interface>
+  <component key="sbccUserAdminService" class="se.bjurr.sbcc.SbccUserAdminServiceImpl" public="true">
+    <interface>se.bjurr.sbcc.SbccUserAdminService</interface>
   </component>
 
-  <merge-check key="sscc-merge-repository-hook.name" class="se.bjurr.sscc.SsccRepositoryMergeRequestCheck" />
+  <merge-check key="sbcc-merge-repository-hook.name" class="se.bjurr.sbcc.SbccRepositoryMergeRequestCheck" />
 
-  <repository-hook name="Simple Stash Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sscc.SsccPreReceiveRepositoryHook">
-    <description key="pre-receive-repository-hook.description">Simple Stash Commit Checker</description>
+  <repository-hook name="Simple Bitbucket Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sbcc.SbccPreReceiveRepositoryHook">
+    <description key="pre-receive-repository-hook.description">Simple Bitbucket Commit Checker</description>
     <icon>images/pluginLogo.png</icon>
-    <config-form name="SSCC Hook Config" key="ssccHook-config">
-      <view>se.bjurr.sscc</view>
+    <config-form name="SBCC Hook Config" key="sbccHook-config">
+      <view>se.bjurr.sbcc</view>
       <directory location="/static/" />
     </config-form>
-    <validator>se.bjurr.sscc.ConfigValidator</validator>
+    <validator>se.bjurr.sbcc.ConfigValidator</validator>
   </repository-hook>
 </atlassian-plugin>

@@ -1,4 +1,4 @@
-Simple Stash Commit Checker
+Simple Bitbucket Commit Checker
 
                              __ 
                    _ ,___,-'",-=-. 
@@ -34,8 +34,8 @@ Simple Stash Commit Checker
 10fe5ad13bbd9c180a4668334cda9c83cd92dd46 Tomas <my@email.com>
 >>> Fixing review comments from previous commits
 
-- Stash: 'email@stash.example' != Commit: 'my@email.com'
-  Please set correct author and comitter email in your commits. git config --global user.email 'email@stash.example'
+- Bitbucket: 'email@bitbucket.example' != Commit: 'my@email.com'
+  Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
 - /repo/binaryfile.zip 501kb > 500kb
   Commits with files larger then 500kb not allowed!
@@ -65,24 +65,24 @@ Simple Stash Commit Checker
 26094a0739ed397b0d475f4a8d3af35f33a6a0cf Tomas <my@email.com>
 >>> SB-1234 SB-5678 Cleaning some code
 
-- Stash: 'email@stash.example' != Commit: 'my@email.com'
-  Please set correct author and comitter email in your commits. git config --global user.email 'email@stash.example'
+- Bitbucket: 'email@bitbucket.example' != Commit: 'my@email.com'
+  Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
-- Stash: 'email@stash.example' != Commit: 'email@other.example'
-  Please set correct author and comitter email in your commits. git config --global user.email 'email@stash.example'
+- Bitbucket: 'email@bitbucket.example' != Commit: 'email@other.example'
+  Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
-- JQL: issue = SB-1234 AND assignee in ("tomas.stashy") AND status = "In Progress"
+- JQL: issue = SB-1234 AND assignee in ("tomas.bitbuckety") AND status = "In Progress"
   Jira must be in progress and have assignee!
 
-- JQL: issue = SB-5678 AND assignee in ("tomas.stashy") AND status = "In Progress"
+- JQL: issue = SB-5678 AND assignee in ("tomas.bitbuckety") AND status = "In Progress"
   Jira must be in progress and have assignee!
 
 
 97b0d475f4a8d326094a0739ed3af35f33a6a0cf Tomas <my@email.com>
 >>> INC123 Solving incident with....
 
-- Stash: 'email@stash.example' != Commit: 'my@email.com'
-  Please set correct author and comitter email in your commits. git config --global user.email 'email@stash.example'
+- Bitbucket: 'email@bitbucket.example' != Commit: 'my@email.com'
+  Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
 - It is easier to maintain the code if you create a JIRA issue for every incident. But this is optional for now.
 
@@ -90,10 +90,10 @@ Simple Stash Commit Checker
 af35f33a6a26094a0739ed397b0d475f4a8d30cf Tomas <my@email.com>
 >>> SB-1234 Implementing feature....
 
-- Stash: 'email@stash.example' != Commit: 'my@email.com'
-  Please set correct author and comitter email in your commits. git config --global user.email 'email@stash.example'
+- Bitbucket: 'email@bitbucket.example' != Commit: 'my@email.com'
+  Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
-- JQL: issue = SB-1234 AND assignee in ("tomas.stashy") AND status = "In Progress"
+- JQL: issue = SB-1234 AND assignee in ("tomas.bitbuckety") AND status = "In Progress"
   Jira must be in progress and have assignee!
 
 *** We are currently running commit checker in dry run mode. Your commits are
