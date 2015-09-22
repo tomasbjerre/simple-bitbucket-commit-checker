@@ -2,6 +2,10 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 2.1
+* Building against Bitbucket 4.0.0
+ * Was using EAP
+ 
 ## 2.0
 * Migrated from Stash 3 to Bitbucket 4.
  * The release of Bitbucket 4.0 (2015-09-22) broke all backwards compatibility and made it more ore less impossible to maintain a version that is compatible with both Stash 3.x and Bitbucket 4.x. That is why this plugin changed name and started over with a 1.0 release.

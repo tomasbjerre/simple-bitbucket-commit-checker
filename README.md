@@ -1,7 +1,7 @@
 # Simple Bitbucket Commit Checker [![Build Status](https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker.svg?branch=master)](https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker)
 Simple, and easy to use, commit checker for Atlassian Bitbucket. There are many commit checkers out there. This plugin aims at being simple and user friendly. The admin GUI ([here](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_upper.png) and [here](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_lower.png)) allows the Bitbucket administrator to add custom messages for each rejection reason. [Here](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt) is a sample reject message and [here](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatSuccessResponseLooksGood.txt) is a sample accept message. [This](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/config_and_reject.png) is a screenshot of a push being rejected.
 
-Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sbcc.sbcc).
+Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc).
 
 ## Features
 * Check author in commit
