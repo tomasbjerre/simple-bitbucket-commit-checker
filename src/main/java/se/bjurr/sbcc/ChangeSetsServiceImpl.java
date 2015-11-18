@@ -141,13 +141,18 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
     try {
      final RevCommit commit = walk.parseCommit(fromString(changeset.getId()));
-     Optional<RevCommit> firstParentCommit = Optional.absent();
-     if (changeset.getParents().size() > 0) {
-      // If this is not the very first commit in the repo
-      firstParentCommit = Optional.of(walk.parseCommit(fromString(changeset.getParents().iterator().next().getId())));
-     }
 
-     String diff = getDiffString(jGitRepo, commit, firstParentCommit);
+     String diff = "";
+     if (settings.getCommitDiffRegexp().isPresent()) {
+      if (changeset.getParents().size() > 0) {
+       // If this is not the very first commit in the repo
+       Optional<RevCommit> firstParentCommit = Optional.of(walk.parseCommit(fromString(changeset.getParents()
+         .iterator().next().getId())));
+       if (firstParentCommit.isPresent()) {
+        diff = getDiffString(jGitRepo, commit, firstParentCommit.get());
+       }
+      }
+     }
 
      Map<String, Long> sizePerFile = newHashMap();
      if (settings.shouldCheckCommitSize()) {
@@ -188,13 +193,10 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
  }
 
  private String getDiffString(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit,
-   Optional<RevCommit> firstParentCommit) throws IncorrectObjectTypeException, IOException, GitAPIException {
-  if (!firstParentCommit.isPresent()) {
-   return "";
-  }
+   RevCommit firstParentCommit) throws IncorrectObjectTypeException, IOException, GitAPIException {
   ObjectReader reader = jGitRepo.newObjectReader();
   CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-  oldTreeIter.reset(reader, firstParentCommit.get().getTree().getId());
+  oldTreeIter.reset(reader, firstParentCommit.getTree().getId());
   CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
   newTreeIter.reset(reader, commit.getTree().getId());
 
