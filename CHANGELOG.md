@@ -2,6 +2,11 @@
 
 Changelog of Simple Stash Commit Checker
 
+## 1.15
+* Bugfixes
+ * Checking if object from treeWalker exists before loading it
+ * Only determining size of files in commits if that should be checked
+
 ## 1.14
 * Removing SLF4J usage to deal with classpath issues.
  * https://github.com/tomasbjerre/pull-request-notifier-for-stash/issues/60
