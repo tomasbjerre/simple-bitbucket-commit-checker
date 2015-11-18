@@ -22,6 +22,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -177,8 +178,11 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
   treeWalk.addTree(tree);
   treeWalk.setRecursive(true);
   while (treeWalk.next()) {
-   ObjectLoader loader = jGitRepo.open(treeWalk.getObjectId(0));
-   fileSizes.put(treeWalk.getPathString(), loader.getSize());
+   AnyObjectId objectId = treeWalk.getObjectId(0);
+   if (jGitRepo.hasObject(objectId)) {
+    ObjectLoader loader = jGitRepo.open(objectId);
+    fileSizes.put(treeWalk.getPathString(), loader.getSize());
+   }
   }
   return fileSizes;
  }

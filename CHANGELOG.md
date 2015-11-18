@@ -2,6 +2,11 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 2.2
+* Bugfixes
+ * Checking if object from treeWalker exists before loading it
+ * Only determining size of files in commits if that should be checked
+
 ## 2.1
 * Building against Bitbucket 4.0.0
  * Was using EAP
