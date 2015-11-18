@@ -3,6 +3,7 @@ package se.bjurr.sscc;
 import static com.atlassian.stash.repository.RefChangeType.DELETE;
 import static com.atlassian.stash.scm.git.GitRefPattern.TAGS;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newTreeMap;
 import static java.util.logging.Level.SEVERE;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
@@ -147,7 +148,10 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
 
      String diff = getDiffString(jGitRepo, commit, firstParentCommit);
 
-     Map<String, Long> sizePerFile = getSizePerFile(jGitRepo, commit);
+     Map<String, Long> sizePerFile = newHashMap();
+     if (settings.shouldCheckCommitSize()) {
+      sizePerFile = getSizePerFile(jGitRepo, commit);
+     }
 
      final String message = commit.getFullMessage();
      final PersonIdent authorIdent = commit.getAuthorIdent();

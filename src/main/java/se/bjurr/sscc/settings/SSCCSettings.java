@@ -469,4 +469,8 @@ public class SSCCSettings {
  public boolean shouldCheckPullRequests() {
   return shouldCheckPullRequests;
  }
+
+ public boolean shouldCheckCommitSize() {
+  return commitSize != 0 && commitSize != MAX_VALUE;
+ }
 }
