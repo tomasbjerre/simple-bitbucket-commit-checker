@@ -56,6 +56,7 @@ public class SbccSettings {
  public static final String SETTING_JQL_CHECK_QUERY = "jqlCheckQuery";
  public static final String SETTING_CHECK_PULLREQUESTS = "shouldCheckPullrequests";
  public static final String SETTING_CHECK_PULLREQUESTS_MESSAGE = "shouldCheckPullrequestsMessage";
+ public static final String SETTING_IGNORE_USERS_PATTERN = "ignoreUsersPattern";
 
  private String commitDiffRegexp;
  private String commitDiffRegexpMessage;
@@ -89,6 +90,7 @@ public class SbccSettings {
  private Boolean requireMatchingAuthorNameInBitbucket;
  private boolean shouldCheckPullRequests;
  private String shouldCheckPullRequestsMessage;
+ private String ignoreUsersPattern;
 
  public static SbccSettings sscSettings(Settings settings) throws ValidationException {
   final SbccSettings sbccSettings = new SbccSettings();
@@ -122,7 +124,8 @@ public class SbccSettings {
     .withCommitRegexp(settings.getString(SETTING_COMMIT_REGEXP))
     .withJqlCheckQuery(settings.getString(SETTING_JQL_CHECK_QUERY))
     .withShouldCheckPullRequests(settings.getBoolean(SETTING_CHECK_PULLREQUESTS))
-    .withShouldCheckPullRequestsMessage(settings.getString(SETTING_CHECK_PULLREQUESTS_MESSAGE));
+    .withShouldCheckPullRequestsMessage(settings.getString(SETTING_CHECK_PULLREQUESTS_MESSAGE))
+    .withIgnoreUsersPattern(settings.getString(SETTING_IGNORE_USERS_PATTERN));
   try {
    if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
     sbccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
@@ -166,6 +169,10 @@ public class SbccSettings {
    }
   }
   return sbccSettings;
+ }
+
+ private void withIgnoreUsersPattern(String string) {
+  this.ignoreUsersPattern = emptyToNull(string);
  }
 
  private SbccSettings withShouldCheckPullRequestsMessage(String string) {
@@ -472,5 +479,9 @@ public class SbccSettings {
 
  public boolean shouldCheckCommitSize() {
   return commitSize != 0 && commitSize != MAX_VALUE;
+ }
+
+ public Optional<String> getIgnoreUsersPattern() {
+  return fromNullable(ignoreUsersPattern);
  }
 }

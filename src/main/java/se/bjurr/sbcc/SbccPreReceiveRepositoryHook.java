@@ -1,6 +1,5 @@
 package se.bjurr.sbcc;
 
-import static com.atlassian.bitbucket.user.UserType.SERVICE;
 import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.SEVERE;
 import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
@@ -56,6 +55,11 @@ public class SbccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
     hookResponse.out().println();
    }
    final SbccSettings settings = sscSettings(repositoryHookContext.getSettings());
+
+   if (new UserValidator(settings, bitbucketAuthenticationContext.getCurrentUser()).shouldIgnoreChecksForUser()) {
+    return TRUE;
+   }
+
    SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
    final SbccVerificationResult refChangeVerificationResults = new RefChangeValidator(
      repositoryHookContext.getRepository(), repositoryHookContext.getRepository(), settings, changesetsService,
@@ -69,8 +73,7 @@ public class SbccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
     hookResponse.out().println(settings.getDryRunMessage().get());
    }
 
-   if (!settings.isDryRun()
-     && !(settings.allowServiceUsers() && bitbucketAuthenticationContext.getCurrentUser().getType().equals(SERVICE))) {
+   if (!settings.isDryRun()) {
     return refChangeVerificationResults.isAccepted();
    }
 

@@ -2,6 +2,9 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 2.3
+* Ignore users by pattern matching the username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.
+
 ## 2.2
 * Bugfixes
  * Checking if object from treeWalker exists before loading it

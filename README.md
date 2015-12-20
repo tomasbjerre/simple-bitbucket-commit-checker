@@ -30,6 +30,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Show a general reject message.
 * Show a general accept message.
 * Optionally accept all commits from service users.
+* Optionally accept all commits if pattern matches the username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.
 * Dry run mode, where all commits are accepted. But verification results are shown.
 * Supporting variables to be used in error messages and checks.
  * BITBUCKET_EMAIL, Email of user in Bitbucket.

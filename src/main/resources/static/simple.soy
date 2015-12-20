@@ -99,6 +99,15 @@
         ]] /}
         {param descriptionText: 'Always accept commits from service users.' /}
     {/call}
+
+    {call aui.form.textField}
+        {param id: 'ignoreUsersPattern' /}
+        {param labelContent: 'Ignore users' /}
+        {param value: $config['ignoreUsersPattern'] /}
+        {param rows: 3 /}
+        {param descriptionText: 'Optional (leave empty to disable) regular expression to match against authenticated username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.' /}
+        {param errorTexts: $errors ? $errors['ignoreUsersPattern'] : null /}
+    {/call}
     
     <div class="fieldGroup">
         {call aui.form.checkboxField}
