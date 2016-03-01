@@ -49,7 +49,7 @@ public class SbccUserAdminServiceImpl implements SbccUserAdminService {
       }
      }).getValues()) {
       map.put(detailedUser.getDisplayName(), detailedUser);
-      map.put(detailedUser.getEmailAddress(), detailedUser);
+      map.put(detailedUser.getEmailAddress().toLowerCase(), detailedUser);
       map.put(detailedUser.getName(), detailedUser);
      }
      return map;

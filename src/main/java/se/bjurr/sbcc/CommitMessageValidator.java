@@ -76,7 +76,8 @@ public class CommitMessageValidator {
     return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
       sbccChangeSet.getCommitter().getEmailAddress()).find();
    }
-   return getBitbucketEmail(bitbucketAuthenticationContext).equals(sbccChangeSet.getCommitter().getEmailAddress());
+   return getBitbucketEmail(bitbucketAuthenticationContext)//
+     .equalsIgnoreCase(sbccChangeSet.getCommitter().getEmailAddress());
   }
   return TRUE;
  }
@@ -88,7 +89,8 @@ public class CommitMessageValidator {
      sbccChangeSet.getAuthor().getEmailAddress()).find();
   }
   if (settings.shouldRequireMatchingAuthorEmail()) {
-   return getBitbucketEmail(bitbucketAuthenticationContext).equals(sbccChangeSet.getAuthor().getEmailAddress());
+   return getBitbucketEmail(bitbucketAuthenticationContext)//
+     .equalsIgnoreCase(sbccChangeSet.getAuthor().getEmailAddress());
   }
   return TRUE;
  }
@@ -113,7 +115,7 @@ public class CommitMessageValidator {
  public boolean validateChangeSetForAuthorEmailInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
    throws ExecutionException {
   return !settings.getRequireMatchingAuthorEmailInBitbucket() || settings.getRequireMatchingAuthorEmailInBitbucket()
-    && sbccUserAdminService.getBitbucketUsers().containsKey(sbccChangeSet.getAuthor().getEmailAddress());
+    && sbccUserAdminService.getBitbucketUsers().containsKey(sbccChangeSet.getAuthor().getEmailAddress().toLowerCase());
  }
 
  public boolean validateChangeSetForAuthorNameInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
