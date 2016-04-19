@@ -41,6 +41,8 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
  * AUTHOR_NAME, Name of author name.
  * BITBUCKET_USER, Username of user in Bitbucket.
 
+The plugin is configured on repository level, where all hooks are configured. If you want to configure it once for all repos, have a look at [Settings Synchronizer for Bitbucket](https://github.com/tomasbjerre/settings-synchronizer-for-bitbucket-plugin).
+
 ## Design goals
 The included features should:
 
