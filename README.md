@@ -29,7 +29,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check commits in pull requests
 * Show a general reject message.
 * Show a general accept message.
-* Optionally accept all commits from service users.
+* Optionally accept all commits from [service users](https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.3/api/reference/com/atlassian/bitbucket/user/UserType.html).
 * Optionally accept all commits if pattern matches the username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.
 * Dry run mode, where all commits are accepted. But verification results are shown.
 * Supporting variables to be used in error messages and checks.
