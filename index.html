@@ -32,7 +32,7 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="simple-bitbucket-commit-checker-" class="anchor" href="#simple-bitbucket-commit-checker-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Simple Bitbucket Commit Checker <a href="https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker"><img src="https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker.svg?branch=master" alt="Build Status"></a>
+<a id="simple-bitbucket-commit-checker-" class="anchor" href="#simple-bitbucket-commit-checker-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Simple Bitbucket Commit Checker <a href="https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker"><img src="https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker.svg?branch=master" alt="Build Status"></a>
 </h1>
 
 <p>Simple, and easy to use, commit checker for Atlassian Bitbucket. There are many commit checkers out there. This plugin aims at being simple and user friendly. The admin GUI (<a href="https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_upper.png">here</a> and <a href="https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_lower.png">here</a>) allows the Bitbucket administrator to add custom messages for each rejection reason. <a href="https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt">Here</a> is a sample reject message and <a href="https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatSuccessResponseLooksGood.txt">here</a> is a sample accept message. <a href="https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/config_and_reject.png">This</a> is a screenshot of a push being rejected.</p>
@@ -40,7 +40,7 @@
 <p>Available in <a href="https://marketplace.atlassian.com/plugins/se.bjurr.sscc.sscc">Atlassian Marketplace</a>.</p>
 
 <h2>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>Check author in commit
@@ -88,7 +88,8 @@
 <li>Check commits in pull requests</li>
 <li>Show a general reject message.</li>
 <li>Show a general accept message.</li>
-<li>Optionally accept all commits from service users.</li>
+<li>Optionally accept all commits from <a href="https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.3/api/reference/com/atlassian/bitbucket/user/UserType.html">service users</a>.</li>
+<li>Optionally accept all commits if pattern matches the username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.</li>
 <li>Dry run mode, where all commits are accepted. But verification results are shown.</li>
 <li>Supporting variables to be used in error messages and checks.
 
@@ -104,8 +105,10 @@
 </li>
 </ul>
 
+<p>The plugin is configured on repository level, where all hooks are configured. If you want to configure it once for all repos, have a look at <a href="https://github.com/tomasbjerre/settings-synchronizer-for-bitbucket-plugin">Settings Synchronizer for Bitbucket</a>.</p>
+
 <h2>
-<a id="design-goals" class="anchor" href="#design-goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Design goals</h2>
+<a id="design-goals" class="anchor" href="#design-goals" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Design goals</h2>
 
 <p>The included features should:</p>
 
@@ -115,7 +118,7 @@
 </ul>
 
 <h2>
-<a id="developer-instructions" class="anchor" href="#developer-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Developer instructions</h2>
+<a id="developer-instructions" class="anchor" href="#developer-instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developer instructions</h2>
 
 <p>You will need Atlas SDK to compile the code.</p>
 
@@ -137,9 +140,9 @@
 mvn bitbucket:run
 </code></pre>
 
-<p>You can also debug with:</p>
+<p>You can also remote debug on port 5005 with:</p>
 
-<pre><code>mvn bitbucket:debug
+<pre><code>atlas-debug
 </code></pre>
 
 <p>Make a release:</p>
