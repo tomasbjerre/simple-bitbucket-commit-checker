@@ -19,6 +19,75 @@ import se.bjurr.sbcc.data.SbccPerson;
 
 public class MatchingEmailTest {
  @Test
+ public void testCommitAuthorMustMatchNameInBitbucketAndOnlyOneOfTwoCommitsIsOk() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(new SbccPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SbccPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withChangeSet(
+      changeSetBuilder().withId("2").withCommitter(new SbccPerson("Tomas Committer", "tomas.bjerre@two.site"))
+        .withAuthor(new SbccPerson("Tomas Author", "author@diff.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withBitbucketEmail("author@one.site")
+    .withBitbucketDisplayName("Tompa Committer")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Name in Bitbucket not same as in commit")
+    .build()
+    .run()
+    .hasTrimmedFlatOutput(
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Bitbucket: 'author@one.site' != Commit: 'author@diff.site'   Name in Bitbucket not same as in commit")
+    .wasRejected();
+ }
+
+ @Test
+ public void testCommitAuthorMustMatchNameInBitbucketAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
+  refChangeBuilder()
+    .withChangeSet(
+      changeSetBuilder().withId("1").withCommitter(new SbccPerson("Tomas Committer", "committer@one.site"))
+        .withAuthor(new SbccPerson("Tomas Author", "author@diff.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withChangeSet(
+      changeSetBuilder().withId("2").withCommitter(new SbccPerson("Tomas Committer", "tomas.bjerre@two.site"))
+        .withAuthor(new SbccPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
+    .withBitbucketEmail("author@one.site")
+    .withBitbucketDisplayName("Tompa Committer")
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Author email in Bitbucket not same as in commit")
+    .build()
+    .run()
+    .hasTrimmedFlatOutput(
+      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Bitbucket: 'author@one.site' != Commit: 'author@diff.site'   Author email in Bitbucket not same as in commit")
+    .wasRejected();
+ }
+
+ @Test
+ public void testCommitIsAcceptedWhenEmailMustMatchEmailInBitbucketAndTwoOfTwoCommitsHaveDifferentAuthor()
+   throws IOException {
+  refChangeBuilder()//
+    .withChangeSet(//
+      changeSetBuilder()//
+        .withId("1")//
+        .withCommitter(new SbccPerson("Tomas Committer", "Committer@one.site"))//
+        .withAuthor(new SbccPerson("Tomas Author", "author@other.site"))//
+        .withMessage(COMMIT_MESSAGE_JIRA)//
+        .build()//
+    )//
+    .withChangeSet(//
+      changeSetBuilder()//
+        .withId("2")//
+        .withCommitter(new SbccPerson("Tomas Committer", "cOmmitter@one.site"))//
+        .withMessage(COMMIT_MESSAGE_JIRA)//
+        .build()//
+    )//
+    .withBitbucketEmail("committer@one.site")//
+    .withBitbucketDisplayName("Tomas Committer")//
+    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)//
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Bitbucket not same as in commit")//
+    .build()//
+    .run()//
+    .hasNoOutput()//
+    .wasAccepted();
+ }
+
+ @Test
  public void testCommitMustMatchEmailInBitbucketAndOnlyOneOfTwoCommitsIsOk() throws IOException {
   refChangeBuilder()//
     .withChangeSet(//
@@ -77,72 +146,23 @@ public class MatchingEmailTest {
  }
 
  @Test
- public void testCommitIsAcceptedWhenEmailMustMatchEmailInBitbucketAndTwoOfTwoCommitsHaveDifferentAuthor()
-   throws IOException {
+ public void testThatAuthorEmailCanBeAcceptedIfInBitbucket() throws IOException {
   refChangeBuilder()//
     .withChangeSet(//
       changeSetBuilder()//
         .withId("1")//
-        .withCommitter(new SbccPerson("Tomas Committer", "Committer@one.site"))//
-        .withAuthor(new SbccPerson("Tomas Author", "author@other.site"))//
+        .withCommitter(DEFAULT_COMMITTER)//
+        .withAuthor(new SbccPerson("Tomas Author", "author@one.site"))//
         .withMessage(COMMIT_MESSAGE_JIRA)//
         .build()//
     )//
-    .withChangeSet(//
-      changeSetBuilder()//
-        .withId("2")//
-        .withCommitter(new SbccPerson("Tomas Committer", "cOmmitter@one.site"))//
-        .withMessage(COMMIT_MESSAGE_JIRA)//
-        .build()//
-    )//
-    .withBitbucketEmail("committer@one.site")//
-    .withBitbucketDisplayName("Tomas Committer")//
-    .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_EMAIL, TRUE)//
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email in Bitbucket not same as in commit")//
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_BITBUCKET, TRUE)//
+    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email not available in Bitbucket")//
+    .withUserInBitbucket("Display Name", "author@one.site", "user@email")//
     .build()//
     .run()//
     .hasNoOutput()//
     .wasAccepted();
- }
-
- @Test
- public void testCommitAuthorMustMatchNameInBitbucketAndOnlyOneOfTwoCommitsIsOk() throws IOException {
-  refChangeBuilder()
-    .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SbccPerson("Tomas Committer", "committer@one.site"))
-        .withAuthor(new SbccPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withChangeSet(
-      changeSetBuilder().withId("2").withCommitter(new SbccPerson("Tomas Committer", "tomas.bjerre@two.site"))
-        .withAuthor(new SbccPerson("Tomas Author", "author@diff.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withBitbucketEmail("author@one.site")
-    .withBitbucketDisplayName("Tompa Committer")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Name in Bitbucket not same as in commit")
-    .build()
-    .run()
-    .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   2 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Bitbucket: 'author@one.site' != Commit: 'author@diff.site'   Name in Bitbucket not same as in commit")
-    .wasRejected();
- }
-
- @Test
- public void testCommitAuthorMustMatchNameInBitbucketAndOnlyOneOfTwoCommitsIsOkReverseOrder() throws IOException {
-  refChangeBuilder()
-    .withChangeSet(
-      changeSetBuilder().withId("1").withCommitter(new SbccPerson("Tomas Committer", "committer@one.site"))
-        .withAuthor(new SbccPerson("Tomas Author", "author@diff.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withChangeSet(
-      changeSetBuilder().withId("2").withCommitter(new SbccPerson("Tomas Committer", "tomas.bjerre@two.site"))
-        .withAuthor(new SbccPerson("Tomas Author", "author@one.site")).withMessage(COMMIT_MESSAGE_JIRA).build())
-    .withBitbucketEmail("author@one.site")
-    .withBitbucketDisplayName("Tompa Committer")
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL, TRUE)
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Author email in Bitbucket not same as in commit")
-    .build()
-    .run()
-    .hasTrimmedFlatOutput(
-      "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@diff.site> >>> SB-5678 fixing stuff  - Bitbucket: 'author@one.site' != Commit: 'author@diff.site'   Author email in Bitbucket not same as in commit")
-    .wasRejected();
  }
 
  @Test
@@ -205,25 +225,5 @@ public class MatchingEmailTest {
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Commit: 'author@one.site'   Email not available in Bitbucket")
     .wasRejected();
- }
-
- @Test
- public void testThatAuthorEmailCanBeAcceptedIfInBitbucket() throws IOException {
-  refChangeBuilder()//
-    .withChangeSet(//
-      changeSetBuilder()//
-        .withId("1")//
-        .withCommitter(DEFAULT_COMMITTER)//
-        .withAuthor(new SbccPerson("Tomas Author", "AuthoR@one.site"))//
-        .withMessage(COMMIT_MESSAGE_JIRA)//
-        .build()//
-    )//
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_BITBUCKET, TRUE)//
-    .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE, "Email not available in Bitbucket")//
-    .withUserInBitbucket("Display Name", "author@one.site", "user@email")//
-    .build()//
-    .run()//
-    .hasNoOutput()//
-    .wasAccepted();
  }
 }

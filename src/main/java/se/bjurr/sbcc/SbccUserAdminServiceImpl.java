@@ -1,63 +1,91 @@
 package se.bjurr.sbcc;
 
-import static com.google.common.base.Suppliers.memoizeWithExpiration;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.cache.CacheBuilder.newBuilder;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-import com.atlassian.bitbucket.user.DetailedUser;
-import com.atlassian.bitbucket.user.UserAdminService;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
+import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PageRequestImpl;
-import com.google.common.base.Supplier;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class SbccUserAdminServiceImpl implements SbccUserAdminService {
 
- private final UserAdminService userAdminService;
+ private final LoadingCache<String, Boolean> displayNameCache = newBuilder()//
+   .maximumSize(10000)//
+   .expireAfterWrite(10, MINUTES)//
+   .build(new CacheLoader<String, Boolean>() {
+    @Override
+    public Boolean load(String key) {
+     return doDisplayNameExist(key);
+    }
+   });
 
- public SbccUserAdminServiceImpl(UserAdminService userAdminService) {
-  this.userAdminService = userAdminService;
+ private final LoadingCache<String, Boolean> emailCache = newBuilder()//
+   .maximumSize(10000)//
+   .expireAfterWrite(10, MINUTES)//
+   .build(new CacheLoader<String, Boolean>() {
+    @Override
+    public Boolean load(String key) {
+     return doEmailExist(key);
+    }
+   });
+
+ private final UserService userService;
+
+ public SbccUserAdminServiceImpl(UserService userService) {
+  this.userService = userService;
  }
 
- private final Supplier<Map<String, DetailedUser>> bitbucketUsers = memoizeWithExpiration(
-   new Supplier<Map<String, DetailedUser>>() {
-    @Override
-    public java.util.Map<String, DetailedUser> get() {
-     final Map<String, DetailedUser> map = newHashMap();
-     for (DetailedUser detailedUser : userAdminService.findUsers(new PageRequest() {
-
-      public String getFilter() {
-       // This method is not available in Sash 2.12.0, but in 3
-       return "";
-      }
-
-      @Override
-      public int getStart() {
-       getFilter(); // Ensure save-actions does not remove the method
-       return 0;
-      }
-
-      @Override
-      public int getLimit() {
-       return MAX_PAGE_LIMIT;
-      }
-
-      @Override
-      public PageRequest buildRestrictedPageRequest(int arg0) {
-       return new PageRequestImpl(0, 1048575);
-      }
-     }).getValues()) {
-      map.put(detailedUser.getDisplayName(), detailedUser);
-      map.put(detailedUser.getEmailAddress().toLowerCase(), detailedUser);
-      map.put(detailedUser.getName(), detailedUser);
-     }
-     return map;
-    };
-   }, 5, MINUTES);
+ @Override
+ public boolean displayNameExists(String name) {
+  try {
+   return this.displayNameCache.get(name);
+  } catch (ExecutionException e) {
+   throw propagate(e);
+  }
+ }
 
  @Override
- public Map<String, DetailedUser> getBitbucketUsers() {
-  return bitbucketUsers.get();
+ public boolean emailExists(String email) {
+  try {
+   return this.emailCache.get(email);
+  } catch (ExecutionException e) {
+   throw propagate(e);
+  }
+ }
+
+ private boolean doDisplayNameExist(String name) {
+  Page<ApplicationUser> found = getMatching(name);
+  for (ApplicationUser f : found.getValues()) {
+   if (f.getDisplayName().equalsIgnoreCase(name)) {
+    return TRUE;
+   }
+  }
+  return FALSE;
+ }
+
+ private boolean doEmailExist(String email) {
+  Page<ApplicationUser> found = getMatching(email);
+  for (ApplicationUser f : found.getValues()) {
+   if (f.getEmailAddress().equalsIgnoreCase(email)) {
+    return TRUE;
+   }
+  }
+  return FALSE;
+ }
+
+ private Page<ApplicationUser> getMatching(String nameOrEmail) {
+  int start = 0;
+  int limit = 1000;
+  PageRequest pagedRequest = new PageRequestImpl(start, limit);
+  return this.userService.findUsersByName(nameOrEmail, pagedRequest);
  }
 }

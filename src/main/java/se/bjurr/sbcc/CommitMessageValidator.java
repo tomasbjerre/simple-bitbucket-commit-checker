@@ -36,6 +36,66 @@ public class CommitMessageValidator {
   this.sbccUserAdminService = sbccUserAdminService;
  }
 
+ public boolean validateChangeSetForAuthorEmail(SbccSettings settings, SbccChangeSet sbccChangeSet,
+   SbccRenderer sbccRenderer) {
+  if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+   return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
+     sbccChangeSet.getAuthor().getEmailAddress()).find();
+  }
+  if (settings.shouldRequireMatchingAuthorEmail()) {
+   return getBitbucketEmail(this.bitbucketAuthenticationContext)//
+     .equalsIgnoreCase(sbccChangeSet.getAuthor().getEmailAddress());
+  }
+  return TRUE;
+ }
+
+ public boolean validateChangeSetForAuthorEmailInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
+   throws ExecutionException {
+  if (settings.getRequireMatchingAuthorEmailInBitbucket()) {
+   return this.sbccUserAdminService.emailExists(sbccChangeSet.getAuthor().getEmailAddress());
+  } else {
+   return TRUE;
+  }
+ }
+
+ public boolean validateChangeSetForAuthorName(SbccSettings settings, SbccChangeSet sbccChangeSet) {
+  if (settings.shouldRequireMatchingAuthorName()
+    && !getBitbucketName(this.bitbucketAuthenticationContext).equals(sbccChangeSet.getAuthor().getName())) {
+   return FALSE;
+  }
+  return TRUE;
+ }
+
+ public boolean validateChangeSetForAuthorNameInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
+   throws ExecutionException {
+  if (settings.getRequireMatchingAuthorNameInBitbucket()) {
+   return this.sbccUserAdminService.displayNameExists(sbccChangeSet.getAuthor().getName());
+  }
+  return true;
+ }
+
+ public boolean validateChangeSetForCommitterEmail(SbccSettings settings, SbccChangeSet sbccChangeSet,
+   SbccRenderer sbccRenderer) {
+  if (settings.shouldRequireMatchingCommitterEmail()) {
+   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
+    return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
+      sbccChangeSet.getCommitter().getEmailAddress()).find();
+   }
+   return getBitbucketEmail(this.bitbucketAuthenticationContext)//
+     .equalsIgnoreCase(sbccChangeSet.getCommitter().getEmailAddress());
+  }
+  return TRUE;
+ }
+
+ public boolean validateChangeSetForCommitterName(SbccSettings settings, SbccChangeSet sbccChangeSet)
+   throws ExecutionException {
+  if (settings.shouldRequireMatchingCommitterName()
+    && !getBitbucketName(this.bitbucketAuthenticationContext).equals(sbccChangeSet.getCommitter().getName())) {
+   return FALSE;
+  }
+  return TRUE;
+ }
+
  public Map<SbccGroup, SbccMatch> validateChangeSetForGroups(SbccSettings settings, final SbccChangeSet sbccChangeSet) {
   final Map<SbccGroup, SbccMatch> allMatching = newTreeMap();
   for (final SbccGroup group : settings.getGroups()) {
@@ -67,61 +127,6 @@ public class CommitMessageValidator {
    }
   }
   return allMatching;
- }
-
- public boolean validateChangeSetForCommitterEmail(SbccSettings settings, SbccChangeSet sbccChangeSet,
-   SbccRenderer sbccRenderer) {
-  if (settings.shouldRequireMatchingCommitterEmail()) {
-   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
-    return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
-      sbccChangeSet.getCommitter().getEmailAddress()).find();
-   }
-   return getBitbucketEmail(bitbucketAuthenticationContext)//
-     .equalsIgnoreCase(sbccChangeSet.getCommitter().getEmailAddress());
-  }
-  return TRUE;
- }
-
- public boolean validateChangeSetForAuthorEmail(SbccSettings settings, SbccChangeSet sbccChangeSet,
-   SbccRenderer sbccRenderer) {
-  if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
-   return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
-     sbccChangeSet.getAuthor().getEmailAddress()).find();
-  }
-  if (settings.shouldRequireMatchingAuthorEmail()) {
-   return getBitbucketEmail(bitbucketAuthenticationContext)//
-     .equalsIgnoreCase(sbccChangeSet.getAuthor().getEmailAddress());
-  }
-  return TRUE;
- }
-
- public boolean validateChangeSetForAuthorName(SbccSettings settings, SbccChangeSet sbccChangeSet) {
-  if (settings.shouldRequireMatchingAuthorName()
-    && !getBitbucketName(bitbucketAuthenticationContext).equals(sbccChangeSet.getAuthor().getName())) {
-   return FALSE;
-  }
-  return TRUE;
- }
-
- public boolean validateChangeSetForCommitterName(SbccSettings settings, SbccChangeSet sbccChangeSet)
-   throws ExecutionException {
-  if (settings.shouldRequireMatchingCommitterName()
-    && !getBitbucketName(bitbucketAuthenticationContext).equals(sbccChangeSet.getCommitter().getName())) {
-   return FALSE;
-  }
-  return TRUE;
- }
-
- public boolean validateChangeSetForAuthorEmailInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
-   throws ExecutionException {
-  return !settings.getRequireMatchingAuthorEmailInBitbucket() || settings.getRequireMatchingAuthorEmailInBitbucket()
-    && sbccUserAdminService.getBitbucketUsers().containsKey(sbccChangeSet.getAuthor().getEmailAddress().toLowerCase());
- }
-
- public boolean validateChangeSetForAuthorNameInBitbucket(SbccSettings settings, SbccChangeSet sbccChangeSet)
-   throws ExecutionException {
-  return !settings.getRequireMatchingAuthorNameInBitbucket() || settings.getRequireMatchingAuthorNameInBitbucket()
-    && sbccUserAdminService.getBitbucketUsers().containsKey(sbccChangeSet.getAuthor().getName());
  }
 
 }
