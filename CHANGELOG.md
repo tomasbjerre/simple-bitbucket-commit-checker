@@ -8,7 +8,7 @@ Changelog of Simple Bitbucket Commit Checker.
 
  * Was loading all users from user service in a cache, every 5 minutes. This was causing performance issues and is now using https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.1/api/reference/com/atlassian/bitbucket/user/UserService.html#findUserByNameOrEmail(java.lang.String) instead.
   
-  [dc44820b61f0b63](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/dc44820b61f0b63) Tomas Bjerre *2016-06-21 16:51:42*
+  [b1553b16018fe50](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/b1553b16018fe50) Tomas Bjerre *2016-06-21 16:58:01*
 
 ### GitHub [#51](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/51) Question: What defines what a &quot;service user&quot; is for the Accept Service Users checkbox?
   Adding link to explain service user
@@ -20,7 +20,7 @@ Changelog of Simple Bitbucket Commit Checker.
 
  * Was loading all users from user service in a cache, every 5 minutes. This was causing performance issues and is now using https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.1/api/reference/com/atlassian/bitbucket/user/UserService.html#findUserByNameOrEmail(java.lang.String) instead.
   
-  [dc44820b61f0b63](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/dc44820b61f0b63) Tomas Bjerre *2016-06-21 16:51:42*
+  [b1553b16018fe50](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/b1553b16018fe50) Tomas Bjerre *2016-06-21 16:58:01*
 
 ### No issue
   Doc
