@@ -116,8 +116,8 @@ public class TemplateTest {
       .withId("10fe5ad13bbd9c180a4668334cda9c83cd92dd46") //
       .withMessage("Fixing review comments from previous commits") //
       .withCommitter(identityCorrect) //
-      .withSize("/repo/binaryfile.zip", 501 * 1024L) //
-      .withSize("/repo/other/binary2.zip", 677 * 1024L) //
+      .withSize("/repo/binaryfile.zip", 501L) //
+      .withSize("/repo/other/binary2.zip", 677L) //
       .withDiff("" + //
         "line 1\n" + //
         "+line 2\n" + //

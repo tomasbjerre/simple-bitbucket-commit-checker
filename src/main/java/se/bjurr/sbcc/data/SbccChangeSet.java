@@ -1,9 +1,13 @@
 package se.bjurr.sbcc.data;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 public class SbccChangeSet implements Comparable<SbccChangeSet> {
+ private final SbccPerson author;
+
  private final SbccPerson committer;
+
+ private final String diff;
 
  private final String id;
 
@@ -11,56 +15,52 @@ public class SbccChangeSet implements Comparable<SbccChangeSet> {
 
  private final int parentCount;
 
- private final Map<String, Long> sizePerFile;
-
- private final String diff;
-
- private final SbccPerson author;
+ private final TreeMap<String, Long> sizeAboveLimitPerFile;
 
  public SbccChangeSet(String id, SbccPerson committer, SbccPerson author, String message, int parentCount,
-   Map<String, Long> sizePerFile, String diff) {
+   TreeMap<String, Long> sizeAboveLimitPerFile, String diff) {
   this.id = id;
   this.author = author;
   this.committer = committer;
   this.message = message.trim();
   this.parentCount = parentCount;
-  this.sizePerFile = sizePerFile;
+  this.sizeAboveLimitPerFile = sizeAboveLimitPerFile;
   this.diff = diff;
  }
 
  @Override
  public int compareTo(SbccChangeSet o) {
-  return id.compareTo(o.id);
- }
-
- public SbccPerson getCommitter() {
-  return committer;
+  return this.id.compareTo(o.id);
  }
 
  public SbccPerson getAuthor() {
-  return author;
+  return this.author;
+ }
+
+ public SbccPerson getCommitter() {
+  return this.committer;
+ }
+
+ public String getDiff() {
+  return this.diff;
  }
 
  /**
   * The commit hash
   */
  public String getId() {
-  return id;
+  return this.id;
  }
 
  public String getMessage() {
-  return message;
+  return this.message;
  }
 
  public int getParentCount() {
-  return parentCount;
+  return this.parentCount;
  }
 
- public Map<String, Long> getSizePerFile() {
-  return sizePerFile;
- }
-
- public String getDiff() {
-  return diff;
+ public TreeMap<String, Long> getSizeAboveLimitPerFile() {
+  return this.sizeAboveLimitPerFile;
  }
 }

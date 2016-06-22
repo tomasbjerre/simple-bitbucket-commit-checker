@@ -3,6 +3,17 @@
 Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
+### GitHub [#53](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/53) Slow in big instalaltions, with alot of users
+  Caching file sizes
+  
+  [48d20f8b0f38f05](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/48d20f8b0f38f05) Tomas Bjerre *2016-06-22 16:49:10*
+
+### No issue
+  Adding script to setup Atlassian SDK
+  
+  [4c25126469090bf](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/4c25126469090bf) Tomas Bjerre *2016-06-21 19:46:07*
+
+## 2.5
 ### GitHub [#49](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/49) Case insensitive email addresses for commit author
   Checking email/name in commits with UserService  
 

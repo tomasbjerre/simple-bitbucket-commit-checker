@@ -2,19 +2,22 @@ package se.bjurr.sbcc;
 
 import static com.atlassian.bitbucket.repository.RefChangeType.DELETE;
 import static com.atlassian.bitbucket.scm.git.GitRefPattern.TAGS;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.cache.CacheBuilder.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newTreeMap;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.logging.Level.SEVERE;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
@@ -51,16 +54,37 @@ import com.atlassian.bitbucket.util.PageProvider;
 import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PagedIterable;
 import com.google.common.base.Optional;
+import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 public class ChangeSetsServiceImpl implements ChangeSetsService {
  private static Logger logger = Logger.getLogger(ChangeSetsServiceImpl.class.getName());
+ private static Cache<String, Long> objectSizeCache = newBuilder()//
+   .maximumSize(10000)//
+   .expireAfterAccess(120, MINUTES)//
+   .build();
  private final ApplicationPropertiesService applicationPropertiesService;
+
  private final CommitService commitService;
 
  public ChangeSetsServiceImpl(CommitService commitService, ApplicationPropertiesService applicationPropertiesService) {
   this.commitService = commitService;
   this.applicationPropertiesService = applicationPropertiesService;
+ }
+
+ @Override
+ public List<SbccChangeSet> getNewChangeSets(SbccSettings settings, PullRequest pullRequest) throws IOException {
+  final CommitsBetweenRequest changesetsBetweenRequest = new CommitsBetweenRequest.Builder(pullRequest).build();
+  return getNewChangesets(settings, pullRequest.getToRef().getRepository(), pullRequest.getToRef().getId(),
+    RefChangeType.ADD, pullRequest.getToRef().getLatestCommit(), changesetsBetweenRequest);
+ }
+
+ @Override
+ public List<SbccChangeSet> getNewChangeSets(SbccSettings settings, Repository repository, String refId,
+   RefChangeType type, String fromHash, String toHash) throws IOException {
+  final CommitsBetweenRequest changesetsBetweenRequest = new CommitsBetweenRequest.Builder(repository)
+    .exclude(getBranches(repository)).include(toHash).build();
+  return getNewChangesets(settings, repository, refId, type, toHash, changesetsBetweenRequest);
  }
 
  private Set<String> getBranches(Repository repository) throws IOException {
@@ -77,25 +101,29 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
   return refHeads;
  }
 
+ private String getDiffString(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit,
+   RevCommit firstParentCommit) throws IncorrectObjectTypeException, IOException, GitAPIException {
+  ObjectReader reader = jGitRepo.newObjectReader();
+  CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+  oldTreeIter.reset(reader, firstParentCommit.getTree().getId());
+  CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+  newTreeIter.reset(reader, commit.getTree().getId());
+
+  final StringBuilder sb = new StringBuilder();
+  OutputStream out = new OutputStream() {
+   @Override
+   public void write(int b) throws IOException {
+    sb.append((char) b);
+   }
+  };
+  new Git(jGitRepo).diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).setOutputStream(out).call();
+  return sb.toString();
+ }
+
  private org.eclipse.jgit.lib.Repository getJGitRepo(Repository repository) throws IOException {
   final FileRepositoryBuilder builder = new FileRepositoryBuilder();
-  final File repoDir = applicationPropertiesService.getRepositoryDir(repository);
+  final File repoDir = this.applicationPropertiesService.getRepositoryDir(repository);
   return builder.setGitDir(repoDir).build();
- }
-
- @Override
- public List<SbccChangeSet> getNewChangeSets(SbccSettings settings, Repository repository, String refId,
-   RefChangeType type, String fromHash, String toHash) throws IOException {
-  final CommitsBetweenRequest changesetsBetweenRequest = new CommitsBetweenRequest.Builder(repository)
-    .exclude(getBranches(repository)).include(toHash).build();
-  return getNewChangesets(settings, repository, refId, type, toHash, changesetsBetweenRequest);
- }
-
- @Override
- public List<SbccChangeSet> getNewChangeSets(SbccSettings settings, PullRequest pullRequest) throws IOException {
-  final CommitsBetweenRequest changesetsBetweenRequest = new CommitsBetweenRequest.Builder(pullRequest).build();
-  return getNewChangesets(settings, pullRequest.getToRef().getRepository(), pullRequest.getToRef().getId(),
-    RefChangeType.ADD, pullRequest.getToRef().getLatestCommit(), changesetsBetweenRequest);
  }
 
  private List<SbccChangeSet> getNewChangesets(SbccSettings settings, Repository repository, String refId,
@@ -125,12 +153,12 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    final String message = tag.getFullMessage();
    final PersonIdent ident = tag.getTaggerIdent();
    final SbccPerson committer = new SbccPerson(ident.getName(), ident.getEmailAddress());
-   changesets.add(new SbccChangeSet(toHash, committer, committer, message, 1, new HashMap<String, Long>(), ""));
+   changesets.add(new SbccChangeSet(toHash, committer, committer, message, 1, new TreeMap<String, Long>(), ""));
   } else {
    final Iterable<Commit> changes = new PagedIterable<Commit>(new PageProvider<Commit>() {
     @Override
     public Page<Commit> get(PageRequest pr) {
-     return commitService.getCommitsBetween(request, pr);
+     return ChangeSetsServiceImpl.this.commitService.getCommitsBetween(request, pr);
     }
    }, 100);
 
@@ -154,9 +182,9 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
       }
      }
 
-     Map<String, Long> sizePerFile = newHashMap();
+     TreeMap<String, Long> sizeAboveLimitPerFile = newTreeMap();
      if (settings.shouldCheckCommitSize()) {
-      sizePerFile = getSizePerFile(jGitRepo, commit);
+      sizeAboveLimitPerFile = getSizeAboveLimitPerFile(jGitRepo, commit, settings.getCommitSizeKb());
      }
 
      final String message = commit.getFullMessage();
@@ -165,7 +193,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
      final PersonIdent committerIdent = commit.getCommitterIdent();
      final SbccPerson committer = new SbccPerson(committerIdent.getName(), committerIdent.getEmailAddress());
      changesets.add(new SbccChangeSet(changeset.getId(), committer, author, message, commit.getParentCount(),
-       sizePerFile, diff));
+       sizeAboveLimitPerFile, diff));
     } catch (GitAPIException e) {
      logger.log(SEVERE, refId, e);
     }
@@ -175,39 +203,35 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
   return changesets;
  }
 
- private Map<String, Long> getSizePerFile(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit)
-   throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
-  Map<String, Long> fileSizes = newTreeMap();
+ private TreeMap<String, Long> getSizeAboveLimitPerFile(final org.eclipse.jgit.lib.Repository jGitRepo,
+   final RevCommit commit, int maxCommitSizeKb) throws MissingObjectException, IncorrectObjectTypeException,
+   CorruptObjectException, IOException {
+  TreeMap<String, Long> fileSizesAboveLimit = newTreeMap();
   RevTree tree = commit.getTree();
   TreeWalk treeWalk = new TreeWalk(jGitRepo);
   treeWalk.addTree(tree);
   treeWalk.setRecursive(true);
   while (treeWalk.next()) {
    AnyObjectId objectId = treeWalk.getObjectId(0);
-   if (jGitRepo.hasObject(objectId)) {
-    ObjectLoader loader = jGitRepo.open(objectId);
-    fileSizes.put(treeWalk.getPathString(), loader.getSize());
+   try {
+    Long sizeKb = objectSizeCache.get(objectId.getName(), new Callable<Long>() {
+     @Override
+     public Long call() throws Exception {
+      if (jGitRepo.hasObject(objectId)) {
+       ObjectLoader loader = jGitRepo.open(objectId);
+       long size = loader.getSize();
+       return size / 1024;
+      }
+      return 0L;
+     }
+    });
+    if (sizeKb > maxCommitSizeKb) {
+     fileSizesAboveLimit.put(treeWalk.getPathString(), sizeKb);
+    }
+   } catch (ExecutionException e) {
+    throw propagate(e);
    }
   }
-  return fileSizes;
- }
-
- private String getDiffString(final org.eclipse.jgit.lib.Repository jGitRepo, final RevCommit commit,
-   RevCommit firstParentCommit) throws IncorrectObjectTypeException, IOException, GitAPIException {
-  ObjectReader reader = jGitRepo.newObjectReader();
-  CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-  oldTreeIter.reset(reader, firstParentCommit.getTree().getId());
-  CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-  newTreeIter.reset(reader, commit.getTree().getId());
-
-  final StringBuilder sb = new StringBuilder();
-  OutputStream out = new OutputStream() {
-   @Override
-   public void write(int b) throws IOException {
-    sb.append((char) b);
-   }
-  };
-  new Git(jGitRepo).diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).setOutputStream(out).call();
-  return sb.toString();
+  return fileSizesAboveLimit;
  }
 }

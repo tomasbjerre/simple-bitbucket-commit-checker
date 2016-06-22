@@ -3,29 +3,36 @@ package se.bjurr.sbcc.data;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.Maps.newTreeMap;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 public class SbccChangeSetBuilder {
- public static final SbccPerson DEFAULT_COMMITTER = new SbccPerson("Tomas", "my@email.com");
  public static final SbccPerson DEFAULT_AUTHOR = new SbccPerson("Tomas", "my@email.com");
- private SbccPerson committer;
- private SbccPerson author;
- private String id;
- private String message;
- private int parentCount;
- private final Map<String, Long> fileSizeBytes = newTreeMap();
- private String diff;
+ public static final SbccPerson DEFAULT_COMMITTER = new SbccPerson("Tomas", "my@email.com");
 
  public static SbccChangeSetBuilder changeSetBuilder() {
   return new SbccChangeSetBuilder();
  }
 
+ private SbccPerson author;
+ private SbccPerson committer;
+ private String diff;
+ private final TreeMap<String, Long> fileSizeBytes = newTreeMap();
+ private String id;
+ private String message;
+
+ private int parentCount;
+
  private SbccChangeSetBuilder() {
  }
 
  public SbccChangeSet build() {
-  return new SbccChangeSet(id, firstNonNull(committer, DEFAULT_COMMITTER), firstNonNull(author, DEFAULT_AUTHOR),
-    message, parentCount, fileSizeBytes, diff);
+  return new SbccChangeSet(this.id, firstNonNull(this.committer, DEFAULT_COMMITTER), firstNonNull(this.author,
+    DEFAULT_AUTHOR), this.message, this.parentCount, this.fileSizeBytes, this.diff);
+ }
+
+ public SbccChangeSetBuilder withAuthor(SbccPerson author) {
+  this.author = author;
+  return this;
  }
 
  public SbccChangeSetBuilder withCommitter(SbccPerson committer) {
@@ -33,8 +40,8 @@ public class SbccChangeSetBuilder {
   return this;
  }
 
- public SbccChangeSetBuilder withAuthor(SbccPerson author) {
-  this.author = author;
+ public SbccChangeSetBuilder withDiff(String diff) {
+  this.diff = diff;
   return this;
  }
 
@@ -53,13 +60,8 @@ public class SbccChangeSetBuilder {
   return this;
  }
 
- public SbccChangeSetBuilder withDiff(String diff) {
-  this.diff = diff;
-  return this;
- }
-
- public SbccChangeSetBuilder withSize(String path, Long fileSizeBytes) {
-  this.fileSizeBytes.put(path, fileSizeBytes);
+ public SbccChangeSetBuilder withSize(String path, Long fileSizeKBytes) {
+  this.fileSizeBytes.put(path, fileSizeKBytes);
   return this;
  }
 }

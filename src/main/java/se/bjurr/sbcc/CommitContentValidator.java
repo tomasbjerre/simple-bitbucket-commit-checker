@@ -1,7 +1,6 @@
 package se.bjurr.sbcc;
 
 import static com.google.common.base.Optional.absent;
-import static com.google.common.collect.Maps.newTreeMap;
 import static java.util.regex.Pattern.DOTALL;
 
 import java.util.Map;
@@ -21,28 +20,21 @@ public class CommitContentValidator {
  }
 
  public SbccSettings getSettings() {
-  return settings;
- }
-
- public Map<String, Long> validateChangeSetForContentSize(SbccChangeSet sbccChangeSet) {
-  Map<String, Long> exceeding = newTreeMap();
-  for (String file : sbccChangeSet.getSizePerFile().keySet()) {
-   Long sizeKb = sbccChangeSet.getSizePerFile().get(file) / 1024;
-   if (sizeKb > settings.getCommitSizeKb()) {
-    exceeding.put(file, sizeKb);
-   }
-  }
-  return exceeding;
+  return this.settings;
  }
 
  public Optional<String> validateChangeSetForContentDiff(SbccChangeSet sbccChangeSet) {
-  if (!settings.getCommitDiffRegexp().isPresent()) {
+  if (!this.settings.getCommitDiffRegexp().isPresent()) {
    return absent();
   }
-  Matcher m = Pattern.compile(settings.getCommitDiffRegexp().get(), DOTALL).matcher(sbccChangeSet.getDiff());
+  Matcher m = Pattern.compile(this.settings.getCommitDiffRegexp().get(), DOTALL).matcher(sbccChangeSet.getDiff());
   if (m.find()) {
    return Optional.of(sbccChangeSet.getDiff().substring(m.start(), m.end()));
   }
   return absent();
+ }
+
+ public Map<String, Long> validateChangeSetForContentSize(SbccChangeSet sbccChangeSet) {
+  return sbccChangeSet.getSizeAboveLimitPerFile();
  }
 }
