@@ -2,11 +2,8 @@ package se.bjurr.sbcc;
 
 import static com.atlassian.bitbucket.repository.RefChangeType.DELETE;
 import static com.atlassian.bitbucket.scm.git.GitRefPattern.TAGS;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.cache.CacheBuilder.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newTreeMap;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.logging.Level.SEVERE;
 import static org.eclipse.jgit.lib.ObjectId.fromString;
 
@@ -16,12 +13,13 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -32,11 +30,10 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
 import org.eclipse.jgit.revwalk.RevTag;
-import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccPerson;
@@ -54,15 +51,11 @@ import com.atlassian.bitbucket.util.PageProvider;
 import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PagedIterable;
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 public class ChangeSetsServiceImpl implements ChangeSetsService {
  private static Logger logger = Logger.getLogger(ChangeSetsServiceImpl.class.getName());
- private static Cache<String, Long> objectSizeCache = newBuilder()//
-   .maximumSize(10000)//
-   .expireAfterAccess(120, MINUTES)//
-   .build();
+
  private final ApplicationPropertiesService applicationPropertiesService;
 
  private final CommitService commitService;
@@ -207,31 +200,24 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    final RevCommit commit, int maxCommitSizeKb) throws MissingObjectException, IncorrectObjectTypeException,
    CorruptObjectException, IOException {
   TreeMap<String, Long> fileSizesAboveLimit = newTreeMap();
-  RevTree tree = commit.getTree();
-  TreeWalk treeWalk = new TreeWalk(jGitRepo);
-  treeWalk.addTree(tree);
-  treeWalk.setRecursive(true);
-  while (treeWalk.next()) {
-   AnyObjectId objectId = treeWalk.getObjectId(0);
-   try {
-    Long sizeKb = objectSizeCache.get(objectId.getName(), new Callable<Long>() {
-     @Override
-     public Long call() throws Exception {
-      if (jGitRepo.hasObject(objectId)) {
-       ObjectLoader loader = jGitRepo.open(objectId);
-       long size = loader.getSize();
-       return size / 1024;
-      }
-      return 0L;
-     }
-    });
-    if (sizeKb > maxCommitSizeKb) {
-     fileSizesAboveLimit.put(treeWalk.getPathString(), sizeKb);
-    }
-   } catch (ExecutionException e) {
-    throw propagate(e);
+
+  RevWalk rw = new RevWalk(jGitRepo);
+  RevCommit parent = rw.parseCommit(commit.getParent(0).getId());
+  DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+  df.setRepository(jGitRepo);
+  df.setDiffComparator(RawTextComparator.DEFAULT);
+  df.setDetectRenames(true);
+  List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
+  for (DiffEntry diff : diffs) {
+   AnyObjectId objectId = diff.getNewId().toObjectId();
+   ObjectLoader loader = jGitRepo.open(objectId);
+   long size = loader.getSize();
+   long sizeKb = size / 1024;
+   if (sizeKb > maxCommitSizeKb) {
+    fileSizesAboveLimit.put(diff.getNewPath(), sizeKb);
    }
   }
+
   return fileSizesAboveLimit;
  }
 }

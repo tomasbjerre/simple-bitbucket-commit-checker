@@ -2,11 +2,11 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
+## 2.6
 ### GitHub [#53](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/53) Slow in big instalaltions, with alot of users
   Caching file sizes
   
-  [48d20f8b0f38f05](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/48d20f8b0f38f05) Tomas Bjerre *2016-06-22 16:49:10*
+  [426e5f26c94fc31](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/426e5f26c94fc31) Tomas Bjerre *2016-06-22 16:50:48*
 
 ### No issue
   Adding script to setup Atlassian SDK
