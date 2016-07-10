@@ -126,7 +126,7 @@
 			<plugin>
 				<groupId>se.bjurr.gitchangelog</groupId>
 				<artifactId>git-changelog-maven-plugin</artifactId>
-				<version>1.29</version>
+				<version>1.32</version>
 				<executions>
 					<execution>
 						<id>GenerateGitChangelog</id>
@@ -213,7 +213,7 @@ Changelog of Simple Bitbucket Commit Checker.
 		</resources>
 	</build>
 	<properties>
-		<bitbucket.version>4.4.0</bitbucket.version>
+		<bitbucket.version>4.7.1</bitbucket.version>
 		<bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
 		<amps.version>6.1.0</amps.version>
 	</properties>

@@ -2,6 +2,12 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 2.7
+### GitHub [#55](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/55) size-checker is checking files not part of the pushed change-set
+  Only checking changed files for size
+  
+  [a58018f1da837c5](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/a58018f1da837c5) Tomas Bjerre *2016-06-23 13:47:31*
+
 ## 2.6
 ### GitHub [#53](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/53) Slow in big instalaltions, with alot of users
   Caching file sizes
