@@ -98,8 +98,7 @@ public class SbccSettings {
     .withAcceptMessage( //
       settings.getString(SETTING_ACCEPT_MESSAGE))
     .withBranches(validateRegExp(SETTING_BRANCHES, settings.getString(SETTING_BRANCHES)))
-    .withDryRun(settings.getBoolean(SETTING_DRY_RUN))
-    .withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE))
+    .withDryRun(settings.getBoolean(SETTING_DRY_RUN)).withDryRunMessage(settings.getString(SETTING_DRY_RUN_MESSAGE))
     .withExcludeMergeCommits(settings.getBoolean(SETTING_EXCLUDE_MERGE_COMMITS))
     .withExcludeTagCommits(settings.getBoolean(SETTING_EXCLUDE_TAG_COMMITS))
     .withRejectMessage(settings.getString(SETTING_REJECT_MESSAGE))
@@ -149,8 +148,8 @@ public class SbccSettings {
     for (int r = 0; r < 1000; r++) {
      final String ruleRegexpField = SETTING_RULE_REGEXP + "[" + g + "][" + r + "]";
      final Optional<String> ruleRegexp = fromNullable(settings.getString(ruleRegexpField));
-     final Optional<String> ruleMessage = fromNullable(settings.getString(SETTING_RULE_MESSAGE + "[" + g + "][" + r
-       + "]"));
+     final Optional<String> ruleMessage = fromNullable(
+       settings.getString(SETTING_RULE_MESSAGE + "[" + g + "][" + r + "]"));
      if (ruleRegexp.isPresent()) {
       rules.add(sbccRule()//
         .withRegexp(validateRegExp(ruleRegexpField, ruleRegexp.get())) //

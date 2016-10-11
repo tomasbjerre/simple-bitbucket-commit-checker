@@ -28,12 +28,8 @@ public class ExceptionTest {
 
  @Test
  public void testThatRefChangesAreAcceptedIfAnUnexpectedExceptionIsThrown() throws IOException {
-  refChangeBuilder()
-    .withHookNameVersion("Simple Bitbucket Commit Checker X.X")
-    .throwing(new IOException("the error"))
-    .run()
-    .wasAccepted()
-    .hasTrimmedFlatOutput(
+  refChangeBuilder().withHookNameVersion("Simple Bitbucket Commit Checker X.X").throwing(new IOException("the error"))
+    .run().wasAccepted().hasTrimmedFlatOutput(
       "Simple Bitbucket Commit Checker X.X  Error while validating reference changes. Will allow all of them. \"the error\"");
  }
 
@@ -43,13 +39,8 @@ public class ExceptionTest {
   */
  @Test
  public void testThatRefChangesAreAcceptedIfInvalidSettingsAreSet() throws IOException {
-  refChangeBuilder()
-    .withHookNameVersion("Simple Bitbucket Commit Checker X.X")
-    .withSetting(SETTING_BRANCHES, "[notok")
-    .build()
-    .run()
-    .wasAccepted()
-    .hasTrimmedFlatOutput(
+  refChangeBuilder().withHookNameVersion("Simple Bitbucket Commit Checker X.X").withSetting(SETTING_BRANCHES, "[notok")
+    .build().run().wasAccepted().hasTrimmedFlatOutput(
       "Simple Bitbucket Commit Checker X.X  Error while validating reference changes. Will allow all of them. \"branches=Invalid Regexp: Unclosed character class near index 5 [notok      ^\"");
  }
 }

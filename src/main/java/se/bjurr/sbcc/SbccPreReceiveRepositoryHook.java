@@ -64,7 +64,7 @@ public class SbccPreReceiveRepositoryHook implements PreReceiveRepositoryHook {
    final SbccVerificationResult refChangeVerificationResults = new RefChangeValidator(
      repositoryHookContext.getRepository(), repositoryHookContext.getRepository(), settings, changesetsService,
      bitbucketAuthenticationContext, sbccRenderer, applicationLinkService, sbccUserAdminService)
-     .validateRefChanges(refChanges);
+       .validateRefChanges(refChanges);
 
    String printOut = new SbccPrinter(settings, sbccRenderer).printVerificationResults(refChangeVerificationResults);
 

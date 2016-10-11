@@ -41,8 +41,8 @@ public class RefChangeValidator {
  private final Repository fromRepository;
 
  public RefChangeValidator(Repository fromRepository, Repository toRepository, SbccSettings settings,
-   ChangeSetsService changesetsService, AuthenticationContext bitbucketAuthenticationContext,
-   SbccRenderer sbccRenderer, ApplicationLinkService applicationLinkService, SbccUserAdminService sbccUserAdminService) {
+   ChangeSetsService changesetsService, AuthenticationContext bitbucketAuthenticationContext, SbccRenderer sbccRenderer,
+   ApplicationLinkService applicationLinkService, SbccUserAdminService sbccUserAdminService) {
   this.fromRepository = fromRepository;
   this.settings = settings;
   this.changesetsService = changesetsService;
@@ -53,8 +53,8 @@ public class RefChangeValidator {
   this.jqlValidator = new JqlValidator(applicationLinkService, settings, sbccRenderer);
  }
 
- public SbccVerificationResult validateRefChanges(Collection<RefChange> refChanges) throws IOException,
-   CredentialsRequiredException, ResponseException, ExecutionException {
+ public SbccVerificationResult validateRefChanges(Collection<RefChange> refChanges)
+   throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
   final SbccVerificationResult refChangeVerificationResult = new SbccVerificationResult();
   for (final RefChange refChange : refChanges) {
    validateRefChange(refChangeVerificationResult, refChange.getType(), refChange.getRef().getId(),
@@ -64,11 +64,10 @@ public class RefChangeValidator {
  }
 
  public void validateRefChange(final SbccVerificationResult refChangeVerificationResult, RefChangeType refChangeType,
-   String refId, String fromHash, String toHash) throws IOException, CredentialsRequiredException, ResponseException,
-   ExecutionException {
-  logger.fine(getBitbucketName(bitbucketAuthenticationContext) + " "
-    + getBitbucketEmail(bitbucketAuthenticationContext) + "> RefChange " + fromHash + " " + refId + " " + toHash + " "
-    + refChangeType);
+   String refId, String fromHash, String toHash)
+   throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
+  logger.fine(getBitbucketName(bitbucketAuthenticationContext) + " " + getBitbucketEmail(bitbucketAuthenticationContext)
+    + "> RefChange " + fromHash + " " + refId + " " + toHash + " " + refChangeType);
   if (compile(settings.getBranches().or(".*")).matcher(refId).find()) {
    if (refChangeType != DELETE) {
     List<SbccChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, fromRepository, refId,
@@ -87,9 +86,9 @@ public class RefChangeValidator {
   validateRefChange(refChangeVerificationResults, refId, fromHash, toHash, refChangeSets);
  }
 
- private void validateRefChange(final SbccVerificationResult refChangeVerificationResult, String refId,
-   String fromHash, String toHash, List<SbccChangeSet> refChangeSets) throws IOException, CredentialsRequiredException,
-   ResponseException, ExecutionException {
+ private void validateRefChange(final SbccVerificationResult refChangeVerificationResult, String refId, String fromHash,
+   String toHash, List<SbccChangeSet> refChangeSets)
+   throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
   SbccRefChangeVerificationResult refChangeVerificationResults = validateRefChange(refChangeSets, settings, refId,
     fromHash, toHash);
   if (refChangeVerificationResults.hasReportables()) {
@@ -98,8 +97,8 @@ public class RefChangeValidator {
  }
 
  private SbccRefChangeVerificationResult validateRefChange(List<SbccChangeSet> sbccChangeSets, SbccSettings settings,
-   String refId, String fromHash, String toHash) throws IOException, CredentialsRequiredException, ResponseException,
-   ExecutionException {
+   String refId, String fromHash, String toHash)
+   throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
   final SbccRefChangeVerificationResult refChangeVerificationResult = new SbccRefChangeVerificationResult(refId,
     fromHash, toHash);
   refChangeVerificationResult.setBranchValidationResult(validateBranchName(refId));

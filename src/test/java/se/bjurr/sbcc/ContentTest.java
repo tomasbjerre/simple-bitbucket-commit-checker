@@ -16,18 +16,13 @@ public class ContentTest {
 
  @Test
  public void testContentWithOneLargeFileSizeCanBeRejected() throws IOException {
-  refChangeBuilder()
-    .withChangeSet( //
-      changeSetBuilder() //
-        .withId("1") //
-        .withMessage("") //
-        .withSize("someFile", 15000L) //
-        .build() //
-    )
-    .withSetting(SETTING_SIZE, "10000")
-    .withSetting(SETTING_SIZE_MESSAGE, "To large!")
-    .build()
-    .run()
+  refChangeBuilder().withChangeSet( //
+    changeSetBuilder() //
+      .withId("1") //
+      .withMessage("") //
+      .withSize("someFile", 15000L) //
+      .build() //
+  ).withSetting(SETTING_SIZE, "10000").withSetting(SETTING_SIZE_MESSAGE, "To large!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>>   - someFile 15000kb > 10000kb   To large!")
     .wasRejected();
@@ -54,19 +49,14 @@ public class ContentTest {
 
  @Test
  public void testContentWithTwoLargeFileSizeCanBeRejected() throws IOException {
-  refChangeBuilder()
-    .withChangeSet( //
-      changeSetBuilder() //
-        .withId("1") //
-        .withMessage("") //
-        .withSize("someFile", 15000L) //
-        .withSize("someOtherFile", 16000L) //
-        .build() //
-    )
-    .withSetting(SETTING_SIZE, "10000")
-    .withSetting(SETTING_SIZE_MESSAGE, "To large!")
-    .build()
-    .run()
+  refChangeBuilder().withChangeSet( //
+    changeSetBuilder() //
+      .withId("1") //
+      .withMessage("") //
+      .withSize("someFile", 15000L) //
+      .withSize("someOtherFile", 16000L) //
+      .build() //
+  ).withSetting(SETTING_SIZE, "10000").withSetting(SETTING_SIZE_MESSAGE, "To large!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>>   - someFile 15000kb > 10000kb   To large!  - someOtherFile 16000kb > 10000kb   To large!") //
     .wasRejected();
@@ -74,25 +64,21 @@ public class ContentTest {
 
  @Test
  public void testContentWithUnresolvedMergeCanBeRejected() throws IOException {
-  refChangeBuilder()
-    .withChangeSet( //
-      changeSetBuilder() //
-        .withId("1") //
-        .withMessage("") //
-        .withDiff("" + //
-          "line 1\n" + //
-          "+line 2\n" + //
-          "+<<<<<<<\n" + //
-          "+=======\n" + //
-          "+>>>>>>>\n" + //
-          "line 3\n" //
-        ) //
-        .build() //
-    )
-    .withSetting(SETTING_DIFF_REGEXP, UNRESOLVED_MERGE)
-    .withSetting(SETTING_DIFF_REGEXP_MESSAGE, "Unresolved merge found!")
-    .build()
-    .run()
+  refChangeBuilder().withChangeSet( //
+    changeSetBuilder() //
+      .withId("1") //
+      .withMessage("") //
+      .withDiff("" + //
+        "line 1\n" + //
+        "+line 2\n" + //
+        "+<<<<<<<\n" + //
+        "+=======\n" + //
+        "+>>>>>>>\n" + //
+        "line 3\n" //
+      ) //
+      .build() //
+  ).withSetting(SETTING_DIFF_REGEXP, UNRESOLVED_MERGE)
+    .withSetting(SETTING_DIFF_REGEXP_MESSAGE, "Unresolved merge found!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>>   - <<<<<<<.*?=======.*?>>>>>>>: <<<<<<< +======= +>>>>>>>      Unresolved merge found!")
     .wasRejected();

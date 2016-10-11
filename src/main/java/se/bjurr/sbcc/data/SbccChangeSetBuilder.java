@@ -26,8 +26,8 @@ public class SbccChangeSetBuilder {
  }
 
  public SbccChangeSet build() {
-  return new SbccChangeSet(this.id, firstNonNull(this.committer, DEFAULT_COMMITTER), firstNonNull(this.author,
-    DEFAULT_AUTHOR), this.message, this.parentCount, this.fileSizeBytes, this.diff);
+  return new SbccChangeSet(this.id, firstNonNull(this.committer, DEFAULT_COMMITTER),
+    firstNonNull(this.author, DEFAULT_AUTHOR), this.message, this.parentCount, this.fileSizeBytes, this.diff);
  }
 
  public SbccChangeSetBuilder withAuthor(SbccPerson author) {

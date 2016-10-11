@@ -164,10 +164,9 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder build() throws IOException {
   this.refChange = newRefChange();
-  when(
-    this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
-      Matchers.eq(this.refId), Matchers.eq(this.type), Matchers.eq(this.fromHash), Matchers.eq(this.toHash)))
-    .thenReturn(this.newChangesets);
+  when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
+    Matchers.eq(this.refId), Matchers.eq(this.type), Matchers.eq(this.fromHash), Matchers.eq(this.toHash)))
+      .thenReturn(this.newChangesets);
   when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(PullRequest.class)))
     .thenReturn(this.newChangesets);
   return this;
@@ -243,8 +242,8 @@ public class RefChangeBuilder {
     RefChangeBuilder.this.prMessage = messageParam;
    }
   });
-  when(this.repositoryHookService.getSettings(Matchers.any(Repository.class), Matchers.anyString())).thenReturn(
-    this.settings);
+  when(this.repositoryHookService.getSettings(Matchers.any(Repository.class), Matchers.anyString()))
+    .thenReturn(this.settings);
   Repository repository = mock(Repository.class);
   MergeRequest mergeRequest = mock(MergeRequest.class);
   PullRequest pullRequest = mock(PullRequest.class);
@@ -263,10 +262,9 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder throwing(IOException ioException) throws IOException {
   this.refChange = newRefChange();
-  when(
-    this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
-      Matchers.any(String.class), Matchers.any(RefChangeType.class), Matchers.any(String.class),
-      Matchers.any(String.class))).thenThrow(ioException);
+  when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
+    Matchers.any(String.class), Matchers.any(RefChangeType.class), Matchers.any(String.class),
+    Matchers.any(String.class))).thenThrow(ioException);
   return this;
  }
 

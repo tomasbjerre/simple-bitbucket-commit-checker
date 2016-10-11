@@ -67,8 +67,8 @@ public class ConfigValidatorTest {
   when(settings.getString(SETTING_BRANCHES)).thenReturn("[notok");
   configValidator.validate(settings, errors, repository);
   assertEquals(SETTING_BRANCHES, on(",").join(fieldErrors.keySet()));
-  assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^", on(",")
-    .join(fieldErrors.values()));
+  assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^",
+    on(",").join(fieldErrors.values()));
  }
 
  @Test
@@ -78,15 +78,15 @@ public class ConfigValidatorTest {
   when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("[notok");
   configValidator.validate(settings, errors, repository);
   assertEquals("ruleRegexp[0][0]", on(",").join(fieldErrors.keySet()));
-  assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^", on(",")
-    .join(fieldErrors.values()));
+  assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^",
+    on(",").join(fieldErrors.values()));
  }
 
  @Test
  public void testThatRulesWithAcceptMatchAndRegexpDoesValidate() throws ValidationException {
   when(settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString().toLowerCase());
-  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(
-    SbccGroup.Accept.SHOW_MESSAGE.toString().toLowerCase());
+  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]"))
+    .thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString().toLowerCase());
   when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
   configValidator.validate(settings, errors, repository);
   assertEquals("", on(",").join(fieldErrors.keySet()));

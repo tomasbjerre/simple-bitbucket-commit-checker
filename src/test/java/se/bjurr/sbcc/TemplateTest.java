@@ -57,28 +57,22 @@ public class TemplateTest {
  public void testThatRejectResponseLooksGood() throws IOException {
   SbccPerson identityCorrect = new SbccPerson("Tomas Bitbuckety", "email@bitbucket.example");
   SbccPerson identityWrong = new SbccPerson("Tomas", "email@other.example");
-  refChangeBuilder()
-    .withBitbucketName("tomas.bitbuckety")
-    .withBitbucketDisplayName("Tomas Bitbuckety")
+  refChangeBuilder().withBitbucketName("tomas.bitbuckety").withBitbucketDisplayName("Tomas Bitbuckety")
     .withBitbucketEmail("email@bitbucket.example")
     .fakeJiraResponse("issue = AB-1234 AND assignee in (\"Tomas Bitbuckety\") AND status = \"In Progress\"",
       JIRA_RESPONSE_EMPTY)
-    .withSetting(SETTING_JQL_CHECK, TRUE)
-    .withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
+    .withSetting(SETTING_JQL_CHECK, TRUE).withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
     .withSetting(SETTING_JQL_CHECK_QUERY,
       "issue = ${REGEXP} AND assignee in (\"${BITBUCKET_USER}\") AND status = \"In Progress\"")
     .withSetting(SETTING_JQL_CHECK_MESSAGE, "Jira must be in progress and have assignee!")
-    .withHookNameVersion("Simple Bitbucket Commit Checker")
-    .withGroupAcceptingAtLeastOneJira()
-    .withRefId("/ref/master")
+    .withHookNameVersion("Simple Bitbucket Commit Checker").withGroupAcceptingAtLeastOneJira().withRefId("/ref/master")
     .withSetting(SETTING_BRANCHES, "master")
     .withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString())
     .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString())
     .withSetting(SETTING_GROUP_MESSAGE + "[0]",
       "Every commit needs at least one issue. If this is just refactoring or other code cleanup, you can use JIRA AB-1234.")
     .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA")
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*")
+    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA").withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*")
     .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident")
     .withSetting(SETTING_GROUP_ACCEPT + "[1]", SbccGroup.Accept.ACCEPT.toString())
     .withSetting(SETTING_GROUP_MATCH + "[1]", SbccGroup.Match.NONE.toString())
@@ -100,8 +94,7 @@ public class TemplateTest {
     .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE,
       "Please set correct author and comitter name in your commits. git config --global user.email '${BITBUCKET_NAME}'")
     .withSetting(SETTING_DRY_RUN, TRUE)
-    .withSetting(
-      SETTING_DRY_RUN_MESSAGE,
+    .withSetting(SETTING_DRY_RUN_MESSAGE,
       "*** We are currently running commit checker in dry run mode. Your commits are\n"
         + "*** being accepted. We will soon start blocking this kind of commits.")
     .withSetting(SETTING_REJECT_MESSAGE, Resources.toString(getResource(RESPONSE_REJECT_TXT), UTF_8))
@@ -148,16 +141,12 @@ public class TemplateTest {
 
  @Test
  public void testThatSuccessResponseIncludesAcceptMessageAndShowMessage() throws IOException {
-  refChangeBuilder()
-    .withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString())
+  refChangeBuilder().withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString())
     .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString())
     .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira =)")
     .withSetting(SETTING_RULE_REGEXP + "[0][0]", "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)")
-    .withSetting(SETTING_ACCEPT_MESSAGE, "Accepted by me")
-    .withSetting(SETTING_REJECT_MESSAGE, "Rejected by me")
-    .withChangeSet(changeSetBuilder().withId("1").withMessage("SB-5678 fixing stuff").build())
-    .build()
-    .run()
+    .withSetting(SETTING_ACCEPT_MESSAGE, "Accepted by me").withSetting(SETTING_REJECT_MESSAGE, "Rejected by me")
+    .withChangeSet(changeSetBuilder().withId("1").withMessage("SB-5678 fixing stuff").build()).build().run()
     .hasTrimmedFlatOutput(
       "Accepted by me refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> SB-5678 fixing stuff  - Thanks for not specifying a Jira =)")
     .wasAccepted();

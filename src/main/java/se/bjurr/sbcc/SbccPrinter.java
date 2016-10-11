@@ -101,7 +101,8 @@ public class SbccPrinter {
     sbccRenderer.append(sb, "  " + settings.getRequireMatchingAuthorNameMessage().get() + NL);
    }
   }
-  if (!refChangeVerificationResult.getSbccChangeSets().get(sbccChangeSet).isValidateChangeSetForAuthorNameInBitbucket()) {
+  if (!refChangeVerificationResult.getSbccChangeSets().get(sbccChangeSet)
+    .isValidateChangeSetForAuthorNameInBitbucket()) {
    sbccRenderer.append(sb, NL);
    sbccRenderer.append(sb, "- Commit: '" + sbccChangeSet.getAuthor().getName() + "'" + NL);
    if (settings.getRequireMatchingAuthorNameMessage().isPresent()) {
@@ -110,11 +111,12 @@ public class SbccPrinter {
   }
  }
 
- private void printBranchNameVerification(SbccRefChangeVerificationResult refChangeVerificationResult, StringBuilder sb) {
+ private void printBranchNameVerification(SbccRefChangeVerificationResult refChangeVerificationResult,
+   StringBuilder sb) {
   if (!refChangeVerificationResult.isBranchNameValid()) {
    sbccRenderer.append(sb, NL);
-   sbccRenderer.append(sb, "- Branch: " + refChangeVerificationResult.getRefId() + ", "
-     + settings.getBranchRejectionRegexp().get() + NL);
+   sbccRenderer.append(sb,
+     "- Branch: " + refChangeVerificationResult.getRefId() + ", " + settings.getBranchRejectionRegexp().get() + NL);
    if (settings.getBranchRejectionRegexpMessage().isPresent()) {
     sbccRenderer.append(sb, "  " + settings.getBranchRejectionRegexpMessage().get() + NL);
    }
@@ -144,9 +146,9 @@ public class SbccPrinter {
  }
 
  private void printRefChange(final SbccRefChangeVerificationResult refChangeVerificationResult, StringBuilder sb) {
-  sbccRenderer.append(sb, refChangeVerificationResult.getRefId() + " "
-    + refChangeVerificationResult.getFromHash().substring(0, 10) + " -> "
-    + refChangeVerificationResult.getToHash().substring(0, 10) + NL);
+  sbccRenderer.append(sb,
+    refChangeVerificationResult.getRefId() + " " + refChangeVerificationResult.getFromHash().substring(0, 10) + " -> "
+      + refChangeVerificationResult.getToHash().substring(0, 10) + NL);
  }
 
  private void printRuleMessage(final SbccGroup sbccVerificationResult, StringBuilder sb) {
@@ -189,8 +191,8 @@ public class SbccPrinter {
    printBranchNameVerification(refChangeVerificationResult, sb);
    for (final SbccChangeSet sbccChangeSet : refChangeVerificationResult.getSbccChangeSets().keySet()) {
     sbccRenderer.setSbccChangeSet(sbccChangeSet);
-    SbccChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSbccChangeSets().get(
-      sbccChangeSet);
+    SbccChangeSetVerificationResult changeSetVerificationResult = refChangeVerificationResult.getSbccChangeSets()
+      .get(sbccChangeSet);
     if (!changeSetVerificationResult.hasReportables()) {
      continue;
     }

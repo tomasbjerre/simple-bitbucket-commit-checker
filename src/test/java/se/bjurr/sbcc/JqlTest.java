@@ -20,14 +20,10 @@ public class JqlTest {
 
  @Test
  public void testThatTheJQLQueryCanBeUsedWithoutVariablesToReject() throws Exception {
-  refChangeBuilder()
-    .fakeJiraResponse(JQL_STATUS_IN_PROGRESS, JIRA_RESPONSE_EMPTY)
+  refChangeBuilder().fakeJiraResponse(JQL_STATUS_IN_PROGRESS, JIRA_RESPONSE_EMPTY)
     .withChangeSet(changeSetBuilder().withId("1").withMessage("fixing stuff").build())
-    .withSetting(SETTING_JQL_CHECK, TRUE)
-    .withSetting(SETTING_JQL_CHECK_QUERY, JQL_STATUS_IN_PROGRESS)
-    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must be in progess!")
-    .build()
-    .run()
+    .withSetting(SETTING_JQL_CHECK, TRUE).withSetting(SETTING_JQL_CHECK_QUERY, JQL_STATUS_IN_PROGRESS)
+    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must be in progess!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> fixing stuff  - JQL: status = \"In Progress\"   Must be in progess!")
     .wasRejected();
@@ -59,22 +55,17 @@ public class JqlTest {
 
  @Test
  public void testThatTheJQLQueryCanBeUsedWithChangesetVariables() throws Exception {
-  refChangeBuilder()
-    .fakeJiraResponse("assignee in (\"tomas\")", JIRA_RESPONSE_ONE)
-    .withBitbucketName("tomas")
-    .withChangeSet(
-      changeSetBuilder().withId("1").withMessage("fixing stuff")
-        .withAuthor(sbccPersonBuilder().withName("Author name").withEmailAddress("Author Email").build())
-        .withCommitter(sbccPersonBuilder().withName("Committer name").withEmailAddress("Committer Email").build())
-        .build())
+  refChangeBuilder().fakeJiraResponse("assignee in (\"tomas\")", JIRA_RESPONSE_ONE).withBitbucketName("tomas")
+    .withChangeSet(changeSetBuilder().withId("1").withMessage("fixing stuff")
+      .withAuthor(sbccPersonBuilder().withName("Author name").withEmailAddress("Author Email").build())
+      .withCommitter(sbccPersonBuilder().withName("Committer name").withEmailAddress("Committer Email").build())
+      .build())
     .withSetting(SETTING_JQL_CHECK, TRUE)
-    .withSetting(
-      SETTING_JQL_CHECK_QUERY,
+    .withSetting(SETTING_JQL_CHECK_QUERY,
       "assignee in (\"${BITBUCKET_USER}\", \"${COMMITTER_NAME}\", \"${COMMITTER_EMAIL}\", \"${AUTHOR_NAME}\", \"${AUTHOR_EMAIL}\")")
     .withSetting(SETTING_JQL_CHECK_MESSAGE,
       "Msg... \"${COMMITTER_NAME} \"${COMMITTER_EMAIL}\", \"${AUTHOR_NAME}\", \"${AUTHOR_EMAIL}\"")
-    .build()
-    .run()
+    .build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Author name <Author Email> >>> fixing stuff  - JQL: assignee in (\"tomas\", \"Committer name\", \"Committer Email\", \"Author name\", \"Author Email\")   Msg... \"Committer name \"Committer Email\", \"Author name\", \"Author Email\"")
     .wasRejected();
@@ -130,15 +121,11 @@ public class JqlTest {
 
  @Test
  public void testThatTheJQLQueryCanMatchJiraWithSecondRegexpFirstCrashes() throws Exception {
-  refChangeBuilder()
-    .fakeJiraResponse("issue = CD-5678", JIRA_RESPONSE_EMPTY)
+  refChangeBuilder().fakeJiraResponse("issue = CD-5678", JIRA_RESPONSE_EMPTY)
     .withChangeSet(changeSetBuilder().withId("1").withMessage("AB-1234 fixing stuff CD-5678").build())
-    .withSetting(SETTING_JQL_CHECK, TRUE)
-    .withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
+    .withSetting(SETTING_JQL_CHECK, TRUE).withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
     .withSetting(SETTING_JQL_CHECK_QUERY, "issue = ${REGEXP}")
-    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
-    .build()
-    .run()
+    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> AB-1234 fixing stuff CD-5678  - JQL: issue = AB-1234   Issue must exist!  - JQL: issue = CD-5678   Issue must exist!")
     .wasRejected();
@@ -146,16 +133,12 @@ public class JqlTest {
 
  @Test
  public void testThatTheJQLQueryCanFailWithTwoRegexpMatching() throws Exception {
-  refChangeBuilder()
-    .fakeJiraResponse("issue = AB-1234", JIRA_RESPONSE_EMPTY)
+  refChangeBuilder().fakeJiraResponse("issue = AB-1234", JIRA_RESPONSE_EMPTY)
     .fakeJiraResponse("issue = CD-5678", JIRA_RESPONSE_EMPTY)
     .withChangeSet(changeSetBuilder().withId("1").withMessage("AB-1234 fixing stuff CD-5678").build())
-    .withSetting(SETTING_JQL_CHECK, TRUE)
-    .withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
+    .withSetting(SETTING_JQL_CHECK, TRUE).withSetting(SETTING_COMMIT_REGEXP, JIRA_REGEXP)
     .withSetting(SETTING_JQL_CHECK_QUERY, "issue = ${REGEXP}")
-    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
-    .build()
-    .run()
+    .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!").build().run()
     .hasTrimmedFlatOutput(
       "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas <my@email.com> >>> AB-1234 fixing stuff CD-5678  - JQL: issue = AB-1234   Issue must exist!  - JQL: issue = CD-5678   Issue must exist!")
     .wasRejected();

@@ -64,8 +64,8 @@ public class SbccRepositoryMergeRequestCheck implements MergeRequestCheck {
     return;
    }
    SbccSettings settings = sscSettings(rawSettings);
-   if (settings.isDryRun() || !settings.shouldCheckPullRequests() || settings.allowServiceUsers()
-     && bitbucketAuthenticationContext.getCurrentUser().getType().equals(SERVICE)) {
+   if (settings.isDryRun() || !settings.shouldCheckPullRequests()
+     || settings.allowServiceUsers() && bitbucketAuthenticationContext.getCurrentUser().getType().equals(SERVICE)) {
     resultsCallback.report(TRUE, null, null);
     return;
    }

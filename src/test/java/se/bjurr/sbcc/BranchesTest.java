@@ -90,16 +90,13 @@ public class BranchesTest {
 
  @Test
  public void testThatBranchCanBeRejectedByRegexp() throws IOException {
-  refChangeBuilder()
-    .withRefId("/ref/feeture")
+  refChangeBuilder().withRefId("/ref/feeture")
     .withChangeSet(changeSetBuilder() //
       .withId("1") //
       .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
       .build())
     .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok")
-    .build()
-    .run()
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
     .hasTrimmedFlatOutput(
       "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
     .wasRejected();
@@ -107,12 +104,8 @@ public class BranchesTest {
 
  @Test
  public void testThatBranchCanBeRejectedByRegexpEvenIfNoCommitsArePushed() throws IOException {
-  refChangeBuilder()
-    .withRefId("/ref/feeture")
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok")
-    .build()
-    .run()
+  refChangeBuilder().withRefId("/ref/feeture").withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
     .hasTrimmedFlatOutput(
       "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
     .wasRejected();

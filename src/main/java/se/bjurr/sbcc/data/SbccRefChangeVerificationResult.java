@@ -29,7 +29,8 @@ public class SbccRefChangeVerificationResult {
   getOrAdd(sbccChangeSet).setEmailAuthorResult(validateChangeSetForAuthorEmail);
  }
 
- public void addCommitterEmailValidationResult(SbccChangeSet sbccChangeSet, boolean validateChangeSetForCommitterEmail) {
+ public void addCommitterEmailValidationResult(SbccChangeSet sbccChangeSet,
+   boolean validateChangeSetForCommitterEmail) {
   getOrAdd(sbccChangeSet).setEmailCommitterResult(validateChangeSetForCommitterEmail);
  }
 

@@ -39,8 +39,8 @@ public class CommitMessageValidator {
  public boolean validateChangeSetForAuthorEmail(SbccSettings settings, SbccChangeSet sbccChangeSet,
    SbccRenderer sbccRenderer) {
   if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
-   return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
-     sbccChangeSet.getAuthor().getEmailAddress()).find();
+   return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get()))
+     .matcher(sbccChangeSet.getAuthor().getEmailAddress()).find();
   }
   if (settings.shouldRequireMatchingAuthorEmail()) {
    return getBitbucketEmail(this.bitbucketAuthenticationContext)//
@@ -78,8 +78,8 @@ public class CommitMessageValidator {
    SbccRenderer sbccRenderer) {
   if (settings.shouldRequireMatchingCommitterEmail()) {
    if (settings.getRequireMatchingAuthorEmailRegexp().isPresent()) {
-    return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get())).matcher(
-      sbccChangeSet.getCommitter().getEmailAddress()).find();
+    return compile(sbccRenderer.render(settings.getRequireMatchingAuthorEmailRegexp().get()))
+      .matcher(sbccChangeSet.getCommitter().getEmailAddress()).find();
    }
    return getBitbucketEmail(this.bitbucketAuthenticationContext)//
      .equalsIgnoreCase(sbccChangeSet.getCommitter().getEmailAddress());

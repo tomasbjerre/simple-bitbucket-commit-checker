@@ -120,8 +120,8 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
  }
 
  private List<SbccChangeSet> getNewChangesets(SbccSettings settings, Repository repository, String refId,
-   RefChangeType type, String toHash, final CommitsBetweenRequest request) throws IOException, MissingObjectException,
-   IncorrectObjectTypeException, CorruptObjectException {
+   RefChangeType type, String toHash, final CommitsBetweenRequest request)
+   throws IOException, MissingObjectException, IncorrectObjectTypeException, CorruptObjectException {
   final org.eclipse.jgit.lib.Repository jGitRepo = getJGitRepo(repository);
 
   final RevWalk walk = new RevWalk(jGitRepo);
@@ -167,8 +167,8 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
      if (settings.getCommitDiffRegexp().isPresent()) {
       if (changeset.getParents().size() > 0) {
        // If this is not the very first commit in the repo
-       Optional<RevCommit> firstParentCommit = Optional.of(walk.parseCommit(fromString(changeset.getParents()
-         .iterator().next().getId())));
+       Optional<RevCommit> firstParentCommit = Optional
+         .of(walk.parseCommit(fromString(changeset.getParents().iterator().next().getId())));
        if (firstParentCommit.isPresent()) {
         diff = getDiffString(jGitRepo, commit, firstParentCommit.get());
        }
@@ -197,8 +197,8 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
  }
 
  private TreeMap<String, Long> getSizeAboveLimitPerFile(final org.eclipse.jgit.lib.Repository jGitRepo,
-   final RevCommit commit, int maxCommitSizeKb) throws MissingObjectException, IncorrectObjectTypeException,
-   CorruptObjectException, IOException {
+   final RevCommit commit, int maxCommitSizeKb)
+   throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
   TreeMap<String, Long> fileSizesAboveLimit = newTreeMap();
 
   RevWalk rw = new RevWalk(jGitRepo);

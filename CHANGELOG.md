@@ -2,6 +2,12 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### No issue
+  Latest changelog lib and BBS 4.7.1
+  
+  [fa396c1ace1951a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fa396c1ace1951a) Tomas Bjerre *2016-07-10 06:57:25*
+
 ## 2.7
 ### GitHub [#55](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/55) size-checker is checking files not part of the pushed change-set
   Only checking changed files for size

@@ -29,8 +29,7 @@ public class JiraClient {
  @VisibleForTesting
  protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
    throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
-  return applicationLinkService.getPrimaryApplicationLink(JiraApplicationType.class)
-    .createAuthenticatedRequestFactory()
+  return applicationLinkService.getPrimaryApplicationLink(JiraApplicationType.class).createAuthenticatedRequestFactory()
     .createRequest(GET, "/rest/api/2/search?jql=" + encode(jqlCheckQuery, UTF_8.name())).execute();
  }
 }
