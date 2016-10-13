@@ -4,6 +4,10 @@ Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
 ### No issue
+  Reformat code
+  
+  [ecb147fe5ada92a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/ecb147fe5ada92a) Tomas Bjerre *2016-10-11 15:30:11*
+
   Latest changelog lib and BBS 4.7.1
   
   [fa396c1ace1951a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fa396c1ace1951a) Tomas Bjerre *2016-07-10 06:57:25*

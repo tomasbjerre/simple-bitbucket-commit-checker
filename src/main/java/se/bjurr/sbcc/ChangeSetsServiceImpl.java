@@ -35,10 +35,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.data.SbccPerson;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.bitbucket.commit.Commit;
 import com.atlassian.bitbucket.commit.CommitService;
 import com.atlassian.bitbucket.commit.CommitsBetweenRequest;
@@ -52,6 +48,10 @@ import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PagedIterable;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
+
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.data.SbccPerson;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class ChangeSetsServiceImpl implements ChangeSetsService {
  private static Logger logger = Logger.getLogger(ChangeSetsServiceImpl.class.getName());
@@ -148,7 +148,7 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
    final SbccPerson committer = new SbccPerson(ident.getName(), ident.getEmailAddress());
    changesets.add(new SbccChangeSet(toHash, committer, committer, message, 1, new TreeMap<String, Long>(), ""));
   } else {
-   final Iterable<Commit> changes = new PagedIterable<Commit>(new PageProvider<Commit>() {
+   final Iterable<Commit> changes = new PagedIterable<>(new PageProvider<Commit>() {
     @Override
     public Page<Commit> get(PageRequest pr) {
      return ChangeSetsServiceImpl.this.commitService.getCommitsBetween(request, pr);
@@ -210,6 +210,9 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
   List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
   for (DiffEntry diff : diffs) {
    AnyObjectId objectId = diff.getNewId().toObjectId();
+   if (isRemoved(objectId)) {
+    continue;
+   }
    ObjectLoader loader = jGitRepo.open(objectId);
    long size = loader.getSize();
    long sizeKb = size / 1024;
@@ -219,5 +222,9 @@ public class ChangeSetsServiceImpl implements ChangeSetsService {
   }
 
   return fileSizesAboveLimit;
+ }
+
+ private boolean isRemoved(AnyObjectId objectId) {
+  return objectId.getName().equals("0000000000000000000000000000000000000000");
  }
 }
