@@ -23,8 +23,8 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
  * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
  * If a group matches a commit, it can reject it or just show a message to the comitter.
 * Check only branches matching a regular expression.
- * You may use variables here to make sure user *admin* can only commit to `dev/admin/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
 * Check that branch name matches specific regexp.
+ * You may use variables here to make sure user *tomas* can only commit to `dev/tomas/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
 * Exclude merge commits.
 * Exclude tag commits.
 * Check commits in pull requests

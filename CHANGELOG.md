@@ -8,7 +8,7 @@ Changelog of Simple Bitbucket Commit Checker.
 
  * So that a user can be rejected if branch does not match /heads/dev/${BITBUCKET_USER_SLUG}/.+
   
-  [f9d03396f16b26a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f9d03396f16b26a) Tomas Bjerre *2016-10-22 15:01:50*
+  [a0b9abdd9e82aa5](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/a0b9abdd9e82aa5) Tomas Bjerre *2016-10-22 16:10:07*
 
 ### No issue
   Change the commit diff descriptions to match with how it actually works
