@@ -20,25 +20,25 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.bjurr.sbcc.ConfigValidator;
-import se.bjurr.sbcc.settings.SbccGroup;
-import se.bjurr.sbcc.settings.ValidationException;
-
+import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.setting.SettingsValidationErrors;
 
+import se.bjurr.sbcc.ConfigValidator;
+
 public class ConfigValidatorTest {
+ private AuthenticationContext authenticationContext;
  private ConfigValidator configValidator;
  private final SettingsValidationErrors errors = new SettingsValidationErrors() {
   @Override
   public void addFieldError(String field, String error) {
-   fieldErrors.put(field, error);
+   ConfigValidatorTest.this.fieldErrors.put(field, error);
   }
 
   @Override
   public void addFormError(String error) {
-   formError.add(error);
+   ConfigValidatorTest.this.formError.add(error);
   }
  };
  private final Map<String, String> fieldErrors = newHashMap();
@@ -48,82 +48,83 @@ public class ConfigValidatorTest {
 
  @Before
  public void before() {
-  settings = mock(Settings.class);
-  when(settings.getBoolean(anyString())).thenReturn(null);
-  when(settings.getString(anyString())).thenReturn(null);
-  configValidator = new ConfigValidator();
+  this.settings = mock(Settings.class);
+  when(this.settings.getBoolean(anyString())).thenReturn(null);
+  when(this.settings.getString(anyString())).thenReturn(null);
+  this.authenticationContext = mock(AuthenticationContext.class);
+  this.configValidator = new ConfigValidator(this.authenticationContext);
  }
 
  @Test
  public void testThatBranchesCanBeEmpty() {
-  when(settings.getString(SETTING_BRANCHES)).thenReturn("");
-  configValidator.validate(settings, errors, repository);
-  assertEquals("", on(",").join(fieldErrors.keySet()));
-  assertEquals("", on(",").join(fieldErrors.values()));
+  when(this.settings.getString(SETTING_BRANCHES)).thenReturn("");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals("", on(",").join(this.fieldErrors.keySet()));
+  assertEquals("", on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatBranchesMustHaveAValidRegexp() {
-  when(settings.getString(SETTING_BRANCHES)).thenReturn("[notok");
-  configValidator.validate(settings, errors, repository);
-  assertEquals(SETTING_BRANCHES, on(",").join(fieldErrors.keySet()));
+  when(this.settings.getString(SETTING_BRANCHES)).thenReturn("[notok");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals(SETTING_BRANCHES, on(",").join(this.fieldErrors.keySet()));
   assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^",
-    on(",").join(fieldErrors.values()));
+    on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatRuleMustHaveAValidRegexp() {
-  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
-  when(settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
-  when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("[notok");
-  configValidator.validate(settings, errors, repository);
-  assertEquals("ruleRegexp[0][0]", on(",").join(fieldErrors.keySet()));
+  when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
+  when(this.settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
+  when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("[notok");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals("ruleRegexp[0][0]", on(",").join(this.fieldErrors.keySet()));
   assertEquals("Invalid Regexp: Unclosed character class near index 5 [notok      ^",
-    on(",").join(fieldErrors.values()));
+    on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatRulesWithAcceptMatchAndRegexpDoesValidate() throws ValidationException {
-  when(settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString().toLowerCase());
-  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]"))
+  when(this.settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString().toLowerCase());
+  when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]"))
     .thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString().toLowerCase());
-  when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-  configValidator.validate(settings, errors, repository);
-  assertEquals("", on(",").join(fieldErrors.keySet()));
-  assertEquals("", on(",").join(fieldErrors.values()));
-  assertEquals("ok", sscSettings(settings).getGroups().get(0).getRules().get(0).getRegexp());
+  when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals("", on(",").join(this.fieldErrors.keySet()));
+  assertEquals("", on(",").join(this.fieldErrors.values()));
+  assertEquals("ok", sscSettings(this.settings).getGroups().get(0).getRules().get(0).getRegexp());
  }
 
  @Test
  public void testThatRulesWithoutAcceptDoesNotValidate() {
-  when(settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
-  when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-  configValidator.validate(settings, errors, repository);
-  assertEquals(SETTING_GROUP_ACCEPT + "[0]", on(",").join(fieldErrors.keySet()));
-  assertEquals("Cannot add a rule group without acceptance criteria!", on(",").join(fieldErrors.values()));
+  when(this.settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
+  when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals(SETTING_GROUP_ACCEPT + "[0]", on(",").join(this.fieldErrors.keySet()));
+  assertEquals("Cannot add a rule group without acceptance criteria!", on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatRulesWithoutMatchDoesNotValidate() {
-  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
-  when(settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-  configValidator.validate(settings, errors, repository);
-  assertEquals(SETTING_GROUP_MATCH + "[0]", on(",").join(fieldErrors.keySet()));
-  assertEquals("Cannot add a rule group without matching criteria!", on(",").join(fieldErrors.values()));
+  when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
+  when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals(SETTING_GROUP_MATCH + "[0]", on(",").join(this.fieldErrors.keySet()));
+  assertEquals("Cannot add a rule group without matching criteria!", on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatRulesWithoutRegexpDoesNotValidate() {
-  when(settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
-  when(settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
-  when(settings.getString(SETTING_RULE_MESSAGE + "[0][0]")).thenReturn("A Message");
-  configValidator.validate(settings, errors, repository);
-  assertEquals("ruleRegexp[0][0]", on(",").join(fieldErrors.keySet()));
-  assertEquals("Cannot add a rule without regexp!", on(",").join(fieldErrors.values()));
+  when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]")).thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
+  when(this.settings.getString(SETTING_GROUP_MATCH + "[0]")).thenReturn(SbccGroup.Match.ALL.toString());
+  when(this.settings.getString(SETTING_RULE_MESSAGE + "[0][0]")).thenReturn("A Message");
+  this.configValidator.validate(this.settings, this.errors, this.repository);
+  assertEquals("ruleRegexp[0][0]", on(",").join(this.fieldErrors.keySet()));
+  assertEquals("Cannot add a rule without regexp!", on(",").join(this.fieldErrors.values()));
  }
 
  @Test
  public void testThatValidationDoesNotFailIfNoValuesAreEntered() {
-  configValidator.validate(settings, errors, repository);
+  this.configValidator.validate(this.settings, this.errors, this.repository);
  }
 }

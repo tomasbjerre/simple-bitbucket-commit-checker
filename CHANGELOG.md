@@ -3,6 +3,24 @@
 Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
+### GitHub [#61](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/61) Using message variables in Regex
+  Variables in all string configurations 
+
+ * So that a user can be rejected if branch does not match /heads/dev/${BITBUCKET_USER_SLUG}/.+
+  
+  [f9d03396f16b26a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f9d03396f16b26a) Tomas Bjerre *2016-10-22 15:01:50*
+
+### No issue
+  Change the commit diff descriptions to match with how it actually works
+  
+  [8054ab7a0a4f923](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/8054ab7a0a4f923) Johan Wärlander *2016-10-17 08:31:41*
+
+## 2.8
+### GitHub [#59](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/59) Error when pushing deleted files
+  Ignoring filesize check on deleted files
+  
+  [919ea69497d2445](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/919ea69497d2445) Tomas Bjerre *2016-10-13 15:09:37*
+
 ### No issue
   Reformat code
   

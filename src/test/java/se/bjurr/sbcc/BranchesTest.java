@@ -14,6 +14,91 @@ import org.junit.Test;
 
 public class BranchesTest {
  @Test
+ public void testThatBitbucketUserVariableCanBeUsedToAcceptCommit() throws IOException {
+  refChangeBuilder() //
+    .withBitbucketUserSlug("tomasbjerre")
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/${BITBUCKET_USER_SLUG}/.*$") //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
+    .withRefId("/ref/tomasbjerre/feature") //
+    .build() //
+    .run() //
+    .wasAccepted();
+ }
+
+ @Test
+ public void testThatBitbucketUserVariableCanBeUsedToRejectCommit() throws IOException {
+  refChangeBuilder() //
+    .withBitbucketUserSlug("tomasbjerre")
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/${BITBUCKET_USER_SLUG}/.*$") //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
+    .withRefId("/ref/tomas/feature") //
+    .build() //
+    .run() //
+    .hasTrimmedFlatOutput(
+      "/ref/tomas/feature e2bc4ed003 -> af35d5c1a4  - Branch: /ref/tomas/feature, /ref/tomasbjerre/.*$   not ok")//
+    .wasRejected();
+ }
+
+ @Test
+ public void testThatBranchCanBeAcceptedByRegexp() throws IOException {
+  refChangeBuilder() //
+    .withRefId("/ref/feature") //
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build()) //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$") //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
+    .build() //
+    .run() //
+    .hasNoOutput() //
+    .wasAccepted();
+ }
+
+ @Test
+ public void testThatBranchCanBeRejectedByRegexp() throws IOException {
+  refChangeBuilder().withRefId("/ref/feeture")
+    .withChangeSet(changeSetBuilder() //
+      .withId("1") //
+      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
+      .build())
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
+    .hasTrimmedFlatOutput(
+      "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
+    .wasRejected();
+ }
+
+ @Test
+ public void testThatBranchCanBeRejectedByRegexpEvenIfNoCommitsArePushed() throws IOException {
+  refChangeBuilder().withRefId("/ref/feeture").withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
+    .hasTrimmedFlatOutput(
+      "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
+    .wasRejected();
+ }
+
+ @Test
+ public void testThatBranchCanBeRejectedByRegexpEvenIfNoCommitsArePushedUnlessDelete() throws IOException {
+  refChangeBuilder() //
+    .withRefId("/ref/feeture") //
+    .withType(DELETE) //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$") //
+    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
+    .build() //
+    .run() //
+    .wasAccepted();
+ }
+
+ @Test
  public void testThatEmptyIsNotIgnoringRefsMaster() throws IOException {
   refChangeBuilder() //
     .withGroupAcceptingAtLeastOneJira() //
@@ -86,56 +171,5 @@ public class BranchesTest {
     .build() //
     .run() //
     .wasRejected();
- }
-
- @Test
- public void testThatBranchCanBeRejectedByRegexp() throws IOException {
-  refChangeBuilder().withRefId("/ref/feeture")
-    .withChangeSet(changeSetBuilder() //
-      .withId("1") //
-      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
-      .build())
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
-    .hasTrimmedFlatOutput(
-      "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
-    .wasRejected();
- }
-
- @Test
- public void testThatBranchCanBeRejectedByRegexpEvenIfNoCommitsArePushed() throws IOException {
-  refChangeBuilder().withRefId("/ref/feeture").withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$")
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok").build().run()
-    .hasTrimmedFlatOutput(
-      "/ref/feeture e2bc4ed003 -> af35d5c1a4  - Branch: /ref/feeture, /ref/(master|feature)$   not ok") //
-    .wasRejected();
- }
-
- @Test
- public void testThatBranchCanBeRejectedByRegexpEvenIfNoCommitsArePushedUnlessDelete() throws IOException {
-  refChangeBuilder() //
-    .withRefId("/ref/feeture") //
-    .withType(DELETE) //
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$") //
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
-    .build() //
-    .run() //
-    .wasAccepted();
- }
-
- @Test
- public void testThatBranchCanBeAcceptedByRegexp() throws IOException {
-  refChangeBuilder() //
-    .withRefId("/ref/feature") //
-    .withChangeSet(changeSetBuilder() //
-      .withId("1") //
-      .withMessage(COMMIT_MESSAGE_NO_ISSUE) //
-      .build()) //
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP, "/ref/(master|feature)$") //
-    .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
-    .build() //
-    .run() //
-    .hasNoOutput() //
-    .wasAccepted();
  }
 }

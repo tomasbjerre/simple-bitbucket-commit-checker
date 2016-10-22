@@ -28,4 +28,12 @@ public class SbccCommon {
   return bitbucketAuthenticationContext.getCurrentUser().getName();
  }
 
+ public static String getBitbucketUserSlug(AuthenticationContext bitbucketAuthenticationContext) {
+  if (bitbucketAuthenticationContext == null || bitbucketAuthenticationContext.getCurrentUser() == null
+    || bitbucketAuthenticationContext.getCurrentUser().getSlug() == null) {
+   return "Unset";
+  }
+  return bitbucketAuthenticationContext.getCurrentUser().getSlug();
+ }
+
 }

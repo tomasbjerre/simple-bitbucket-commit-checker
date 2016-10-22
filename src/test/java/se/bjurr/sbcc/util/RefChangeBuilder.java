@@ -32,17 +32,6 @@ import java.util.Map;
 
 import org.mockito.Matchers;
 
-import se.bjurr.sbcc.ChangeSetsService;
-import se.bjurr.sbcc.JiraClient;
-import se.bjurr.sbcc.ResultsCallable;
-import se.bjurr.sbcc.SbccPreReceiveRepositoryHook;
-import se.bjurr.sbcc.SbccRepositoryMergeRequestCheck;
-import se.bjurr.sbcc.SbccUserAdminService;
-import se.bjurr.sbcc.SbccUserAdminServiceImpl;
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.settings.SbccGroup;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
@@ -69,6 +58,17 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.io.Resources;
+
+import se.bjurr.sbcc.ChangeSetsService;
+import se.bjurr.sbcc.JiraClient;
+import se.bjurr.sbcc.ResultsCallable;
+import se.bjurr.sbcc.SbccPreReceiveRepositoryHook;
+import se.bjurr.sbcc.SbccRepositoryMergeRequestCheck;
+import se.bjurr.sbcc.SbccUserAdminService;
+import se.bjurr.sbcc.SbccUserAdminServiceImpl;
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.settings.SbccGroup;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class RefChangeBuilder {
  public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
@@ -141,7 +141,7 @@ public class RefChangeBuilder {
   this.repositoryHookService = mock(RepositoryHookService.class);
   PluginSettings pluginSettings = mock(PluginSettings.class);
   when(pluginSettingsFactory.createGlobalSettings()).thenReturn(pluginSettings);
-  HashMap<String, Object> map = new HashMap<String, Object>();
+  HashMap<String, Object> map = new HashMap<>();
   when(pluginSettingsFactory.createGlobalSettings().get(Matchers.anyString())).thenReturn(map);
   SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
   when(this.repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
@@ -290,6 +290,11 @@ public class RefChangeBuilder {
 
  public RefChangeBuilder withBitbucketName(String name) {
   when(this.bitbucketUser.getName()).thenReturn(name);
+  return this;
+ }
+
+ public RefChangeBuilder withBitbucketUserSlug(String name) {
+  when(this.bitbucketUser.getSlug()).thenReturn(name);
   return this;
  }
 

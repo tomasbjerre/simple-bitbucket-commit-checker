@@ -23,6 +23,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
  * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
  * If a group matches a commit, it can reject it or just show a message to the comitter.
 * Check only branches matching a regular expression.
+ * You may use variables here to make sure user *admin* can only commit to `dev/admin/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
 * Check that branch name matches specific regexp.
 * Exclude merge commits.
 * Exclude tag commits.
@@ -35,11 +36,12 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Supporting variables to be used in error messages and checks.
  * BITBUCKET_EMAIL, Email of user in Bitbucket.
  * BITBUCKET_NAME Name of user in Bitbucket.
+ * BITBUCKET_USER, User display name of user in Bitbucket.
+ * BITBUCKET_USER_SLUG, User slug (username) of user in Bitbucket.
  * COMMITTER_EMAIL, Email of committer name.
  * COMMITTER_NAME, Name of committer email.
  * AUTHOR_EMAIL, Email of author email.
  * AUTHOR_NAME, Name of author name.
- * BITBUCKET_USER, Username of user in Bitbucket.
 
 The plugin is configured on repository level, where all hooks are configured. If you want to configure it once for all repos, have a look at [Settings Synchronizer for Bitbucket](https://github.com/tomasbjerre/settings-synchronizer-for-bitbucket-plugin).
 

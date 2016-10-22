@@ -9,9 +9,6 @@ import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
 import java.util.logging.Logger;
 
-import se.bjurr.sbcc.data.SbccVerificationResult;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookService;
@@ -25,22 +22,20 @@ import com.atlassian.bitbucket.util.Operation;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.annotations.VisibleForTesting;
 
-public class SbccRepositoryMergeRequestCheck implements MergeRequestCheck {
- private static final String HOOK_SETTINGS_KEY = "se.bjurr.sscc.sscc:pre-receive-repository-hook";
- public static final String PR_REJECT_DEFAULT_MSG = "At least one commit in Pull Request is not ok";
- private static Logger logger = Logger.getLogger(SbccRepositoryMergeRequestCheck.class.getName());
- private final AuthenticationContext bitbucketAuthenticationContext;
- private final ApplicationLinkService applicationLinkService;
- private ChangeSetsService changeSetService;
- private final SbccUserAdminService sbccUserAdminService;
- private ResultsCallable resultsCallback = new ResultsCallable();
- private final RepositoryHookService repositoryHookService;
- private final SecurityService securityService;
+import se.bjurr.sbcc.data.SbccVerificationResult;
+import se.bjurr.sbcc.settings.SbccSettings;
 
- @VisibleForTesting
- public void setResultsCallback(ResultsCallable resultsCallback) {
-  this.resultsCallback = resultsCallback;
- }
+public class SbccRepositoryMergeRequestCheck implements MergeRequestCheck {
+ public static final String PR_REJECT_DEFAULT_MSG = "At least one commit in Pull Request is not ok";
+ private static final String HOOK_SETTINGS_KEY = "se.bjurr.sscc.sscc:pre-receive-repository-hook";
+ private static Logger logger = Logger.getLogger(SbccRepositoryMergeRequestCheck.class.getName());
+ private final ApplicationLinkService applicationLinkService;
+ private final AuthenticationContext bitbucketAuthenticationContext;
+ private ChangeSetsService changeSetService;
+ private final RepositoryHookService repositoryHookService;
+ private ResultsCallable resultsCallback = new ResultsCallable();
+ private final SbccUserAdminService sbccUserAdminService;
+ private final SecurityService securityService;
 
  public SbccRepositoryMergeRequestCheck(ChangeSetsService changeSetService,
    AuthenticationContext bitbucketAuthenticationContext, ApplicationLinkService applicationLinkService,
@@ -63,44 +58,50 @@ public class SbccRepositoryMergeRequestCheck implements MergeRequestCheck {
     logger.fine("No settings found for SBCC");
     return;
    }
-   SbccSettings settings = sscSettings(rawSettings);
-   if (settings.isDryRun() || !settings.shouldCheckPullRequests()
-     || settings.allowServiceUsers() && bitbucketAuthenticationContext.getCurrentUser().getType().equals(SERVICE)) {
-    resultsCallback.report(TRUE, null, null);
+   SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
+   SbccSettings settings = sscSettings(new RenderingSettings(rawSettings, sbccRenderer));
+   if (settings.isDryRun() || !settings.shouldCheckPullRequests() || settings.allowServiceUsers()
+     && this.bitbucketAuthenticationContext.getCurrentUser().getType().equals(SERVICE)) {
+    this.resultsCallback.report(TRUE, null, null);
     return;
    }
    PullRequest pullRequest = mergeRequest.getPullRequest();
-   SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
    RefChangeValidator sbccVerificationResult = new RefChangeValidator(pullRequest.getFromRef().getRepository(),
-     pullRequest.getToRef().getRepository(), settings, changeSetService, bitbucketAuthenticationContext, sbccRenderer,
-     applicationLinkService, sbccUserAdminService);
+     pullRequest.getToRef().getRepository(), settings, this.changeSetService, this.bitbucketAuthenticationContext,
+     sbccRenderer, this.applicationLinkService, this.sbccUserAdminService);
    SbccVerificationResult refChangeVerificationResults = new SbccVerificationResult();
    sbccVerificationResult.validateRefChange(refChangeVerificationResults, pullRequest);
    boolean isAccepted = refChangeVerificationResults.isAccepted();
    if (isAccepted) {
-    resultsCallback.report(isAccepted, null, null);
+    this.resultsCallback.report(isAccepted, null, null);
     return;
    }
    String printOut = new SbccPrinter(settings, sbccRenderer).printVerificationResults(refChangeVerificationResults)
      .replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll(NL, "<br>\n");
    String summary = settings.getShouldCheckPullRequestsMessage().or(PR_REJECT_DEFAULT_MSG);
    mergeRequest.veto(summary, printOut);
-   resultsCallback.report(isAccepted, summary, printOut);
+   this.resultsCallback.report(isAccepted, summary, printOut);
   } catch (Exception e) {
    logger.log(SEVERE, "", e);
   }
  }
 
- private Settings getSettings(final Repository repository, final String settingsKey) throws Exception {
-  return securityService.withPermission(REPO_ADMIN, "Retrieving settings").call(new Operation<Settings, Exception>() {
-   @Override
-   public Settings perform() throws Exception {
-    return repositoryHookService.getSettings(repository, settingsKey);
-   }
-  });
- }
-
  public void setChangesetsService(ChangeSetsService changeSetService) {
   this.changeSetService = changeSetService;
+ }
+
+ @VisibleForTesting
+ public void setResultsCallback(ResultsCallable resultsCallback) {
+  this.resultsCallback = resultsCallback;
+ }
+
+ private Settings getSettings(final Repository repository, final String settingsKey) throws Exception {
+  return this.securityService.withPermission(REPO_ADMIN, "Retrieving settings")
+    .call(new Operation<Settings, Exception>() {
+     @Override
+     public Settings perform() throws Exception {
+      return SbccRepositoryMergeRequestCheck.this.repositoryHookService.getSettings(repository, settingsKey);
+     }
+    });
  }
 }
