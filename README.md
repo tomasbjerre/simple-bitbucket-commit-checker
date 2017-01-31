@@ -14,8 +14,6 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Optionally check author email against regular expression instead of equality to email in Bitbucket. Like:
  * ^${BITBUCKET_USER}@.*
  * ^[^@]*@company.domain$
-* Check that changed content does not match a specific regexp, like unresolved merge.
-* Check size of commits, so that large files don't accidently gets pushed.
 * Check JQL query. Can be used to check that any JIRA is in a specific state. There is an extra variable, ${REGEXP}, available for use in the query.
  * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${BITBUCKET_USER}")
 * Simple configuration of rules that must apply to commit messages. Organized in groups.

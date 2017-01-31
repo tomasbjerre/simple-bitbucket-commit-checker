@@ -202,44 +202,6 @@
     </div>
 
     <div class="fieldGroup">
-        {call aui.form.textField}
-            {param id: 'checkCommitDiffRegexp' /}
-            {param labelContent: 'Check commit diff' /}
-            {param value: $config['checkCommitDiffRegexp'] /}
-            {param descriptionText: 'Reject the commit if its diff matches the regular expression, leave empty to disable check.' /}
-            {param errorTexts: $errors ? $errors['checkCommitDiffRegexp'] : null /}
-        {/call}
-
-        {call aui.form.textareaField}
-            {param id: 'checkCommitDiffRegexpMessage' /}
-            {param labelContent: 'Reject message' /}
-            {param value: $config['checkCommitDiffRegexpMessage'] /}
-            {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if commit diff matches regular expression.' /}
-            {param errorTexts: $errors ? $errors['checkCommitDiffRegexpMessage'] : null /}
-        {/call}
-    </div>
-
-    <div class="fieldGroup">
-        {call aui.form.textField}
-            {param id: 'checkCommitSize' /}
-            {param labelContent: 'Check commit size (kb)' /}
-            {param value: $config['checkCommitSize'] /}
-            {param descriptionText: 'Reject the commit if its size is larger then entered.' /}
-            {param errorTexts: $errors ? $errors['checkCommitSize'] : null /}
-        {/call}
-
-        {call aui.form.textareaField}
-            {param id: 'checkCommitSizeMessage' /}
-            {param labelContent: 'Reject message' /}
-            {param value: $config['checkCommitSizeMessage'] /}
-            {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if commit is to large.' /}
-            {param errorTexts: $errors ? $errors['checkCommitSizeMessage'] : null /}
-        {/call}
-    </div>
-
-    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'Dry run' /}
             {param fields: [[

@@ -15,21 +15,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class JiraClient {
- public int getNumberOfJqlResults(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
-   throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
-  try {
-   String json = invokeJira(applicationLinkService, jqlCheckQuery);
-   JsonObject response = new JsonParser().parse(json).getAsJsonObject();
-   return response.get("issues").getAsJsonArray().size();
-  } catch (Exception e) {
-   return 0;
+  public int getNumberOfJqlResults(
+      ApplicationLinkService applicationLinkService, String jqlCheckQuery)
+      throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
+    try {
+      String json = invokeJira(applicationLinkService, jqlCheckQuery);
+      JsonObject response = new JsonParser().parse(json).getAsJsonObject();
+      return response.get("issues").getAsJsonArray().size();
+    } catch (Exception e) {
+      return 0;
+    }
   }
- }
 
- @VisibleForTesting
- protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
-   throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
-  return applicationLinkService.getPrimaryApplicationLink(JiraApplicationType.class).createAuthenticatedRequestFactory()
-    .createRequest(GET, "/rest/api/2/search?jql=" + encode(jqlCheckQuery, UTF_8.name())).execute();
- }
+  @VisibleForTesting
+  protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
+      throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
+    return applicationLinkService
+        .getPrimaryApplicationLink(JiraApplicationType.class)
+        .createAuthenticatedRequestFactory()
+        .createRequest(GET, "/rest/api/2/search?jql=" + encode(jqlCheckQuery, UTF_8.name()))
+        .execute();
+  }
 }

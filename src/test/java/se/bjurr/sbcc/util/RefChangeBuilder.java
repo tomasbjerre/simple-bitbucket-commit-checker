@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
@@ -59,449 +59,489 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.io.Resources;
 
-import se.bjurr.sbcc.ChangeSetsService;
 import se.bjurr.sbcc.JiraClient;
 import se.bjurr.sbcc.ResultsCallable;
 import se.bjurr.sbcc.SbccPreReceiveRepositoryHook;
 import se.bjurr.sbcc.SbccRepositoryMergeRequestCheck;
 import se.bjurr.sbcc.SbccUserAdminService;
 import se.bjurr.sbcc.SbccUserAdminServiceImpl;
+import se.bjurr.sbcc.commits.ChangeSetsService;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccSettings;
 
 public class RefChangeBuilder {
- public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
- public static final String JIRA_RESPONSE_EMPTY = "jiraResponseEmpty.json";
- public static final String JIRA_RESPONSE_ONE = "jiraResponseOne.json";
- public static final String JIRA_RESPONSE_TWO = "jiraResponseTwo.json";
+  public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
+  public static final String JIRA_RESPONSE_EMPTY = "jiraResponseEmpty.json";
+  public static final String JIRA_RESPONSE_ONE = "jiraResponseOne.json";
+  public static final String JIRA_RESPONSE_TWO = "jiraResponseTwo.json";
 
- public static RefChangeBuilder refChangeBuilder() {
-  try {
-   return new RefChangeBuilder();
-  } catch (Throwable t) {
-   propagate(t);
-   return null;
-  }
- }
-
- private ApplicationLinkService applicationLinkService;
- private final AuthenticationContext bitbucketAuthenticationContext;
- private final ApplicationUser bitbucketUser;
- private final ChangeSetsService changeSetService;
-
- private String fromHash = "e2bc4ed00386fafe00100738f739b9f29c9f4beb";
- private final SbccPreReceiveRepositoryHook hook;
- private final HookResponse hookResponse;
- private final Map<String, String> jiraJsonResponses = newHashMap();
-
- private final SbccRepositoryMergeRequestCheck mergeHook;
- private final List<SbccChangeSet> newChangesets;
- private final OutputStream outputAll = newOutputStream();
- private final PrintWriter printWriterReject = new PrintWriter(this.outputAll);
- private final PrintWriter printWriterStandard = new PrintWriter(this.outputAll);
- private String prMessage;
- private String prSummary;
- private boolean prWasAccepted;
- private RefChange refChange;
- private String refId = "refs/heads/master";
- private final RepositoryHookContext repositoryHookContext;
- private RepositoryHookService repositoryHookService;
- private SbccUserAdminService sbccUserAdminService;
- private SecurityService securityService;
- private final Settings settings;
- private String toHash = "af35d5c1a435d4f323b4e01775fa90a3eae652b3";
- private RefChangeType type = ADD;
- private Boolean wasAccepted = null;
-
- @SuppressWarnings("unchecked")
- private RefChangeBuilder() throws Throwable {
-  setJiraClient(new JiraClient() {
-   @Override
-   protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
-     throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
-    if (RefChangeBuilder.this.jiraJsonResponses.containsKey(jqlCheckQuery)) {
-     return RefChangeBuilder.this.jiraJsonResponses.get(jqlCheckQuery);
+  public static RefChangeBuilder refChangeBuilder() {
+    try {
+      return new RefChangeBuilder();
+    } catch (Throwable t) {
+      propagate(t);
+      return null;
     }
-    throw new RuntimeException("No faked response for: \"" + jqlCheckQuery + "\"");
-   }
-  });
+  }
 
-  this.newChangesets = newArrayList();
-  this.settings = mock(Settings.class);
-  this.repositoryHookContext = mock(RepositoryHookContext.class);
-  when(this.repositoryHookContext.getSettings()).thenReturn(this.settings);
-  this.changeSetService = mock(ChangeSetsService.class);
-  this.bitbucketAuthenticationContext = mock(AuthenticationContext.class);
-  this.sbccUserAdminService = mock(SbccUserAdminServiceImpl.class);
-  this.hook = new SbccPreReceiveRepositoryHook(this.changeSetService, this.bitbucketAuthenticationContext,
-    this.applicationLinkService, this.sbccUserAdminService);
-  this.hook.setHookName("");
-  PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
-  this.repositoryHookService = mock(RepositoryHookService.class);
-  PluginSettings pluginSettings = mock(PluginSettings.class);
-  when(pluginSettingsFactory.createGlobalSettings()).thenReturn(pluginSettings);
-  HashMap<String, Object> map = new HashMap<>();
-  when(pluginSettingsFactory.createGlobalSettings().get(Matchers.anyString())).thenReturn(map);
-  SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
-  when(this.repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
-  when(this.repositoryHookService.createSettingsBuilder().addAll(Matchers.anyMap())).thenReturn(settingsBuilder);
-  when(this.repositoryHookService.createSettingsBuilder().build()).thenReturn(this.settings);
-  this.securityService = mock(SecurityService.class);
-  EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
-  Operation<Object, RuntimeException> operation = Matchers.any(Operation.class);
-  when(escalatedSecurityContext.call(operation)).thenReturn(this.settings);
-  when(this.securityService.withPermission(REPO_ADMIN, "Retrieving settings")).thenReturn(escalatedSecurityContext);
-  this.mergeHook = new SbccRepositoryMergeRequestCheck(this.changeSetService, this.bitbucketAuthenticationContext,
-    this.applicationLinkService, this.sbccUserAdminService, pluginSettingsFactory, this.repositoryHookService,
-    this.securityService);
-  this.hookResponse = mock(HookResponse.class);
-  when(this.hookResponse.out()).thenReturn(this.printWriterStandard);
-  when(this.hookResponse.err()).thenReturn(this.printWriterReject);
-  this.bitbucketUser = mock(ApplicationUser.class);
-  when(this.bitbucketAuthenticationContext.getCurrentUser()).thenReturn(this.bitbucketUser);
- }
+  private ApplicationLinkService applicationLinkService;
+  private final AuthenticationContext bitbucketAuthenticationContext;
+  private final ApplicationUser bitbucketUser;
+  private final ChangeSetsService changeSetService;
 
- public RefChangeBuilder build() throws IOException {
-  this.refChange = newRefChange();
-  when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
-    Matchers.eq(this.refId), Matchers.eq(this.type), Matchers.eq(this.fromHash), Matchers.eq(this.toHash)))
-      .thenReturn(this.newChangesets);
-  when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(PullRequest.class)))
-    .thenReturn(this.newChangesets);
-  return this;
- }
+  private String fromHash = "e2bc4ed00386fafe00100738f739b9f29c9f4beb";
+  private final SbccPreReceiveRepositoryHook hook;
+  private final HookResponse hookResponse;
+  private final Map<String, String> jiraJsonResponses = newHashMap();
 
- public RefChangeBuilder fakeJiraResponse(String jqlQuery, String responseFileName) throws IOException {
-  this.jiraJsonResponses.put(jqlQuery, Resources.toString(getResource(responseFileName), UTF_8));
-  return this;
- }
+  private final SbccRepositoryMergeRequestCheck mergeHook;
+  private final List<SbccChangeSet> newChangesets;
+  private final OutputStream outputAll = newOutputStream();
+  private final PrintWriter printWriterReject = new PrintWriter(this.outputAll);
+  private final PrintWriter printWriterStandard = new PrintWriter(this.outputAll);
+  private String prMessage;
+  private String prSummary;
+  private boolean prWasAccepted;
+  private RefChange refChange;
+  private String refId = "refs/heads/master";
+  private final RepositoryHookContext repositoryHookContext;
+  private RepositoryHookService repositoryHookService;
+  private SbccUserAdminService sbccUserAdminService;
+  private SecurityService securityService;
+  private final Settings settings;
+  private String toHash = "af35d5c1a435d4f323b4e01775fa90a3eae652b3";
+  private RefChangeType type = ADD;
+  private Boolean wasAccepted = null;
 
- public String getOutputAll() {
-  return this.outputAll.toString();
- }
-
- public RefChangeBuilder hasNoOutput() {
-  assertTrue("Expected output to be empty, but was\"" + getOutputAll() + "\"", getOutputAll().isEmpty());
-  return this;
- }
-
- public RefChangeBuilder hasOutput(String output) {
-  checkNotNull(this.wasAccepted, "do 'run' before.");
-  assertEquals(output, getOutputAll());
-  return this;
- }
-
- public RefChangeBuilder hasOutputFrom(String filename) throws IOException {
-  return hasOutput(Resources.toString(getResource(filename), UTF_8));
- }
-
- public RefChangeBuilder hasTrimmedFlatOutput(String output) {
-  checkNotNull(this.wasAccepted, "do 'run' before.");
-  assertEquals(output.trim().replaceAll("\n", " "), getOutputAll().trim().replaceAll("\n", " "));
-  return this;
- }
-
- public RefChangeBuilder hasTrimmedPrPrintOut(String printOut) {
-  assertEquals(printOut.trim().replaceAll("\n", " "), this.prMessage.trim().replaceAll("\n", " "));
-  return this;
- }
-
- public RefChangeBuilder hasTrimmedPrSummary(String summary) {
-  assertEquals(summary.trim().replaceAll("\n", " "), this.prSummary.trim().replaceAll("\n", " "));
-  return this;
- }
-
- public RefChangeBuilder prWasAccepted() {
-  assertTrue("Pull request was not accepted", this.prWasAccepted);
-  return this;
- }
-
- public RefChangeBuilder prWasRejected() {
-  assertFalse("Pull request was not rejected", this.prWasAccepted);
-  return this;
- }
-
- public RefChangeBuilder run() throws IOException {
-  checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
-  this.hook.setChangesetsService(this.changeSetService);
-  this.wasAccepted = this.hook.onReceive(this.repositoryHookContext, newArrayList(this.refChange), this.hookResponse);
-  this.printWriterReject.flush();
-  this.printWriterStandard.flush();
-  return this;
- }
-
- public RefChangeBuilder runPullRequest() throws IOException {
-  checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
-  this.mergeHook.setChangesetsService(this.changeSetService);
-  this.mergeHook.setResultsCallback(new ResultsCallable() {
-   @Override
-   public void report(boolean isAccepted, String summaryParam, String messageParam) {
-    RefChangeBuilder.this.prWasAccepted = isAccepted;
-    RefChangeBuilder.this.prSummary = summaryParam;
-    RefChangeBuilder.this.prMessage = messageParam;
-   }
-  });
-  when(this.repositoryHookService.getSettings(Matchers.any(Repository.class), Matchers.anyString()))
-    .thenReturn(this.settings);
-  Repository repository = mock(Repository.class);
-  MergeRequest mergeRequest = mock(MergeRequest.class);
-  PullRequest pullRequest = mock(PullRequest.class);
-  PullRequestRef fromRef = mock(PullRequestRef.class);
-  PullRequestRef toRef = mock(PullRequestRef.class);
-  when(mergeRequest.getPullRequest()).thenReturn(pullRequest);
-  when(mergeRequest.getPullRequest().getFromRef()).thenReturn(fromRef);
-  when(mergeRequest.getPullRequest().getFromRef().getId()).thenReturn(this.refId);
-  when(mergeRequest.getPullRequest().getFromRef().getLatestCommit()).thenReturn(this.fromHash);
-  when(mergeRequest.getPullRequest().getFromRef().getRepository()).thenReturn(repository);
-  when(mergeRequest.getPullRequest().getToRef()).thenReturn(toRef);
-  when(mergeRequest.getPullRequest().getToRef().getLatestCommit()).thenReturn(this.toHash);
-  this.mergeHook.check(mergeRequest);
-  return this;
- }
-
- public RefChangeBuilder throwing(IOException ioException) throws IOException {
-  this.refChange = newRefChange();
-  when(this.changeSetService.getNewChangeSets(Matchers.any(SbccSettings.class), Matchers.any(Repository.class),
-    Matchers.any(String.class), Matchers.any(RefChangeType.class), Matchers.any(String.class),
-    Matchers.any(String.class))).thenThrow(ioException);
-  return this;
- }
-
- public RefChangeBuilder wasAccepted() {
-  assertEquals("Expected accepted", TRUE, this.wasAccepted);
-  return this;
- }
-
- public RefChangeBuilder wasRejected() {
-  assertEquals("Expected rejection", FALSE, this.wasAccepted);
-  return this;
- }
-
- public RefChangeBuilder withBitbucketDisplayName(String name) {
-  when(this.bitbucketUser.getDisplayName()).thenReturn(name);
-  return this;
- }
-
- public RefChangeBuilder withBitbucketEmail(String email) {
-  when(this.bitbucketUser.getEmailAddress()).thenReturn(email);
-  return this;
- }
-
- public RefChangeBuilder withBitbucketName(String name) {
-  when(this.bitbucketUser.getName()).thenReturn(name);
-  return this;
- }
-
- public RefChangeBuilder withBitbucketUserSlug(String name) {
-  when(this.bitbucketUser.getSlug()).thenReturn(name);
-  return this;
- }
-
- public RefChangeBuilder withBitbucketUserType(UserType type) {
-  when(this.bitbucketUser.getType()).thenReturn(type);
-  return this;
- }
-
- public RefChangeBuilder withChangeSet(SbccChangeSet changeSet) {
-  this.newChangesets.add(changeSet);
-  return this;
- }
-
- public RefChangeBuilder withFromHash(String fromHash) {
-  this.fromHash = fromHash;
-  return this;
- }
-
- public RefChangeBuilder withGroupAcceptingAtLeastOneJira() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity an issue") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
- }
-
- public RefChangeBuilder withGroupAcceptingJirasAndAnotherRejectingInc() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_GROUP_ACCEPT + "[1]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[1]", SbccGroup.Match.NONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[1]", "Dont include INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
- }
-
- public RefChangeBuilder withGroupAcceptingOnlyBothJiraAndIncInEachCommit() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA and INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
- }
-
- public RefChangeBuilder withGroupAcceptingOnlyJiraAndAnotherGroupAcceptingOnlyInc() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_GROUP_ACCEPT + "[1]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[1]", SbccGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[1]", "You need to specity INC") //
-    .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
- }
-
- public RefChangeBuilder withGroupRejectingAnyCommitContainingJiraOrInc() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.NONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Do not specify issues") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
- }
-
- public RefChangeBuilder withGroupShowingMessageForAnyCommitContainingAtLeastOneJira() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
- }
-
- public RefChangeBuilder withGroupShowingMessageToAllCommitsNotContainingJiraOrInc() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.NONE.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
- }
-
- public RefChangeBuilder withGroupShowingMessageToEveryCommitContainingJiraOrInc() {
-  return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
-    .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
-    .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira and INC =)") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
-    .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
-    .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
- }
-
- public RefChangeBuilder withHookNameVersion(String hookNameVersion) {
-  this.hook.setHookName(hookNameVersion);
-  return this;
- }
-
- public RefChangeBuilder withRefChange(RefChange refChange) {
-  this.refChange = refChange;
-  return this;
- }
-
- public RefChangeBuilder withRefId(String refId) {
-  this.refId = refId;
-  return this;
- }
-
- public RefChangeBuilder withSetting(String field, Boolean value) {
-  when(this.settings.getBoolean(field)).thenReturn(value);
-  return this;
- }
-
- public RefChangeBuilder withSetting(String field, String value) {
-  when(this.settings.getString(field)).thenReturn(value);
-  return this;
- }
-
- public RefChangeBuilder withToHash(String toHash) {
-  this.toHash = toHash;
-  return this;
- }
-
- public RefChangeBuilder withType(RefChangeType type) {
-  this.type = type;
-  return this;
- }
-
- public RefChangeBuilder withUserInBitbucket(final String displayName, final String email, final String name) {
   @SuppressWarnings("unchecked")
-  Page<ApplicationUser> page = mock(Page.class);
-  when(page.getSize())//
-    .thenReturn(1);
-  when(this.sbccUserAdminService.emailExists(email))//
-    .thenReturn(true);
-  when(this.sbccUserAdminService.displayNameExists(displayName))//
-    .thenReturn(true);
-  return this;
- }
+  private RefChangeBuilder() throws Throwable {
+    setJiraClient(
+        new JiraClient() {
+          @Override
+          protected String invokeJira(
+              ApplicationLinkService applicationLinkService, String jqlCheckQuery)
+              throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
+            if (RefChangeBuilder.this.jiraJsonResponses.containsKey(jqlCheckQuery)) {
+              return RefChangeBuilder.this.jiraJsonResponses.get(jqlCheckQuery);
+            }
+            throw new RuntimeException("No faked response for: \"" + jqlCheckQuery + "\"");
+          }
+        });
 
- private OutputStream newOutputStream() {
-  return new OutputStream() {
-   private final StringBuilder string = new StringBuilder();
+    this.newChangesets = newArrayList();
+    this.settings = mock(Settings.class);
+    this.repositoryHookContext = mock(RepositoryHookContext.class);
+    when(this.repositoryHookContext.getSettings()).thenReturn(this.settings);
+    Repository repository = mock(Repository.class);
+    when(this.repositoryHookContext.getRepository()).thenReturn(repository);
+    this.changeSetService = mock(ChangeSetsService.class);
+    this.bitbucketAuthenticationContext = mock(AuthenticationContext.class);
+    this.sbccUserAdminService = mock(SbccUserAdminServiceImpl.class);
+    this.hook =
+        new SbccPreReceiveRepositoryHook(
+            this.changeSetService,
+            this.bitbucketAuthenticationContext,
+            this.applicationLinkService,
+            this.sbccUserAdminService);
+    this.hook.setHookName("");
+    PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
+    this.repositoryHookService = mock(RepositoryHookService.class);
+    PluginSettings pluginSettings = mock(PluginSettings.class);
+    when(pluginSettingsFactory.createGlobalSettings()).thenReturn(pluginSettings);
+    HashMap<String, Object> map = new HashMap<>();
+    when(pluginSettingsFactory.createGlobalSettings().get(ArgumentMatchers.anyString()))
+        .thenReturn(map);
+    SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
+    when(this.repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
+    when(this.repositoryHookService.createSettingsBuilder().addAll(ArgumentMatchers.anyMap()))
+        .thenReturn(settingsBuilder);
+    when(this.repositoryHookService.createSettingsBuilder().build()).thenReturn(this.settings);
+    this.securityService = mock(SecurityService.class);
+    EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
+    Operation<Object, RuntimeException> operation = ArgumentMatchers.any(Operation.class);
+    when(escalatedSecurityContext.call(operation)).thenReturn(this.settings);
+    when(this.securityService.withPermission(REPO_ADMIN, "Retrieving settings"))
+        .thenReturn(escalatedSecurityContext);
+    this.mergeHook =
+        new SbccRepositoryMergeRequestCheck(
+            this.changeSetService,
+            this.bitbucketAuthenticationContext,
+            this.applicationLinkService,
+            this.sbccUserAdminService,
+            pluginSettingsFactory,
+            this.repositoryHookService,
+            this.securityService);
+    this.hookResponse = mock(HookResponse.class);
+    when(this.hookResponse.out()).thenReturn(this.printWriterStandard);
+    when(this.hookResponse.err()).thenReturn(this.printWriterReject);
+    this.bitbucketUser = mock(ApplicationUser.class);
+    when(this.bitbucketAuthenticationContext.getCurrentUser()).thenReturn(this.bitbucketUser);
+  }
 
-   @Override
-   public String toString() {
-    return this.string.toString();
-   }
+  public RefChangeBuilder build() throws IOException {
+    this.refChange = newRefChange();
+    when(this.changeSetService.getNewChangeSets(
+            ArgumentMatchers.any(SbccSettings.class),
+            ArgumentMatchers.any(Repository.class),
+            ArgumentMatchers.eq(this.refId),
+            ArgumentMatchers.eq(this.type),
+            ArgumentMatchers.eq(this.fromHash),
+            ArgumentMatchers.eq(this.toHash)))
+        .thenReturn(this.newChangesets);
+    when(this.changeSetService.getNewChangeSets(
+            ArgumentMatchers.any(SbccSettings.class), ArgumentMatchers.any(PullRequest.class)))
+        .thenReturn(this.newChangesets);
+    return this;
+  }
 
-   @Override
-   public void write(int b) throws IOException {
-    this.string.append((char) b);
-   }
-  };
- }
+  public RefChangeBuilder fakeJiraResponse(String jqlQuery, String responseFileName)
+      throws IOException {
+    this.jiraJsonResponses.put(jqlQuery, Resources.toString(getResource(responseFileName), UTF_8));
+    return this;
+  }
 
- private RefChange newRefChange() {
-  final RefChange refChange = new RefChange() {
+  public String getOutputAll() {
+    return this.outputAll.toString();
+  }
 
-   @Override
-   public String getFromHash() {
-    return RefChangeBuilder.this.fromHash;
-   }
+  public RefChangeBuilder hasNoOutput() {
+    assertTrue(
+        "Expected output to be empty, but was\"" + getOutputAll() + "\"", getOutputAll().isEmpty());
+    return this;
+  }
 
-   @Override
-   public MinimalRef getRef() {
-    return new MinimalRef() {
+  public RefChangeBuilder hasOutput(String output) {
+    checkNotNull(this.wasAccepted, "do 'run' before.");
+    assertEquals(output, getOutputAll());
+    return this;
+  }
 
-     @Override
-     public String getDisplayId() {
-      return null;
-     }
+  public RefChangeBuilder hasOutputFrom(String filename) throws IOException {
+    return hasOutput(Resources.toString(getResource(filename), UTF_8));
+  }
 
-     @Override
-     public String getId() {
-      return RefChangeBuilder.this.refId;
-     }
+  public RefChangeBuilder hasTrimmedFlatOutput(String output) {
+    checkNotNull(this.wasAccepted, "do 'run' before.");
+    assertEquals(output.trim().replaceAll("\n", " "), getOutputAll().trim().replaceAll("\n", " "));
+    return this;
+  }
 
-     @Override
-     public RefType getType() {
-      return null;
-     }
+  public RefChangeBuilder hasTrimmedPrPrintOut(String printOut) {
+    assertEquals(
+        printOut.trim().replaceAll("\n", " "), this.prMessage.trim().replaceAll("\n", " "));
+    return this;
+  }
+
+  public RefChangeBuilder hasTrimmedPrSummary(String summary) {
+    assertEquals(summary.trim().replaceAll("\n", " "), this.prSummary.trim().replaceAll("\n", " "));
+    return this;
+  }
+
+  public RefChangeBuilder prWasAccepted() {
+    assertTrue("Pull request was not accepted", this.prWasAccepted);
+    return this;
+  }
+
+  public RefChangeBuilder prWasRejected() {
+    assertFalse("Pull request was not rejected", this.prWasAccepted);
+    return this;
+  }
+
+  public RefChangeBuilder run() throws IOException {
+    checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
+    this.hook.setChangesetsService(this.changeSetService);
+    this.wasAccepted =
+        this.hook.onReceive(
+            this.repositoryHookContext, newArrayList(this.refChange), this.hookResponse);
+    this.printWriterReject.flush();
+    this.printWriterStandard.flush();
+    return this;
+  }
+
+  public RefChangeBuilder runPullRequest() throws IOException {
+    checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
+    this.mergeHook.setChangesetsService(this.changeSetService);
+    this.mergeHook.setResultsCallback(
+        new ResultsCallable() {
+          @Override
+          public void report(boolean isAccepted, String summaryParam, String messageParam) {
+            RefChangeBuilder.this.prWasAccepted = isAccepted;
+            RefChangeBuilder.this.prSummary = summaryParam;
+            RefChangeBuilder.this.prMessage = messageParam;
+          }
+        });
+    when(this.repositoryHookService.getSettings(
+            ArgumentMatchers.any(Repository.class), ArgumentMatchers.anyString()))
+        .thenReturn(this.settings);
+    Repository repository = mock(Repository.class);
+    MergeRequest mergeRequest = mock(MergeRequest.class);
+    PullRequest pullRequest = mock(PullRequest.class);
+    PullRequestRef fromRef = mock(PullRequestRef.class);
+    PullRequestRef toRef = mock(PullRequestRef.class);
+    when(mergeRequest.getPullRequest()).thenReturn(pullRequest);
+    when(mergeRequest.getPullRequest().getFromRef()).thenReturn(fromRef);
+    when(mergeRequest.getPullRequest().getFromRef().getId()).thenReturn(this.refId);
+    when(mergeRequest.getPullRequest().getFromRef().getLatestCommit()).thenReturn(this.fromHash);
+    when(mergeRequest.getPullRequest().getFromRef().getRepository()).thenReturn(repository);
+    when(mergeRequest.getPullRequest().getToRef()).thenReturn(toRef);
+    when(mergeRequest.getPullRequest().getToRef().getLatestCommit()).thenReturn(this.toHash);
+    this.mergeHook.check(mergeRequest);
+    return this;
+  }
+
+  public RefChangeBuilder throwing(IOException ioException) throws IOException {
+    this.refChange = newRefChange();
+    when(this.changeSetService.getNewChangeSets(
+            ArgumentMatchers.any(SbccSettings.class),
+            ArgumentMatchers.any(Repository.class),
+            ArgumentMatchers.any(String.class),
+            ArgumentMatchers.any(RefChangeType.class),
+            ArgumentMatchers.any(String.class),
+            ArgumentMatchers.any(String.class)))
+        .thenThrow(ioException);
+    return this;
+  }
+
+  public RefChangeBuilder wasAccepted() {
+    assertEquals("Expected accepted", TRUE, this.wasAccepted);
+    return this;
+  }
+
+  public RefChangeBuilder wasRejected() {
+    assertEquals("Expected rejection", FALSE, this.wasAccepted);
+    return this;
+  }
+
+  public RefChangeBuilder withBitbucketDisplayName(String name) {
+    when(this.bitbucketUser.getDisplayName()).thenReturn(name);
+    return this;
+  }
+
+  public RefChangeBuilder withBitbucketEmail(String email) {
+    when(this.bitbucketUser.getEmailAddress()).thenReturn(email);
+    return this;
+  }
+
+  public RefChangeBuilder withBitbucketName(String name) {
+    when(this.bitbucketUser.getName()).thenReturn(name);
+    return this;
+  }
+
+  public RefChangeBuilder withBitbucketUserSlug(String name) {
+    when(this.bitbucketUser.getSlug()).thenReturn(name);
+    return this;
+  }
+
+  public RefChangeBuilder withBitbucketUserType(UserType type) {
+    when(this.bitbucketUser.getType()).thenReturn(type);
+    return this;
+  }
+
+  public RefChangeBuilder withChangeSet(SbccChangeSet changeSet) {
+    this.newChangesets.add(changeSet);
+    return this;
+  }
+
+  public RefChangeBuilder withFromHash(String fromHash) {
+    this.fromHash = fromHash;
+    return this;
+  }
+
+  public RefChangeBuilder withGroupAcceptingAtLeastOneJira() {
+    return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity an issue") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
+  }
+
+  public RefChangeBuilder withGroupAcceptingJirasAndAnotherRejectingInc() {
+    return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_GROUP_ACCEPT + "[1]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[1]", SbccGroup.Match.NONE.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[1]", "Dont include INC") //
+        .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
+        .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withGroupAcceptingOnlyBothJiraAndIncInEachCommit() {
+    return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA and INC") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withGroupAcceptingOnlyJiraAndAnotherGroupAcceptingOnlyInc() {
+    return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "You need to specity JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_GROUP_ACCEPT + "[1]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[1]", SbccGroup.Match.ALL.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[1]", "You need to specity INC") //
+        .withSetting(SETTING_RULE_REGEXP + "[1][0]", "INC") //
+        .withSetting(SETTING_RULE_MESSAGE + "[1][0]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withGroupRejectingAnyCommitContainingJiraOrInc() {
+    return this.withSetting(SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.ACCEPT.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.NONE.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Do not specify issues") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withGroupShowingMessageForAnyCommitContainingAtLeastOneJira() {
+    return this.withSetting(
+            SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ONE.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira =)") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA");
+  }
+
+  public RefChangeBuilder withGroupShowingMessageToAllCommitsNotContainingJiraOrInc() {
+    return this.withSetting(
+            SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.NONE.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withGroupShowingMessageToEveryCommitContainingJiraOrInc() {
+    return this.withSetting(
+            SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
+        .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.ALL.toString()) //
+        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for specifying a Jira and INC =)") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
+        .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC[0-9]*") //
+        .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
+  }
+
+  public RefChangeBuilder withHookNameVersion(String hookNameVersion) {
+    this.hook.setHookName(hookNameVersion);
+    return this;
+  }
+
+  public RefChangeBuilder withRefChange(RefChange refChange) {
+    this.refChange = refChange;
+    return this;
+  }
+
+  public RefChangeBuilder withRefId(String refId) {
+    this.refId = refId;
+    return this;
+  }
+
+  public RefChangeBuilder withSetting(String field, Boolean value) {
+    when(this.settings.getBoolean(field)).thenReturn(value);
+    return this;
+  }
+
+  public RefChangeBuilder withSetting(String field, String value) {
+    when(this.settings.getString(field)).thenReturn(value);
+    return this;
+  }
+
+  public RefChangeBuilder withToHash(String toHash) {
+    this.toHash = toHash;
+    return this;
+  }
+
+  public RefChangeBuilder withType(RefChangeType type) {
+    this.type = type;
+    return this;
+  }
+
+  public RefChangeBuilder withUserInBitbucket(
+      final String displayName, final String email, final String name) {
+    @SuppressWarnings("unchecked")
+    Page<ApplicationUser> page = mock(Page.class);
+    when(page.getSize()) //
+        .thenReturn(1);
+    when(this.sbccUserAdminService.emailExists(email)) //
+        .thenReturn(true);
+    when(this.sbccUserAdminService.displayNameExists(displayName)) //
+        .thenReturn(true);
+    return this;
+  }
+
+  private OutputStream newOutputStream() {
+    return new OutputStream() {
+      private final StringBuilder string = new StringBuilder();
+
+      @Override
+      public String toString() {
+        return this.string.toString();
+      }
+
+      @Override
+      public void write(int b) throws IOException {
+        this.string.append((char) b);
+      }
     };
-   }
+  }
 
-   @Override
-   public String getRefId() {
-    return RefChangeBuilder.this.refId;
-   }
+  private RefChange newRefChange() {
+    final RefChange refChange =
+        new RefChange() {
 
-   @Override
-   public String getToHash() {
-    return RefChangeBuilder.this.toHash;
-   }
+          @Override
+          public String getFromHash() {
+            return RefChangeBuilder.this.fromHash;
+          }
 
-   @Override
-   public RefChangeType getType() {
-    return RefChangeBuilder.this.type;
-   }
-  };
-  return refChange;
- }
+          @Override
+          public MinimalRef getRef() {
+            return new MinimalRef() {
+
+              @Override
+              public String getDisplayId() {
+                return null;
+              }
+
+              @Override
+              public String getId() {
+                return RefChangeBuilder.this.refId;
+              }
+
+              @Override
+              public RefType getType() {
+                return null;
+              }
+            };
+          }
+
+          @Override
+          public String getRefId() {
+            return RefChangeBuilder.this.refId;
+          }
+
+          @Override
+          public String getToHash() {
+            return RefChangeBuilder.this.toHash;
+          }
+
+          @Override
+          public RefChangeType getType() {
+            return RefChangeBuilder.this.type;
+          }
+        };
+    return refChange;
+  }
 }

@@ -24,8 +24,10 @@
 
   <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
 
-  <component key="changeSetsService" class="se.bjurr.sbcc.ChangeSetsServiceImpl" public="true">
-    <interface>se.bjurr.sbcc.ChangeSetsService</interface>
+  <component-import key="scmService" interface="com.atlassian.bitbucket.scm.ScmService"/>
+
+  <component key="changeSetsService" class="se.bjurr.sbcc.commits.ChangeSetsServiceImpl" public="true">
+    <interface>se.bjurr.sbcc.commits.ChangeSetsService</interface>
   </component>
 
   <component key="sbccUserAdminService" class="se.bjurr.sbcc.SbccUserAdminServiceImpl" public="true">

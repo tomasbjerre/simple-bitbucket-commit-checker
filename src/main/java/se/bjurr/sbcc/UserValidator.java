@@ -8,24 +8,24 @@ import com.atlassian.bitbucket.user.ApplicationUser;
 
 public class UserValidator {
 
- private final ApplicationUser currentUser;
- private final SbccSettings settings;
+  private final ApplicationUser currentUser;
+  private final SbccSettings settings;
 
- public UserValidator(SbccSettings settings, ApplicationUser currentUser) {
-  this.currentUser = currentUser;
-  this.settings = settings;
- }
+  public UserValidator(SbccSettings settings, ApplicationUser currentUser) {
+    this.currentUser = currentUser;
+    this.settings = settings;
+  }
 
- public boolean shouldIgnoreChecksForUser() {
-  return shouldIgnoreServiceUser() || shouldIgnoreByUserNamePattern();
- }
+  public boolean shouldIgnoreChecksForUser() {
+    return shouldIgnoreServiceUser() || shouldIgnoreByUserNamePattern();
+  }
 
- private boolean shouldIgnoreByUserNamePattern() {
-  return settings.getIgnoreUsersPattern().isPresent()
-    && matches(settings.getIgnoreUsersPattern().get(), currentUser.getName());
- }
+  private boolean shouldIgnoreByUserNamePattern() {
+    return settings.getIgnoreUsersPattern().isPresent()
+        && matches(settings.getIgnoreUsersPattern().get(), currentUser.getName());
+  }
 
- private boolean shouldIgnoreServiceUser() {
-  return settings.allowServiceUsers() && currentUser.getType().equals(SERVICE);
- }
+  private boolean shouldIgnoreServiceUser() {
+    return settings.allowServiceUsers() && currentUser.getType().equals(SERVICE);
+  }
 }

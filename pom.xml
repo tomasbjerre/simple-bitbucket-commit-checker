@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.bjurr.sbcc</groupId>
 	<artifactId>sbcc</artifactId>
@@ -79,7 +80,6 @@
 		<dependency>
 			<groupId>com.atlassian.bitbucket.server</groupId>
 			<artifactId>bitbucket-scm-common</artifactId>
-			<version>${bitbucket.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -98,11 +98,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jgit</groupId>
-			<artifactId>org.eclipse.jgit</artifactId>
-			<version>3.0.0.201306101825-r</version>
-		</dependency>
-		<dependency>
 			<groupId>com.atlassian.applinks</groupId>
 			<artifactId>applinks-api</artifactId>
 			<scope>provided</scope>
@@ -111,13 +106,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.8.5</version>
+			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -171,7 +164,7 @@ Changelog of Simple Bitbucket Commit Checker.
 					</execution>
 				</executions>
 			</plugin>
-				<plugin>
+			<plugin>
 				<groupId>com.atlassian.maven.plugins</groupId>
 				<artifactId>bitbucket-maven-plugin</artifactId>
 				<version>${amps.version}</version>
@@ -204,6 +197,18 @@ Changelog of Simple Bitbucket Commit Checker.
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.17</version>
 			</plugin>
+			<plugin>
+				<groupId>com.coveo</groupId>
+				<artifactId>fmt-maven-plugin</artifactId>
+				<version>1.3.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>
@@ -213,8 +218,10 @@ Changelog of Simple Bitbucket Commit Checker.
 		</resources>
 	</build>
 	<properties>
-		<bitbucket.version>4.8.1</bitbucket.version>
+		<bitbucket.version>4.13.0</bitbucket.version>
 		<bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
-		<amps.version>6.1.0</amps.version>
+		<amps.version>6.2.11</amps.version>
+		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+		<atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
 	</properties>
 </project>

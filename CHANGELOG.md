@@ -3,6 +3,24 @@
 Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
+### GitHub [#66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/66) Support Git 2.11 or higher
+  Support Git 2.11 or higher 
+
+ * Removing support for file size and commit diff checks. Cannot easily implement it after Atlassian platform changes.
+ * Formatting code to Google Java Format.
+  
+  [9b2c78b542452af](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/9b2c78b542452af) Tomas Bjerre *2017-01-31 21:08:49*
+
+### No issue
+  Set theme jekyll-theme-slate
+  
+  [25484a2e739ce89](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/25484a2e739ce89) Tomas Bjerre *2017-01-12 03:05:06*
+
+  doc
+  
+  [6f42f9b9f54f7f7](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/6f42f9b9f54f7f7) Tomas Bjerre *2016-11-11 06:46:30*
+
+## 2.9
 ### GitHub [#61](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/61) Using message variables in Regex
   Variables in all string configurations 
 

@@ -37,21 +37,6 @@ Simple Bitbucket Commit Checker
 - Bitbucket: 'email@bitbucket.example' != Commit: 'my@email.com'
   Please set correct author and comitter email in your commits. git config --global user.email 'email@bitbucket.example'
 
-- /repo/binaryfile.zip 501kb > 500kb
-  Commits with files larger then 500kb not allowed!
-
-- /repo/other/binary2.zip 677kb > 500kb
-  Commits with files larger then 500kb not allowed!
-
-- <<<<<<<.*?=======.*?>>>>>>>:
-<<<<<<<  HEAD
-+my cool stuff
-+=======
-+master stuff
-+>>>>>>>
-  
-  Looks like there is an unresolved merge.
-
 - Dont mention review
   Dont mention that you are fixing a review, say what you are changing and why it needs to be changed!: .*review.*
 

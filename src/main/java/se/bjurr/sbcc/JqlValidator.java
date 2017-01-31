@@ -16,49 +16,54 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.annotations.VisibleForTesting;
 
 public class JqlValidator {
- private final SbccSettings settings;
- private final SbccRenderer renderer;
- private final ApplicationLinkService applicationLinkService;
- private static JiraClient jiraClient = new JiraClient();
+  private final SbccSettings settings;
+  private final SbccRenderer renderer;
+  private final ApplicationLinkService applicationLinkService;
+  private static JiraClient jiraClient = new JiraClient();
 
- public JqlValidator(ApplicationLinkService applicationLinkService, SbccSettings settings, SbccRenderer renderer) {
-  this.settings = settings;
-  this.renderer = renderer;
-  this.applicationLinkService = applicationLinkService;
- }
-
- public List<String> validateJql(SbccChangeSet sbccChangeSet)
-   throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
-  List<String> failingJqls = newArrayList();
-  if (!settings.shouldCheckJql()) {
-   return failingJqls;
+  public JqlValidator(
+      ApplicationLinkService applicationLinkService, SbccSettings settings, SbccRenderer renderer) {
+    this.settings = settings;
+    this.renderer = renderer;
+    this.applicationLinkService = applicationLinkService;
   }
-  if (settings.getCommitRegexp().isPresent()) {
-   for (String renderedJqlQUery : renderer.renderAll(SbccRenderer.SBCCVariable.REGEXP, settings.getCommitRegexp().get(),
-     sbccChangeSet, settings.getJqlCheckQuery())) {
-    if (addJqlQuery(failingJqls, renderedJqlQUery)) {
-     return newArrayList();
+
+  public List<String> validateJql(SbccChangeSet sbccChangeSet)
+      throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
+    List<String> failingJqls = newArrayList();
+    if (!settings.shouldCheckJql()) {
+      return failingJqls;
     }
-   }
-  } else {
-   if (addJqlQuery(failingJqls, renderer.render(settings.getJqlCheckQuery()))) {
-    return newArrayList();
-   }
+    if (settings.getCommitRegexp().isPresent()) {
+      for (String renderedJqlQUery :
+          renderer.renderAll(
+              SbccRenderer.SBCCVariable.REGEXP,
+              settings.getCommitRegexp().get(),
+              sbccChangeSet,
+              settings.getJqlCheckQuery())) {
+        if (addJqlQuery(failingJqls, renderedJqlQUery)) {
+          return newArrayList();
+        }
+      }
+    } else {
+      if (addJqlQuery(failingJqls, renderer.render(settings.getJqlCheckQuery()))) {
+        return newArrayList();
+      }
+    }
+    return failingJqls;
   }
-  return failingJqls;
- }
 
- private Boolean addJqlQuery(List<String> failingJqls, String renderedJqlQUery)
-   throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
-  if (jiraClient.getNumberOfJqlResults(applicationLinkService, renderedJqlQUery) > 0) {
-   return TRUE;
+  private Boolean addJqlQuery(List<String> failingJqls, String renderedJqlQUery)
+      throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
+    if (jiraClient.getNumberOfJqlResults(applicationLinkService, renderedJqlQUery) > 0) {
+      return TRUE;
+    }
+    failingJqls.add(renderedJqlQUery);
+    return FALSE;
   }
-  failingJqls.add(renderedJqlQUery);
-  return FALSE;
- }
 
- @VisibleForTesting
- public static void setJiraClient(JiraClient jiraClient) {
-  JqlValidator.jiraClient = jiraClient;
- }
+  @VisibleForTesting
+  public static void setJiraClient(JiraClient jiraClient) {
+    JqlValidator.jiraClient = jiraClient;
+  }
 }

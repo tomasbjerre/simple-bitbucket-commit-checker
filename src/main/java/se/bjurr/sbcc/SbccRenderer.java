@@ -20,128 +20,161 @@ import se.bjurr.sbcc.data.SbccChangeSet;
 
 public class SbccRenderer {
 
- public enum SBCCVariable {
-  AUTHOR_EMAIL(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    if (sbccChangeSet.isPresent()) {
-     return sbccChangeSet.get().getAuthor().getEmailAddress();
+  public enum SBCCVariable {
+    AUTHOR_EMAIL(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            if (sbccChangeSet.isPresent()) {
+              return sbccChangeSet.get().getAuthor().getEmailAddress();
+            }
+            return "";
+          }
+        }),
+    AUTHOR_NAME(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            if (sbccChangeSet.isPresent()) {
+              return sbccChangeSet.get().getAuthor().getName();
+            }
+            return "";
+          }
+        }),
+    BITBUCKET_EMAIL(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            return getBitbucketEmail(authenticationContext);
+          }
+        }),
+    BITBUCKET_NAME(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            return getBitbucketName(authenticationContext);
+          }
+        }),
+    BITBUCKET_USER(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            return getBitbucketUser(authenticationContext);
+          }
+        }),
+    BITBUCKET_USER_SLUG(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            return getBitbucketUserSlug(authenticationContext);
+          }
+        }),
+    COMMITTER_EMAIL(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            if (sbccChangeSet.isPresent()) {
+              return sbccChangeSet.get().getCommitter().getEmailAddress();
+            }
+            return "";
+          }
+        }),
+    COMMITTER_NAME(
+        new Resolver() {
+          @Override
+          public String resolve(
+              AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+            if (sbccChangeSet.isPresent()) {
+              return sbccChangeSet.get().getCommitter().getName();
+            }
+            return "";
+          }
+        }),
+    REGEXP(
+        new Resolver() {
+          @Override
+          public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
+            List<String> allMatches = newArrayList();
+            Matcher matcher = compile(regexp).matcher(changeSet.getMessage());
+            while (matcher.find()) {
+              allMatches.add(matcher.group());
+            }
+            return allMatches;
+          }
+        });
+
+    private Resolver resolver;
+
+    private SBCCVariable(Resolver resolver) {
+      this.resolver = resolver;
     }
-    return "";
-   }
-  }), AUTHOR_NAME(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    if (sbccChangeSet.isPresent()) {
-     return sbccChangeSet.get().getAuthor().getName();
+
+    public String resolve(
+        AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+      return this.resolver.resolve(authenticationContext, sbccChangeSet);
     }
-    return "";
-   }
-  }), BITBUCKET_EMAIL(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    return getBitbucketEmail(authenticationContext);
-   }
-  }), BITBUCKET_NAME(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    return getBitbucketName(authenticationContext);
-   }
-  }), BITBUCKET_USER(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    return getBitbucketUser(authenticationContext);
-   }
-  }), BITBUCKET_USER_SLUG(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    return getBitbucketUserSlug(authenticationContext);
-   }
-  }), COMMITTER_EMAIL(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    if (sbccChangeSet.isPresent()) {
-     return sbccChangeSet.get().getCommitter().getEmailAddress();
+
+    public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
+      return this.resolver.resolveAll(regexp, changeSet);
     }
-    return "";
-   }
-  }), COMMITTER_NAME(new Resolver() {
-   @Override
-   public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-    if (sbccChangeSet.isPresent()) {
-     return sbccChangeSet.get().getCommitter().getName();
+  }
+
+  private static class Resolver {
+    public String resolve(
+        AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
+      return "";
     }
-    return "";
-   }
-  }), REGEXP(new Resolver() {
-   @Override
-   public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
-    List<String> allMatches = newArrayList();
-    Matcher matcher = compile(regexp).matcher(changeSet.getMessage());
-    while (matcher.find()) {
-     allMatches.add(matcher.group());
+
+    public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
+      return newArrayList();
+    };
+  }
+
+  private final AuthenticationContext authenticationContext;
+  private Optional<SbccChangeSet> sbccChangeSet = absent();
+
+  public SbccRenderer(AuthenticationContext authenticationContext) {
+    this.authenticationContext = authenticationContext;
+  }
+
+  public void append(StringBuilder sb, String renderAndAppend) {
+    sb.append(render(renderAndAppend));
+  }
+
+  public String render(String string) {
+    for (SBCCVariable variable : SBCCVariable.values()) {
+      String resolved = variable.resolve(this.authenticationContext, this.sbccChangeSet);
+      if (isNullOrEmpty(resolved)) {
+        continue;
+      }
+      string = string.replaceAll("\\$\\{" + variable.name() + "\\}", resolved);
     }
-    return allMatches;
-   }
-  });
-
-  private Resolver resolver;
-
-  private SBCCVariable(Resolver resolver) {
-   this.resolver = resolver;
+    return string;
   }
 
-  public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-   return this.resolver.resolve(authenticationContext, sbccChangeSet);
+  public List<String> renderAll(
+      SbccRenderer.SBCCVariable variable,
+      String regexp,
+      SbccChangeSet sbccChangeSet,
+      String toRender) {
+    List<String> renderedList = newArrayList();
+    for (String resolved : variable.resolveAll(regexp, sbccChangeSet)) {
+      renderedList.add(
+          render(
+              toRender.replaceAll(
+                  "\\$\\{" + SbccRenderer.SBCCVariable.REGEXP.name() + "\\}", resolved)));
+    }
+    return renderedList;
   }
 
-  public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
-   return this.resolver.resolveAll(regexp, changeSet);
+  public void setSbccChangeSet(SbccChangeSet sbccChangeSet) {
+    this.sbccChangeSet = fromNullable(sbccChangeSet);
   }
- }
-
- private static class Resolver {
-  public String resolve(AuthenticationContext authenticationContext, Optional<SbccChangeSet> sbccChangeSet) {
-   return "";
-  }
-
-  public List<String> resolveAll(String regexp, SbccChangeSet changeSet) {
-   return newArrayList();
-  };
- }
-
- private final AuthenticationContext authenticationContext;
- private Optional<SbccChangeSet> sbccChangeSet = absent();
-
- public SbccRenderer(AuthenticationContext authenticationContext) {
-  this.authenticationContext = authenticationContext;
- }
-
- public void append(StringBuilder sb, String renderAndAppend) {
-  sb.append(render(renderAndAppend));
- }
-
- public String render(String string) {
-  for (SBCCVariable variable : SBCCVariable.values()) {
-   String resolved = variable.resolve(this.authenticationContext, this.sbccChangeSet);
-   if (isNullOrEmpty(resolved)) {
-    continue;
-   }
-   string = string.replaceAll("\\$\\{" + variable.name() + "\\}", resolved);
-  }
-  return string;
- }
-
- public List<String> renderAll(SbccRenderer.SBCCVariable variable, String regexp, SbccChangeSet sbccChangeSet,
-   String toRender) {
-  List<String> renderedList = newArrayList();
-  for (String resolved : variable.resolveAll(regexp, sbccChangeSet)) {
-   renderedList.add(render(toRender.replaceAll("\\$\\{" + SbccRenderer.SBCCVariable.REGEXP.name() + "\\}", resolved)));
-  }
-  return renderedList;
- }
-
- public void setSbccChangeSet(SbccChangeSet sbccChangeSet) {
-  this.sbccChangeSet = fromNullable(sbccChangeSet);
- }
 }

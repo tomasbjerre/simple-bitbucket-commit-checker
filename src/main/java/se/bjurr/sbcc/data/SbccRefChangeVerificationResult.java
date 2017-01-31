@@ -13,115 +13,120 @@ import se.bjurr.sbcc.settings.SbccMatch;
 import com.google.common.base.Optional;
 
 public class SbccRefChangeVerificationResult {
- private final Map<SbccChangeSet, SbccChangeSetVerificationResult> sbccChangeSets = newTreeMap();
- private boolean branchNameValid = TRUE;
- private final String refId;
- private final String toHash;
- private final String fromHash;
+  private final Map<SbccChangeSet, SbccChangeSetVerificationResult> sbccChangeSets = newTreeMap();
+  private boolean branchNameValid = TRUE;
+  private final String refId;
+  private final String toHash;
+  private final String fromHash;
 
- public SbccRefChangeVerificationResult(String refId, String fromHash, String toHash) {
-  this.refId = refId;
-  this.fromHash = fromHash;
-  this.toHash = toHash;
- }
-
- public void addAuthorEmailValidationResult(SbccChangeSet sbccChangeSet, boolean validateChangeSetForAuthorEmail) {
-  getOrAdd(sbccChangeSet).setEmailAuthorResult(validateChangeSetForAuthorEmail);
- }
-
- public void addCommitterEmailValidationResult(SbccChangeSet sbccChangeSet,
-   boolean validateChangeSetForCommitterEmail) {
-  getOrAdd(sbccChangeSet).setEmailCommitterResult(validateChangeSetForCommitterEmail);
- }
-
- public void addAuthorNameValidationResult(SbccChangeSet sbccChangeSet, boolean validateChangeSetForName) {
-  getOrAdd(sbccChangeSet).setNameAuthorResult(validateChangeSetForName);
- }
-
- public void addCommitterNameValidationResult(SbccChangeSet sbccChangeSet, boolean validateChangeSetForName) {
-  getOrAdd(sbccChangeSet).setNameCommitterResult(validateChangeSetForName);
- }
-
- private SbccChangeSetVerificationResult getOrAdd(SbccChangeSet sbccChangeSet) {
-  if (!sbccChangeSets.containsKey(sbccChangeSet)) {
-   sbccChangeSets.put(sbccChangeSet, new SbccChangeSetVerificationResult());
+  public SbccRefChangeVerificationResult(String refId, String fromHash, String toHash) {
+    this.refId = refId;
+    this.fromHash = fromHash;
+    this.toHash = toHash;
   }
-  return sbccChangeSets.get(sbccChangeSet);
- }
 
- public Map<SbccChangeSet, SbccChangeSetVerificationResult> getSbccChangeSets() {
-  return sbccChangeSets;
- }
-
- public boolean hasReportables() {
-  if (hasErrors()) {
-   return TRUE;
+  public void addAuthorEmailValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForAuthorEmail) {
+    getOrAdd(sbccChangeSet).setEmailAuthorResult(validateChangeSetForAuthorEmail);
   }
-  for (final SbccChangeSet sbccChangeSet : sbccChangeSets.keySet()) {
-   if (sbccChangeSets.get(sbccChangeSet).hasReportables()) {
-    return TRUE;
-   }
+
+  public void addCommitterEmailValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForCommitterEmail) {
+    getOrAdd(sbccChangeSet).setEmailCommitterResult(validateChangeSetForCommitterEmail);
   }
-  return FALSE;
- }
 
- public boolean hasErrors() {
-  if (!branchNameValid) {
-   return TRUE;
+  public void addAuthorNameValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForName) {
+    getOrAdd(sbccChangeSet).setNameAuthorResult(validateChangeSetForName);
   }
-  for (final SbccChangeSet sbccChangeSet : sbccChangeSets.keySet()) {
-   if (sbccChangeSets.get(sbccChangeSet).hasErrors()) {
-    return TRUE;
-   }
+
+  public void addCommitterNameValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForName) {
+    getOrAdd(sbccChangeSet).setNameCommitterResult(validateChangeSetForName);
   }
-  return FALSE;
- }
 
- public void setGroupsResult(SbccChangeSet sbccChangeSet, Map<SbccGroup, SbccMatch> groupsResult) {
-  getOrAdd(sbccChangeSet).setGroupsResult(groupsResult);
- }
+  private SbccChangeSetVerificationResult getOrAdd(SbccChangeSet sbccChangeSet) {
+    if (!sbccChangeSets.containsKey(sbccChangeSet)) {
+      sbccChangeSets.put(sbccChangeSet, new SbccChangeSetVerificationResult());
+    }
+    return sbccChangeSets.get(sbccChangeSet);
+  }
 
- public void addContentSizeValidationResult(SbccChangeSet sbccChangeSet,
-   Map<String, Long> validateChangeSetForContentSize) {
-  getOrAdd(sbccChangeSet).addContentSizeValidationResult(validateChangeSetForContentSize);
- }
+  public Map<SbccChangeSet, SbccChangeSetVerificationResult> getSbccChangeSets() {
+    return sbccChangeSets;
+  }
 
- public void addContentDiffValidationResult(SbccChangeSet sbccChangeSet,
-   Optional<String> validateChangeSetForContentDiff) {
-  getOrAdd(sbccChangeSet).addContentDiffValidationResult(validateChangeSetForContentDiff);
- }
+  public boolean hasReportables() {
+    if (hasErrors()) {
+      return TRUE;
+    }
+    for (final SbccChangeSet sbccChangeSet : sbccChangeSets.keySet()) {
+      if (sbccChangeSets.get(sbccChangeSet).hasReportables()) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
 
- public void setFailingJql(SbccChangeSet sbccChangeSet, List<String> failingJqlQueries) {
-  getOrAdd(sbccChangeSet).setFailingJql(failingJqlQueries);
- }
+  public boolean hasErrors() {
+    if (!branchNameValid) {
+      return TRUE;
+    }
+    for (final SbccChangeSet sbccChangeSet : sbccChangeSets.keySet()) {
+      if (sbccChangeSets.get(sbccChangeSet).hasErrors()) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
 
- public boolean isBranchNameValid() {
-  return branchNameValid;
- }
+  public void setGroupsResult(SbccChangeSet sbccChangeSet, Map<SbccGroup, SbccMatch> groupsResult) {
+    getOrAdd(sbccChangeSet).setGroupsResult(groupsResult);
+  }
 
- public void setBranchValidationResult(boolean branchNameValid) {
-  this.branchNameValid = branchNameValid;
- }
+  public void addContentSizeValidationResult(
+      SbccChangeSet sbccChangeSet, Map<String, Long> validateChangeSetForContentSize) {
+    getOrAdd(sbccChangeSet).addContentSizeValidationResult(validateChangeSetForContentSize);
+  }
 
- public void addAuthorEmailInBitbucketValidationResult(SbccChangeSet sbccChangeSet,
-   boolean validateChangeSetForAuthorEmailInBitbucket) {
-  getOrAdd(sbccChangeSet).addAuthorEmailInBitbucketValidationResult(validateChangeSetForAuthorEmailInBitbucket);
- }
+  public void addContentDiffValidationResult(
+      SbccChangeSet sbccChangeSet, Optional<String> validateChangeSetForContentDiff) {
+    getOrAdd(sbccChangeSet).addContentDiffValidationResult(validateChangeSetForContentDiff);
+  }
 
- public void addAuthorNameInBitbucketValidationResult(SbccChangeSet sbccChangeSet,
-   boolean validateChangeSetForAuthorNameInBitbucket) {
-  getOrAdd(sbccChangeSet).addAuthorNameInBitbucketValidationResult(validateChangeSetForAuthorNameInBitbucket);
- }
+  public void setFailingJql(SbccChangeSet sbccChangeSet, List<String> failingJqlQueries) {
+    getOrAdd(sbccChangeSet).setFailingJql(failingJqlQueries);
+  }
 
- public String getRefId() {
-  return refId;
- }
+  public boolean isBranchNameValid() {
+    return branchNameValid;
+  }
 
- public String getToHash() {
-  return toHash;
- }
+  public void setBranchValidationResult(boolean branchNameValid) {
+    this.branchNameValid = branchNameValid;
+  }
 
- public String getFromHash() {
-  return fromHash;
- }
+  public void addAuthorEmailInBitbucketValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForAuthorEmailInBitbucket) {
+    getOrAdd(sbccChangeSet)
+        .addAuthorEmailInBitbucketValidationResult(validateChangeSetForAuthorEmailInBitbucket);
+  }
+
+  public void addAuthorNameInBitbucketValidationResult(
+      SbccChangeSet sbccChangeSet, boolean validateChangeSetForAuthorNameInBitbucket) {
+    getOrAdd(sbccChangeSet)
+        .addAuthorNameInBitbucketValidationResult(validateChangeSetForAuthorNameInBitbucket);
+  }
+
+  public String getRefId() {
+    return refId;
+  }
+
+  public String getToHash() {
+    return toHash;
+  }
+
+  public String getFromHash() {
+    return fromHash;
+  }
 }
