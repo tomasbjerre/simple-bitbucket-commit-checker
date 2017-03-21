@@ -2,14 +2,20 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
-### GitHub [#66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/66) Support Git 2.11 or higher
-  Support Git 2.11 or higher 
+## 2.11
+### GitHub [#67](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/67) Newline character in output
+  Using LF for newline
+  
+  [56fae7d678718f4](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/56fae7d678718f4) Tomas Bjerre *2017-03-21 16:52:37*
+
+## 2.10
+### GitHub [#66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/66) Support Git 2.11 and Bitbucket Server 4.13 or higher
+  Support Git 2.11 and Bitbucket Server 4.13 or higher 
 
  * Removing support for file size and commit diff checks. Cannot easily implement it after Atlassian platform changes.
  * Formatting code to Google Java Format.
   
-  [9b2c78b542452af](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/9b2c78b542452af) Tomas Bjerre *2017-01-31 21:08:49*
+  [c1981305507a822](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/c1981305507a822) Tomas Bjerre *2017-01-31 21:29:53*
 
 ### No issue
   Set theme jekyll-theme-slate
