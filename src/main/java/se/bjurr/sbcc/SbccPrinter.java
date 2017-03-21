@@ -5,6 +5,8 @@ import static se.bjurr.sbcc.settings.SbccGroup.Accept.SHOW_MESSAGE;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccChangeSetVerificationResult;
 import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;
@@ -13,13 +15,11 @@ import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccRule;
 import se.bjurr.sbcc.settings.SbccSettings;
 
-import com.google.common.base.Optional;
-
 public class SbccPrinter {
 
   private final SbccSettings settings;
   private final SbccRenderer sbccRenderer;
-  public static String NL = System.getProperty("line.separator");
+  public static String NL = "\n";
 
   public SbccPrinter(SbccSettings settings, SbccRenderer sbccRenderer) {
     this.settings = settings;
