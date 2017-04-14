@@ -5,24 +5,25 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 
 ## Features
 * Check author in commit
- * email is same as users email in Bitbucket.
- * name is same as users name in Bitbucket.
-* Check that author name, and/or email, in commit exists for any user in Bitbucket
-* Check committer in commit
- * email is same as users email in Bitbucket.
- * name is same as users name in Bitbucket.
+  * email is same as users email in Bitbucket.
+  * name is same as users name in Bitbucket.
+  * name is same as users user slug in Bitbucket.
+* Check that author name, slug, and/or email, in commit exists for any user in Bitbucket.
+* Check committer in commit.
+  * email is same as users email in Bitbucket.
+  * name is same as users name in Bitbucket.
 * Optionally check author email against regular expression instead of equality to email in Bitbucket. Like:
- * ^${BITBUCKET_USER}@.*
- * ^[^@]*@company.domain$
+  * ^${BITBUCKET_USER}@.*
+  * ^[^@]*@company.domain$
 * Check JQL query. Can be used to check that any JIRA is in a specific state. There is an extra variable, ${REGEXP}, available for use in the query.
- * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${BITBUCKET_USER}")
+  * Example: issue = ${REGEXP} AND status = "In Progress" AND assignee in ("${BITBUCKET_USER}")
 * Simple configuration of rules that must apply to commit messages. Organized in groups.
- * A group can be used for matching, for example, issues. It can state that "at least one", "all of" or "none" of the issues can be mentioned in the commit messages.
- * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
- * If a group matches a commit, it can reject it or just show a message to the comitter.
+  * A group can be used for matching, for example, issues. It can state that "at least one", "all of" or "none" of the issues can be mentioned in the commit messages.
+  * Rules are added to the group. A rule can, for example, define Jira as a regular expression and the name "Jira".
+  * If a group matches a commit, it can reject it or just show a message to the comitter.
 * Check only branches matching a regular expression.
 * Check that branch name matches specific regexp.
- * You may use variables here to make sure user *tomas* can only commit to `dev/tomas/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
+  * You may use variables here to make sure user *tomas* can only commit to `dev/tomas/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
 * Exclude merge commits.
 * Exclude tag commits.
 * Check commits in pull requests
@@ -32,14 +33,14 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Optionally accept all commits if pattern matches the username. Checks will be ignored for user if pattern matches its name, like ^BATCH.* will ignore users with name starting with BATCH.
 * Dry run mode, where all commits are accepted. But verification results are shown.
 * Supporting variables to be used in error messages and checks.
- * BITBUCKET_EMAIL, Email of user in Bitbucket.
- * BITBUCKET_NAME Name of user in Bitbucket.
- * BITBUCKET_USER, User display name of user in Bitbucket.
- * BITBUCKET_USER_SLUG, User slug (username) of user in Bitbucket.
- * COMMITTER_EMAIL, Email of committer name.
- * COMMITTER_NAME, Name of committer email.
- * AUTHOR_EMAIL, Email of author email.
- * AUTHOR_NAME, Name of author name.
+  * BITBUCKET_EMAIL, Email of user in Bitbucket.
+  * BITBUCKET_NAME Name of user in Bitbucket.
+  * BITBUCKET_USER, User display name of user in Bitbucket.
+  * BITBUCKET_USER_SLUG, User slug (username) of user in Bitbucket.
+  * COMMITTER_EMAIL, Email of committer name.
+  * COMMITTER_NAME, Name of committer email.
+  * AUTHOR_EMAIL, Email of author email.
+  * AUTHOR_NAME, Name of author name.
 
 The plugin is configured on repository level, where all hooks are configured. If you want to configure it once for all repos, have a look at [Settings Synchronizer for Bitbucket](https://github.com/tomasbjerre/settings-synchronizer-for-bitbucket-plugin).
 

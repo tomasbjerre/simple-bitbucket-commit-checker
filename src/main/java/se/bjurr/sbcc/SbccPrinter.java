@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
+import se.bjurr.sbcc.SbccRenderer.SBCCVariable;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccChangeSetVerificationResult;
 import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;
@@ -120,10 +121,14 @@ public class SbccPrinter {
       StringBuilder sb) {
     if (!refChangeVerificationResult.getSbccChangeSets().get(sbccChangeSet).getNameAuthorResult()) {
       sbccRenderer.append(sb, NL);
+      SBCCVariable bitbucketName = SbccRenderer.SBCCVariable.BITBUCKET_NAME;
+      if (settings.isRequireMatchingAuthorNameSlug()) {
+        bitbucketName = SbccRenderer.SBCCVariable.BITBUCKET_USER_SLUG;
+      }
       sbccRenderer.append(
           sb,
           "- Bitbucket: '${"
-              + SbccRenderer.SBCCVariable.BITBUCKET_NAME
+              + bitbucketName
               + "}' != Commit: '"
               + sbccChangeSet.getAuthor().getName()
               + "'"
