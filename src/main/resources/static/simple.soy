@@ -170,6 +170,16 @@
             ]] /}
             {param descriptionText: 'Require that the commit authors name matches the Bitbucket users name.' /}
         {/call}
+
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Userslug Matching Author Name' /}
+            {param fields: [[
+                'id' : 'requireMatchingAuthorNameSlug',
+                'labelText': 'yes',
+                'isChecked' : $config['requireMatchingAuthorNameSlug']
+            ]] /}
+            {param descriptionText: 'Require that the commit authors name matches the Bitbucket users slug.' /}
+        {/call}
     
         {call aui.form.checkboxField}
             {param legendContent: 'Require Author Name in Bitbucket' /}
@@ -179,6 +189,16 @@
                 'isChecked' : $config['requireMatchingAuthorNameInBitbucket']
             ]] /}
             {param descriptionText: 'Require that author name exists for at least one user in Bitbucket.' /}
+        {/call}
+    
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Author Name As Userslug in Bitbucket' /}
+            {param fields: [[
+                'id' : 'requireMatchingAuthorNameInBitbucketSlug',
+                'labelText': 'yes',
+                'isChecked' : $config['requireMatchingAuthorNameInBitbucketSlug']
+            ]] /}
+            {param descriptionText: 'Require that author name exists as user slug for at least one user in Bitbucket.' /}
         {/call}
     
         {call aui.form.checkboxField}

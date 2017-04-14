@@ -7,6 +7,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketEmail;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketName;
+import static se.bjurr.sbcc.SbccCommon.getBitbucketSlug;
 import static se.bjurr.sbcc.settings.SbccGroup.Accept.ACCEPT;
 import static se.bjurr.sbcc.settings.SbccGroup.Accept.SHOW_MESSAGE;
 import static se.bjurr.sbcc.settings.SbccGroup.Match.ALL;
@@ -17,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import com.atlassian.bitbucket.auth.AuthenticationContext;
+
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccMatch;
 import se.bjurr.sbcc.settings.SbccRule;
 import se.bjurr.sbcc.settings.SbccSettings;
-
-import com.atlassian.bitbucket.auth.AuthenticationContext;
 
 public class CommitMessageValidator {
 
@@ -67,6 +68,11 @@ public class CommitMessageValidator {
             .equals(sbccChangeSet.getAuthor().getName())) {
       return FALSE;
     }
+    if (settings.isRequireMatchingAuthorNameSlug()
+        && !getBitbucketSlug(this.bitbucketAuthenticationContext)
+            .equals(sbccChangeSet.getAuthor().getName())) {
+      return FALSE;
+    }
     return TRUE;
   }
 
@@ -74,6 +80,9 @@ public class CommitMessageValidator {
       SbccSettings settings, SbccChangeSet sbccChangeSet) throws ExecutionException {
     if (settings.getRequireMatchingAuthorNameInBitbucket()) {
       return this.sbccUserAdminService.displayNameExists(sbccChangeSet.getAuthor().getName());
+    }
+    if (settings.isRequireMatchingAuthorNameInBitbucketSlug()) {
+      return this.sbccUserAdminService.slugExists(sbccChangeSet.getAuthor().getName());
     }
     return true;
   }

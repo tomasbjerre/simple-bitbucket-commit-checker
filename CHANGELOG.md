@@ -2,6 +2,20 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### GitHub [#68](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/68) Require Matching Author Name validates against only Stash &quot;username(userid)&quot; field
+  Check author for user slug 
+
+ * Require that the commit authors name matches the Bitbucket users slug.
+ * Require that author name exists as user slug for at least one user in Bitbucket.
+  
+  [0cbbb7c9e9cf34c](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/0cbbb7c9e9cf34c) Tomas Bjerre *2017-04-14 12:09:59*
+
+### No issue
+  doc
+  
+  [514864e5af3eba3](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/514864e5af3eba3) Tomas Bjerre *2017-03-21 16:55:59*
+
 ## 2.11
 ### GitHub [#67](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/67) Newline character in output
   Using LF for newline

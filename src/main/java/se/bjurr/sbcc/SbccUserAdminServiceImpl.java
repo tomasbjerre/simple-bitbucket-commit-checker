@@ -29,6 +29,17 @@ public class SbccUserAdminServiceImpl implements SbccUserAdminService {
                   return doDisplayNameExist(key);
                 }
               });
+  private final LoadingCache<String, Boolean> slugCache =
+      newBuilder() //
+          .maximumSize(10000) //
+          .expireAfterWrite(10, MINUTES) //
+          .build(
+              new CacheLoader<String, Boolean>() {
+                @Override
+                public Boolean load(String key) {
+                  return doSlugExist(key);
+                }
+              });
 
   private final LoadingCache<String, Boolean> emailCache =
       newBuilder() //
@@ -76,6 +87,11 @@ public class SbccUserAdminServiceImpl implements SbccUserAdminService {
     return FALSE;
   }
 
+  private boolean doSlugExist(String slug) {
+    ApplicationUser found = getMatchingSlug(slug);
+    return found != null;
+  }
+
   private boolean doEmailExist(String email) {
     Page<ApplicationUser> found = getMatching(email);
     for (ApplicationUser f : found.getValues()) {
@@ -91,5 +107,18 @@ public class SbccUserAdminServiceImpl implements SbccUserAdminService {
     int limit = 1000;
     PageRequest pagedRequest = new PageRequestImpl(start, limit);
     return this.userService.findUsersByName(nameOrEmail, pagedRequest);
+  }
+
+  private ApplicationUser getMatchingSlug(String slug) {
+    return this.userService.getUserBySlug(slug);
+  }
+
+  @Override
+  public boolean slugExists(String name) {
+    try {
+      return this.slugCache.get(name);
+    } catch (ExecutionException e) {
+      throw propagate(e);
+    }
   }
 }

@@ -42,8 +42,12 @@ public class SbccSettings {
   public static final String SETTING_REQUIRE_MATCHING_AUTHOR_EMAIL_MESSAGE =
       "requireMatchingAuthorEmailMessage";
   public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME = "requireMatchingAuthorName";
+  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_SLUG =
+      "requireMatchingAuthorNameSlug";
   public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET =
       "requireMatchingAuthorNameInBitbucket";
+  public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET_SLUG =
+      "requireMatchingAuthorNameInBitbucketSlug";
   public static final String SETTING_REQUIRE_MATCHING_COMMITTER_NAME =
       "requireMatchingCommitterName";
   public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE =
@@ -82,6 +86,7 @@ public class SbccSettings {
   private boolean requireMatchingCommitterEmail;
   private String requireMatchingAuthorEmailMessage;
   private boolean requireMatchingAuthorName;
+  private boolean requireMatchingAuthorNameSlug;
   private boolean requireMatchingCommitterName;
   private String requireMatchingAuthorNameMessage;
   private boolean requireOnlyOneIssue;
@@ -96,6 +101,7 @@ public class SbccSettings {
   private String commitRegexp;
   private Boolean requireMatchingAuthorEmailInBitbucket;
   private Boolean requireMatchingAuthorNameInBitbucket;
+  private Boolean requireMatchingAuthorNameInBitbucketSlug;
   private boolean shouldCheckPullRequests;
   private String shouldCheckPullRequestsMessage;
   private String ignoreUsersPattern;
@@ -123,6 +129,10 @@ public class SbccSettings {
         .withRequireMatchingAuthorName(settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME))
         .withRequireMatchingAuthorNameInBitbucket(
             settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET))
+        .withRequireMatchingAuthorNameSlug(
+            settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_SLUG))
+        .withRequireMatchingAuthorNameInBitbucketSlug(
+            settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET_SLUG))
         .withRequireMatchingCommitterName(
             settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_NAME))
         .withRequireMatchingAuthorNameMessage(
@@ -193,6 +203,18 @@ public class SbccSettings {
       }
     }
     return sbccSettings;
+  }
+
+  private SbccSettings withRequireMatchingAuthorNameInBitbucketSlug(
+      Boolean requireMatchingAuthorNameInBitbucketSlug) {
+    this.requireMatchingAuthorNameInBitbucketSlug =
+        firstNonNull(requireMatchingAuthorNameInBitbucketSlug, FALSE);
+    return this;
+  }
+
+  private SbccSettings withRequireMatchingAuthorNameSlug(Boolean requireMatchingAuthorNameSlug) {
+    this.requireMatchingAuthorNameSlug = firstNonNull(requireMatchingAuthorNameSlug, FALSE);
+    return this;
   }
 
   private void withIgnoreUsersPattern(String string) {
@@ -473,6 +495,14 @@ public class SbccSettings {
 
   public Boolean getRequireMatchingAuthorNameInBitbucket() {
     return requireMatchingAuthorNameInBitbucket;
+  }
+
+  public Boolean isRequireMatchingAuthorNameInBitbucketSlug() {
+    return requireMatchingAuthorNameInBitbucketSlug;
+  }
+
+  public boolean isRequireMatchingAuthorNameSlug() {
+    return requireMatchingAuthorNameSlug;
   }
 
   private SbccSettings withRequireMatchingCommitterName(Boolean requireMatchingCommitterName) {
