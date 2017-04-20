@@ -6,12 +6,16 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 ## Features
 * Check author in commit
   * email is same as users email in Bitbucket.
+  * email is same as any users email in Bitbucket.
   * name is same as users name in Bitbucket.
+  * name is same as any users name in Bitbucket.
   * name is same as users user slug in Bitbucket.
+  * name is same as any users user slug in Bitbucket.
 * Check that author name, slug, and/or email, in commit exists for any user in Bitbucket.
 * Check committer in commit.
   * email is same as users email in Bitbucket.
   * name is same as users name in Bitbucket.
+  * name is same as users user slug in Bitbucket.
 * Optionally check author email against regular expression instead of equality to email in Bitbucket. Like:
   * ^${BITBUCKET_USER}@.*
   * ^[^@]*@company.domain$

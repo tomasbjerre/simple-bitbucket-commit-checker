@@ -2,6 +2,20 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### No issue
+  doc
+  
+  [fc0eca0303954ee](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fc0eca0303954ee) Tomas Bjerre *2017-04-20 18:48:43*
+
+## 2.14
+### GitHub [#69](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/69) Requires to have option to validate commiter name with bitbucket user slug
+  Check committer name for Bitbucket user slug 
+
+ * Require that the commit committer name matches the Bitbucket users slug.
+  
+  [0b61bfa5ab0a1bb](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/0b61bfa5ab0a1bb) Tomas Bjerre *2017-04-20 18:40:51*
+
 ## 2.13
 ### GitHub [#68](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/68) Require Matching Author Name validates against only Stash &quot;username(userid)&quot; field
   Correcting rejection message
