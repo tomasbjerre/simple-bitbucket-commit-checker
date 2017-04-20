@@ -7,7 +7,9 @@ import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE;
+import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_AUTHOR_NAME_SLUG;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME;
+import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_COMMITTER_NAME_SLUG;
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
@@ -134,6 +136,96 @@ public class MatchingNameTest {
         .run()
         .hasNoOutput()
         .wasAccepted();
+  }
+
+  @Test
+  public void testCommitIsAcceptedWhenNameMustMatchSlugInBitbucket() throws IOException {
+    refChangeBuilder()
+        .withChangeSet(
+            changeSetBuilder()
+                .withId("1")
+                .withCommitter(new SbccPerson("tomas", "committer@one.site"))
+                .withAuthor(new SbccPerson("Tomas Author", "author@one.site"))
+                .withMessage(COMMIT_MESSAGE_JIRA)
+                .build())
+        .withBitbucketEmail("committer@one.site")
+        .withBitbucketDisplayName("Tomas Committer")
+        .withBitbucketUserSlug("tomas")
+        .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME_SLUG, TRUE)
+        .withSetting(
+            SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
+        .build()
+        .run()
+        .hasNoOutput()
+        .wasAccepted();
+  }
+
+  @Test
+  public void testCommitIsRejectedWhenNameMustMatchSlugInBitbucket() throws IOException {
+    refChangeBuilder()
+        .withChangeSet(
+            changeSetBuilder()
+                .withId("1")
+                .withCommitter(new SbccPerson("tomas", "committer@one.site"))
+                .withAuthor(new SbccPerson("Tomas Author", "author@one.site"))
+                .withMessage(COMMIT_MESSAGE_JIRA)
+                .build())
+        .withBitbucketEmail("committer@one.site")
+        .withBitbucketDisplayName("Tomas Committer")
+        .withBitbucketUserSlug("tomassso")
+        .withSetting(SETTING_REQUIRE_MATCHING_COMMITTER_NAME_SLUG, TRUE)
+        .withSetting(
+            SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
+        .build()
+        .run()
+        .hasTrimmedFlatOutput(
+            "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 Tomas Author <author@one.site> >>> SB-5678 fixing stuff  - Bitbucket: 'tomassso' != Commit: 'tomas'   Slug in Bitbucket not same as in commit")
+        .wasRejected();
+  }
+
+  @Test
+  public void testCommitIsAcceptedWhenAuthorNameMustMatchSlugInBitbucket() throws IOException {
+    refChangeBuilder()
+        .withChangeSet(
+            changeSetBuilder()
+                .withId("1")
+                .withCommitter(new SbccPerson("tomas committer", "committer@one.site"))
+                .withAuthor(new SbccPerson("tomas", "author@one.site"))
+                .withMessage(COMMIT_MESSAGE_JIRA)
+                .build())
+        .withBitbucketEmail("committer@one.site")
+        .withBitbucketDisplayName("Tomas Committer")
+        .withBitbucketUserSlug("tomas")
+        .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_SLUG, TRUE)
+        .withSetting(
+            SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
+        .build()
+        .run()
+        .hasNoOutput()
+        .wasAccepted();
+  }
+
+  @Test
+  public void testCommitIsRejectedWhenAuthorNameMustMatchSlugInBitbucket() throws IOException {
+    refChangeBuilder()
+        .withChangeSet(
+            changeSetBuilder()
+                .withId("1")
+                .withCommitter(new SbccPerson("tomas committer", "committer@one.site"))
+                .withAuthor(new SbccPerson("tomas", "author@one.site"))
+                .withMessage(COMMIT_MESSAGE_JIRA)
+                .build())
+        .withBitbucketEmail("committer@one.site")
+        .withBitbucketDisplayName("Tomas Committer")
+        .withBitbucketUserSlug("tomassso")
+        .withSetting(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_SLUG, TRUE)
+        .withSetting(
+            SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
+        .build()
+        .run()
+        .hasTrimmedFlatOutput(
+            "refs/heads/master e2bc4ed003 -> af35d5c1a4   1 tomas <author@one.site> >>> SB-5678 fixing stuff  - Bitbucket: 'tomassso' != Commit: 'tomas'   Slug in Bitbucket not same as in commit")
+        .wasRejected();
   }
 
   @Test

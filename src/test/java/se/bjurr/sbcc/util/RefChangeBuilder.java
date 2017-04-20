@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static se.bjurr.sbcc.JqlValidator.setJiraClient;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_ACCEPT;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_MATCH;
@@ -30,7 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
@@ -79,7 +82,7 @@ public class RefChangeBuilder {
   public static RefChangeBuilder refChangeBuilder() {
     try {
       return new RefChangeBuilder();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       propagate(t);
       return null;
     }
@@ -114,13 +117,16 @@ public class RefChangeBuilder {
   private RefChangeType type = ADD;
   private Boolean wasAccepted = null;
 
+  @Captor private ArgumentCaptor<Map<String, ?>> mapCaptor;
+
   @SuppressWarnings("unchecked")
   private RefChangeBuilder() throws Throwable {
+    initMocks(this);
     setJiraClient(
         new JiraClient() {
           @Override
           protected String invokeJira(
-              ApplicationLinkService applicationLinkService, String jqlCheckQuery)
+              final ApplicationLinkService applicationLinkService, final String jqlCheckQuery)
               throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
             if (RefChangeBuilder.this.jiraJsonResponses.containsKey(jqlCheckQuery)) {
               return RefChangeBuilder.this.jiraJsonResponses.get(jqlCheckQuery);
@@ -133,7 +139,7 @@ public class RefChangeBuilder {
     this.settings = mock(Settings.class);
     this.repositoryHookContext = mock(RepositoryHookContext.class);
     when(this.repositoryHookContext.getSettings()).thenReturn(this.settings);
-    Repository repository = mock(Repository.class);
+    final Repository repository = mock(Repository.class);
     when(this.repositoryHookContext.getRepository()).thenReturn(repository);
     this.changeSetService = mock(ChangeSetsService.class);
     this.bitbucketAuthenticationContext = mock(AuthenticationContext.class);
@@ -145,21 +151,22 @@ public class RefChangeBuilder {
             this.applicationLinkService,
             this.sbccUserAdminService);
     this.hook.setHookName("");
-    PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
+    final PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
     this.repositoryHookService = mock(RepositoryHookService.class);
-    PluginSettings pluginSettings = mock(PluginSettings.class);
+    final PluginSettings pluginSettings = mock(PluginSettings.class);
     when(pluginSettingsFactory.createGlobalSettings()).thenReturn(pluginSettings);
-    HashMap<String, Object> map = new HashMap<>();
+    final HashMap<String, Object> map = new HashMap<>();
     when(pluginSettingsFactory.createGlobalSettings().get(ArgumentMatchers.anyString()))
         .thenReturn(map);
-    SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
+    final SettingsBuilder settingsBuilder = mock(SettingsBuilder.class);
     when(this.repositoryHookService.createSettingsBuilder()).thenReturn(settingsBuilder);
-    when(this.repositoryHookService.createSettingsBuilder().addAll(ArgumentMatchers.anyMap()))
+
+    when(this.repositoryHookService.createSettingsBuilder().addAll(mapCaptor.capture()))
         .thenReturn(settingsBuilder);
     when(this.repositoryHookService.createSettingsBuilder().build()).thenReturn(this.settings);
     this.securityService = mock(SecurityService.class);
-    EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
-    Operation<Object, RuntimeException> operation = ArgumentMatchers.any(Operation.class);
+    final EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
+    final Operation<Object, RuntimeException> operation = ArgumentMatchers.any(Operation.class);
     when(escalatedSecurityContext.call(operation)).thenReturn(this.settings);
     when(this.securityService.withPermission(REPO_ADMIN, "Retrieving settings"))
         .thenReturn(escalatedSecurityContext);
@@ -195,7 +202,7 @@ public class RefChangeBuilder {
     return this;
   }
 
-  public RefChangeBuilder fakeJiraResponse(String jqlQuery, String responseFileName)
+  public RefChangeBuilder fakeJiraResponse(final String jqlQuery, final String responseFileName)
       throws IOException {
     this.jiraJsonResponses.put(jqlQuery, Resources.toString(getResource(responseFileName), UTF_8));
     return this;
@@ -211,29 +218,29 @@ public class RefChangeBuilder {
     return this;
   }
 
-  public RefChangeBuilder hasOutput(String output) {
+  public RefChangeBuilder hasOutput(final String output) {
     checkNotNull(this.wasAccepted, "do 'run' before.");
     assertEquals(output, getOutputAll());
     return this;
   }
 
-  public RefChangeBuilder hasOutputFrom(String filename) throws IOException {
+  public RefChangeBuilder hasOutputFrom(final String filename) throws IOException {
     return hasOutput(Resources.toString(getResource(filename), UTF_8));
   }
 
-  public RefChangeBuilder hasTrimmedFlatOutput(String output) {
+  public RefChangeBuilder hasTrimmedFlatOutput(final String output) {
     checkNotNull(this.wasAccepted, "do 'run' before.");
     assertEquals(output.trim().replaceAll("\n", " "), getOutputAll().trim().replaceAll("\n", " "));
     return this;
   }
 
-  public RefChangeBuilder hasTrimmedPrPrintOut(String printOut) {
+  public RefChangeBuilder hasTrimmedPrPrintOut(final String printOut) {
     assertEquals(
         printOut.trim().replaceAll("\n", " "), this.prMessage.trim().replaceAll("\n", " "));
     return this;
   }
 
-  public RefChangeBuilder hasTrimmedPrSummary(String summary) {
+  public RefChangeBuilder hasTrimmedPrSummary(final String summary) {
     assertEquals(summary.trim().replaceAll("\n", " "), this.prSummary.trim().replaceAll("\n", " "));
     return this;
   }
@@ -265,7 +272,8 @@ public class RefChangeBuilder {
     this.mergeHook.setResultsCallback(
         new ResultsCallable() {
           @Override
-          public void report(boolean isAccepted, String summaryParam, String messageParam) {
+          public void report(
+              final boolean isAccepted, final String summaryParam, final String messageParam) {
             RefChangeBuilder.this.prWasAccepted = isAccepted;
             RefChangeBuilder.this.prSummary = summaryParam;
             RefChangeBuilder.this.prMessage = messageParam;
@@ -274,11 +282,11 @@ public class RefChangeBuilder {
     when(this.repositoryHookService.getSettings(
             ArgumentMatchers.any(Repository.class), ArgumentMatchers.anyString()))
         .thenReturn(this.settings);
-    Repository repository = mock(Repository.class);
-    MergeRequest mergeRequest = mock(MergeRequest.class);
-    PullRequest pullRequest = mock(PullRequest.class);
-    PullRequestRef fromRef = mock(PullRequestRef.class);
-    PullRequestRef toRef = mock(PullRequestRef.class);
+    final Repository repository = mock(Repository.class);
+    final MergeRequest mergeRequest = mock(MergeRequest.class);
+    final PullRequest pullRequest = mock(PullRequest.class);
+    final PullRequestRef fromRef = mock(PullRequestRef.class);
+    final PullRequestRef toRef = mock(PullRequestRef.class);
     when(mergeRequest.getPullRequest()).thenReturn(pullRequest);
     when(mergeRequest.getPullRequest().getFromRef()).thenReturn(fromRef);
     when(mergeRequest.getPullRequest().getFromRef().getId()).thenReturn(this.refId);
@@ -290,7 +298,7 @@ public class RefChangeBuilder {
     return this;
   }
 
-  public RefChangeBuilder throwing(IOException ioException) throws IOException {
+  public RefChangeBuilder throwing(final IOException ioException) throws IOException {
     this.refChange = newRefChange();
     when(this.changeSetService.getNewChangeSets(
             ArgumentMatchers.any(SbccSettings.class),
@@ -313,37 +321,37 @@ public class RefChangeBuilder {
     return this;
   }
 
-  public RefChangeBuilder withBitbucketDisplayName(String name) {
+  public RefChangeBuilder withBitbucketDisplayName(final String name) {
     when(this.bitbucketUser.getDisplayName()).thenReturn(name);
     return this;
   }
 
-  public RefChangeBuilder withBitbucketEmail(String email) {
+  public RefChangeBuilder withBitbucketEmail(final String email) {
     when(this.bitbucketUser.getEmailAddress()).thenReturn(email);
     return this;
   }
 
-  public RefChangeBuilder withBitbucketName(String name) {
+  public RefChangeBuilder withBitbucketName(final String name) {
     when(this.bitbucketUser.getName()).thenReturn(name);
     return this;
   }
 
-  public RefChangeBuilder withBitbucketUserSlug(String name) {
+  public RefChangeBuilder withBitbucketUserSlug(final String name) {
     when(this.bitbucketUser.getSlug()).thenReturn(name);
     return this;
   }
 
-  public RefChangeBuilder withBitbucketUserType(UserType type) {
+  public RefChangeBuilder withBitbucketUserType(final UserType type) {
     when(this.bitbucketUser.getType()).thenReturn(type);
     return this;
   }
 
-  public RefChangeBuilder withChangeSet(SbccChangeSet changeSet) {
+  public RefChangeBuilder withChangeSet(final SbccChangeSet changeSet) {
     this.newChangesets.add(changeSet);
     return this;
   }
 
-  public RefChangeBuilder withFromHash(String fromHash) {
+  public RefChangeBuilder withFromHash(final String fromHash) {
     this.fromHash = fromHash;
     return this;
   }
@@ -433,37 +441,37 @@ public class RefChangeBuilder {
         .withSetting(SETTING_RULE_MESSAGE + "[0][1]", "Incident, INC");
   }
 
-  public RefChangeBuilder withHookNameVersion(String hookNameVersion) {
+  public RefChangeBuilder withHookNameVersion(final String hookNameVersion) {
     this.hook.setHookName(hookNameVersion);
     return this;
   }
 
-  public RefChangeBuilder withRefChange(RefChange refChange) {
+  public RefChangeBuilder withRefChange(final RefChange refChange) {
     this.refChange = refChange;
     return this;
   }
 
-  public RefChangeBuilder withRefId(String refId) {
+  public RefChangeBuilder withRefId(final String refId) {
     this.refId = refId;
     return this;
   }
 
-  public RefChangeBuilder withSetting(String field, Boolean value) {
+  public RefChangeBuilder withSetting(final String field, final Boolean value) {
     when(this.settings.getBoolean(field)).thenReturn(value);
     return this;
   }
 
-  public RefChangeBuilder withSetting(String field, String value) {
+  public RefChangeBuilder withSetting(final String field, final String value) {
     when(this.settings.getString(field)).thenReturn(value);
     return this;
   }
 
-  public RefChangeBuilder withToHash(String toHash) {
+  public RefChangeBuilder withToHash(final String toHash) {
     this.toHash = toHash;
     return this;
   }
 
-  public RefChangeBuilder withType(RefChangeType type) {
+  public RefChangeBuilder withType(final RefChangeType type) {
     this.type = type;
     return this;
   }
@@ -471,7 +479,7 @@ public class RefChangeBuilder {
   public RefChangeBuilder withUserInBitbucket(
       final String displayName, final String email, final String name) {
     @SuppressWarnings("unchecked")
-    Page<ApplicationUser> page = mock(Page.class);
+    final Page<ApplicationUser> page = mock(Page.class);
     when(page.getSize()) //
         .thenReturn(1);
     when(this.sbccUserAdminService.emailExists(email)) //
@@ -491,7 +499,7 @@ public class RefChangeBuilder {
       }
 
       @Override
-      public void write(int b) throws IOException {
+      public void write(final int b) throws IOException {
         this.string.append((char) b);
       }
     };

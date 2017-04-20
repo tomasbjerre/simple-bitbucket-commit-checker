@@ -108,6 +108,11 @@ public class CommitMessageValidator {
             .equals(sbccChangeSet.getCommitter().getName())) {
       return FALSE;
     }
+    if (settings.isRequireMatchingCommitterNameSlug()
+        && !getBitbucketSlug(this.bitbucketAuthenticationContext)
+            .equals(sbccChangeSet.getCommitter().getName())) {
+      return FALSE;
+    }
     return TRUE;
   }
 

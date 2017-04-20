@@ -155,7 +155,7 @@
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorEmailMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if email not matching authors email. Like: git config --global user.email user@name.com . Supports variables mentioned above.' /}
+            {param descriptionText: 'Reject message to show if above checks fail. Like: git config --global user.email user@name.com . Supports variables mentioned above.' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorEmailMessage'] : null /}
         {/call}
     </div>
@@ -210,13 +210,23 @@
             ]] /}
             {param descriptionText: 'Require that committers name matches the Bitbucket users name.' /}
         {/call}
+
+        {call aui.form.checkboxField}
+            {param legendContent: 'Require Userslug Matching Committer Name' /}
+            {param fields: [[
+                'id' : 'requireMatchingCommitterNameSlug',
+                'labelText': 'yes',
+                'isChecked' : $config['requireMatchingCommitterNameSlug']
+            ]] /}
+            {param descriptionText: 'Require that the commit committer name matches the Bitbucket users slug.' /}
+        {/call}
         
         {call aui.form.textareaField}
             {param id: 'requireMatchingAuthorNameMessage' /}
             {param labelContent: 'Reject message' /}
             {param value: $config['requireMatchingAuthorNameMessage'] /}
             {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if author not matching authors name. Like: git config --global user.name "User Name" . Supports variables mentioned above.' /}
+            {param descriptionText: 'Reject message to show if above checks fail. Like: git config --global user.name "User Name" . Supports variables mentioned above.' /}
             {param errorTexts: $errors ? $errors['requireMatchingAuthorNameMessage'] : null /}
         {/call}
     </div>

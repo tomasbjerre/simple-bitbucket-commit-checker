@@ -50,6 +50,8 @@ public class SbccSettings {
       "requireMatchingAuthorNameInBitbucketSlug";
   public static final String SETTING_REQUIRE_MATCHING_COMMITTER_NAME =
       "requireMatchingCommitterName";
+  public static final String SETTING_REQUIRE_MATCHING_COMMITTER_NAME_SLUG =
+      "requireMatchingCommitterNameSlug";
   public static final String SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE =
       "requireMatchingAuthorNameMessage";
   public static final String SETTING_RULE_MESSAGE = "ruleMessage";
@@ -88,6 +90,7 @@ public class SbccSettings {
   private boolean requireMatchingAuthorName;
   private boolean requireMatchingAuthorNameSlug;
   private boolean requireMatchingCommitterName;
+  private boolean requireMatchingCommitterNameSlug;
   private String requireMatchingAuthorNameMessage;
   private boolean requireOnlyOneIssue;
   private String requireOnlyOneIssueMessage;
@@ -135,6 +138,8 @@ public class SbccSettings {
             settings.getBoolean(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_BITBUCKET_SLUG))
         .withRequireMatchingCommitterName(
             settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_NAME))
+        .withRequireMatchingCommitterNameSlug(
+            settings.getBoolean(SETTING_REQUIRE_MATCHING_COMMITTER_NAME_SLUG))
         .withRequireMatchingAuthorNameMessage(
             settings.getString(SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE))
         .withCheckCommitDiffRegexp(
@@ -214,6 +219,12 @@ public class SbccSettings {
 
   private SbccSettings withRequireMatchingAuthorNameSlug(Boolean requireMatchingAuthorNameSlug) {
     this.requireMatchingAuthorNameSlug = firstNonNull(requireMatchingAuthorNameSlug, FALSE);
+    return this;
+  }
+
+  private SbccSettings withRequireMatchingCommitterNameSlug(
+      Boolean requireMatchingCommitterNameSlug) {
+    this.requireMatchingCommitterNameSlug = firstNonNull(requireMatchingCommitterNameSlug, FALSE);
     return this;
   }
 
@@ -503,6 +514,10 @@ public class SbccSettings {
 
   public boolean isRequireMatchingAuthorNameSlug() {
     return requireMatchingAuthorNameSlug;
+  }
+
+  public boolean isRequireMatchingCommitterNameSlug() {
+    return requireMatchingCommitterNameSlug;
   }
 
   private SbccSettings withRequireMatchingCommitterName(Boolean requireMatchingCommitterName) {

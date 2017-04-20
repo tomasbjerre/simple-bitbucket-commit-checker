@@ -142,10 +142,14 @@ public class SbccPrinter {
         .get(sbccChangeSet)
         .getNameCommitterResult()) {
       sbccRenderer.append(sb, NL);
+      SBCCVariable bitbucketName = SbccRenderer.SBCCVariable.BITBUCKET_NAME;
+      if (settings.isRequireMatchingCommitterNameSlug()) {
+        bitbucketName = SbccRenderer.SBCCVariable.BITBUCKET_USER_SLUG;
+      }
       sbccRenderer.append(
           sb,
           "- Bitbucket: '${"
-              + SbccRenderer.SBCCVariable.BITBUCKET_NAME
+              + bitbucketName
               + "}' != Commit: '"
               + sbccChangeSet.getCommitter().getName()
               + "'"
