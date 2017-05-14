@@ -535,7 +535,6 @@ public class RefChangeBuilder {
             };
           }
 
-          @Override
           public String getRefId() {
             return RefChangeBuilder.this.refId;
           }

@@ -4,9 +4,13 @@ Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
 ### No issue
+  Building for 5.0
+  
+  [deaa6804f03d11b](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/deaa6804f03d11b) Tomas Bjerre *2017-05-14 08:01:27*
+
   doc
   
-  [fc0eca0303954ee](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fc0eca0303954ee) Tomas Bjerre *2017-04-20 18:48:43*
+  [02f3c7f17d125f6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/02f3c7f17d125f6) Tomas Bjerre *2017-04-20 18:48:59*
 
 ## 2.14
 ### GitHub [#69](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/69) Requires to have option to validate commiter name with bitbucket user slug
