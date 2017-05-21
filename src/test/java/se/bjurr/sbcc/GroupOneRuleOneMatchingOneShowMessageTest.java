@@ -18,7 +18,7 @@ public class GroupOneRuleOneMatchingOneShowMessageTest {
         .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -31,7 +31,7 @@ public class GroupOneRuleOneMatchingOneShowMessageTest {
             changeSetBuilder().withId("2").withMessage(COMMIT_MESSAGE_NO_ISSUE + " 2").build())
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

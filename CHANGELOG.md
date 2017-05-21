@@ -3,10 +3,15 @@
 Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
+### GitHub [#70](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/70) In-browser editing bypasses hooks
+  Using PreRepositoryHook
+  
+  [9a8fef3cd561bd9](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/9a8fef3cd561bd9) Tomas Bjerre *2017-05-25 16:45:49*
+
 ### No issue
   Building for 5.0
   
-  [deaa6804f03d11b](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/deaa6804f03d11b) Tomas Bjerre *2017-05-14 08:01:27*
+  [dab3a8ccb231fdd](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/dab3a8ccb231fdd) Tomas Bjerre *2017-05-14 08:11:11*
 
   doc
   

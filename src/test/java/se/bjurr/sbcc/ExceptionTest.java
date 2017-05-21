@@ -16,14 +16,14 @@ public class ExceptionTest {
 
   @Before
   public void before() {
-    beforeLogger = SbccPreReceiveRepositoryHook.getLogger();
+    beforeLogger = SbccRepositoryHook.getLogger();
     Logger mockLogger = mock(Logger.class);
-    SbccPreReceiveRepositoryHook.setLogger(mockLogger);
+    SbccRepositoryHook.setLogger(mockLogger);
   }
 
   @After
   public void after() {
-    SbccPreReceiveRepositoryHook.setLogger(beforeLogger);
+    SbccRepositoryHook.setLogger(beforeLogger);
   }
 
   @Test
@@ -50,6 +50,6 @@ public class ExceptionTest {
         .run()
         .wasAccepted()
         .hasTrimmedFlatOutput(
-            "Simple Bitbucket Commit Checker X.X  Error while validating reference changes. Will allow all of them. \"branches=Invalid Regexp: Unclosed character class near index 5 [notok      ^\"");
+            "Simple Bitbucket Commit Checker X.X  There was an error when checking commit, more info in server log.");
   }
 }

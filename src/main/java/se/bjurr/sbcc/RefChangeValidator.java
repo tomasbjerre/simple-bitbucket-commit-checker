@@ -1,30 +1,28 @@
 package se.bjurr.sbcc;
 
 import static com.atlassian.bitbucket.repository.RefChangeType.DELETE;
+import static java.util.logging.Level.INFO;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketEmail;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketName;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
-
-import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.bitbucket.auth.AuthenticationContext;
-import com.atlassian.bitbucket.pull.PullRequest;
-import com.atlassian.bitbucket.repository.RefChange;
-import com.atlassian.bitbucket.repository.RefChangeType;
-import com.atlassian.bitbucket.repository.Repository;
-import com.atlassian.sal.api.net.ResponseException;
 
 import se.bjurr.sbcc.commits.ChangeSetsService;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;
 import se.bjurr.sbcc.data.SbccVerificationResult;
 import se.bjurr.sbcc.settings.SbccSettings;
+
+import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.applinks.api.CredentialsRequiredException;
+import com.atlassian.bitbucket.auth.AuthenticationContext;
+import com.atlassian.bitbucket.repository.RefChangeType;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.sal.api.net.ResponseException;
 
 public class RefChangeValidator {
   private static Logger logger = Logger.getLogger(RefChangeValidator.class.getName());
@@ -42,7 +40,6 @@ public class RefChangeValidator {
 
   public RefChangeValidator(
       Repository fromRepository,
-      Repository toRepository,
       SbccSettings settings,
       ChangeSetsService changesetsService,
       AuthenticationContext bitbucketAuthenticationContext,
@@ -59,20 +56,6 @@ public class RefChangeValidator {
     this.jqlValidator = new JqlValidator(applicationLinkService, settings, sbccRenderer);
   }
 
-  public SbccVerificationResult validateRefChanges(Collection<RefChange> refChanges)
-      throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
-    final SbccVerificationResult refChangeVerificationResult = new SbccVerificationResult();
-    for (final RefChange refChange : refChanges) {
-      validateRefChange(
-          refChangeVerificationResult,
-          refChange.getType(),
-          refChange.getRef().getId(),
-          refChange.getFromHash(),
-          refChange.getToHash());
-    }
-    return refChangeVerificationResult;
-  }
-
   public void validateRefChange(
       final SbccVerificationResult refChangeVerificationResult,
       RefChangeType refChangeType,
@@ -80,7 +63,8 @@ public class RefChangeValidator {
       String fromHash,
       String toHash)
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
-    logger.fine(
+    logger.log(
+        INFO,
         getBitbucketName(bitbucketAuthenticationContext)
             + " "
             + getBitbucketEmail(bitbucketAuthenticationContext)
@@ -100,16 +84,6 @@ public class RefChangeValidator {
         validateRefChange(refChangeVerificationResult, refId, fromHash, toHash, refChangeSets);
       }
     }
-  }
-
-  public void validateRefChange(
-      SbccVerificationResult refChangeVerificationResults, PullRequest pullRequest)
-      throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
-    String refId = pullRequest.getFromRef().getId();
-    String fromHash = pullRequest.getFromRef().getLatestCommit();
-    String toHash = pullRequest.getToRef().getLatestCommit();
-    List<SbccChangeSet> refChangeSets = changesetsService.getNewChangeSets(settings, pullRequest);
-    validateRefChange(refChangeVerificationResults, refId, fromHash, toHash, refChangeSets);
   }
 
   private void validateRefChange(

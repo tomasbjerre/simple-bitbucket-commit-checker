@@ -26,15 +26,13 @@
 
   <component-import key="scmService" interface="com.atlassian.bitbucket.scm.ScmService"/>
 
-  <component key="changeSetsService" class="se.bjurr.sbcc.commits.ChangeSetsServiceImpl" public="true">
-    <interface>se.bjurr.sbcc.commits.ChangeSetsService</interface>
-  </component>
+  <component-import key="repositoryHookService" interface="com.atlassian.bitbucket.hook.repository.RepositoryHookService" />
 
-  <component key="sbccUserAdminService" class="se.bjurr.sbcc.SbccUserAdminServiceImpl" public="true">
-    <interface>se.bjurr.sbcc.SbccUserAdminService</interface>
-  </component>
+  <component-import key="securityService" interface="com.atlassian.bitbucket.user.SecurityService" />
 
-  <merge-check key="sbcc-merge-repository-hook.name" class="se.bjurr.sbcc.SbccRepositoryMergeRequestCheck" />
+  <component key="changeSetsService" class="se.bjurr.sbcc.commits.ChangeSetsService" />
+
+  <component key="sbccUserAdminService" class="se.bjurr.sbcc.SbccUserAdminService" />
 
   <repository-hook name="Simple Bitbucket Commit Checker" i18n-name-key="pre-receive-repository-hook.name" key="pre-receive-repository-hook" class="se.bjurr.sbcc.SbccPreReceiveRepositoryHook">
     <description key="pre-receive-repository-hook.description">Simple Bitbucket Commit Checker</description>
@@ -45,4 +43,6 @@
     </config-form>
     <validator>se.bjurr.sbcc.ConfigValidator</validator>
   </repository-hook>
+
+  <repository-merge-check key="repository-merge-check" class="se.bjurr.sbcc.SbccRepositoryMergeCheck" configurable="false"/>
 </atlassian-plugin>

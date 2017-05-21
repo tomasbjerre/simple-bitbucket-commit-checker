@@ -45,7 +45,7 @@ public class GroupOneRuleOneMatchingNoneAcceptTest {
         .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_NO_ISSUE).build())
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

@@ -43,7 +43,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must be in progess!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -57,7 +57,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must be in progess!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -72,7 +72,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must have assignee!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -122,7 +122,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -139,7 +139,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Must have assignee!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -156,7 +156,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -173,7 +173,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -189,7 +189,7 @@ public class JqlTest {
         .withSetting(SETTING_JQL_CHECK_MESSAGE, "Issue must exist!")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

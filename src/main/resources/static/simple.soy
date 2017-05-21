@@ -80,15 +80,6 @@
             ]] /}
             {param descriptionText: 'Check commits in pull requests. The hook may, for example, not be enabled in all forks. This will make sure commits are verified before they get merged with a pull request.' /}
         {/call}
-        
-        {call aui.form.textareaField}
-            {param id: 'shouldCheckPullrequestsMessage' /}
-            {param labelContent: 'Reject message' /}
-            {param value: $config['shouldCheckPullrequestsMessage'] /}
-            {param rows: 3 /}
-            {param descriptionText: 'Reject message to show if there are faulty commits in the pull request. This is just the summary message shown in pull requests view. Comments added below will also be present.' /}
-            {param errorTexts: $errors ? $errors['shouldCheckPullrequestsMessage'] : null /}
-        {/call}
     </div>
 
     {call aui.form.checkboxField}

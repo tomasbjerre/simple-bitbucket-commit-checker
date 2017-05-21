@@ -62,7 +62,7 @@ public class BranchesTest {
         .withSetting(SETTING_BRANCH_REJECTION_REGEXP_MESSAGE, "not ok") //
         .build() //
         .run() //
-        .hasNoOutput() //
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

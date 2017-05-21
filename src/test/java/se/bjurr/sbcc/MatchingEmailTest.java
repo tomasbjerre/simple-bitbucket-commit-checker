@@ -108,7 +108,7 @@ public class MatchingEmailTest {
             "Email in Bitbucket not same as in commit") //
         .build() //
         .run() //
-        .hasNoOutput() //
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -192,7 +192,7 @@ public class MatchingEmailTest {
         .withUserInBitbucket("Display Name", "author@one.site", "user@email") //
         .build() //
         .run() //
-        .hasNoOutput() //
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

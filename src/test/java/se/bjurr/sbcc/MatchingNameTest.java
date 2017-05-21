@@ -45,7 +45,7 @@ public class MatchingNameTest {
             SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Bitbucket not same as in commit")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -134,7 +134,7 @@ public class MatchingNameTest {
             SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Name in Bitbucket not same as in commit")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -156,7 +156,7 @@ public class MatchingNameTest {
             SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -201,7 +201,7 @@ public class MatchingNameTest {
             SETTING_REQUIRE_MATCHING_AUTHOR_NAME_MESSAGE, "Slug in Bitbucket not same as in commit")
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -301,7 +301,7 @@ public class MatchingNameTest {
         .withUserInBitbucket("Tomas Author", "user.name", "user@email") //
         .build() //
         .run() //
-        .hasNoOutput() //
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
