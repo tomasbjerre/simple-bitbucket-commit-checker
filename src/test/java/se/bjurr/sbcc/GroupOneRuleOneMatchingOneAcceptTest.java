@@ -18,7 +18,7 @@ public class GroupOneRuleOneMatchingOneAcceptTest {
         .withChangeSet(changeSetBuilder().withId("1").withMessage(COMMIT_MESSAGE_JIRA).build())
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 
@@ -31,7 +31,7 @@ public class GroupOneRuleOneMatchingOneAcceptTest {
             changeSetBuilder().withId("2").withMessage(COMMIT_MESSAGE_JIRA + " 2").build())
         .build()
         .run()
-        .hasNoOutput()
+        .hasTrimmedFlatOutput("")
         .wasAccepted();
   }
 

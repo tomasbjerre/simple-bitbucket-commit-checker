@@ -19,7 +19,6 @@ import java.util.regex.PatternSyntaxException;
 
 import com.atlassian.bitbucket.setting.Settings;
 import com.google.common.base.Optional;
-import com.google.gson.GsonBuilder;
 
 public class SbccSettings {
   public static final String SETTING_ACCEPT_MESSAGE = "acceptMessage";
@@ -420,11 +419,6 @@ public class SbccSettings {
     return fromNullable(commitSizeMessage);
   }
 
-  @Override
-  public String toString() {
-    return new GsonBuilder().setPrettyPrinting().create().toJson(this);
-  }
-
   private SbccSettings withAcceptMessage(String acceptMessage) {
     this.acceptMessage = emptyToNull(acceptMessage);
     return this;
@@ -558,5 +552,82 @@ public class SbccSettings {
 
   public Optional<String> getIgnoreUsersPattern() {
     return fromNullable(ignoreUsersPattern);
+  }
+
+  @Override
+  public String toString() {
+    return "SbccSettings [commitDiffRegexp="
+        + commitDiffRegexp
+        + ", commitDiffRegexpMessage="
+        + commitDiffRegexpMessage
+        + ", commitSizeMessage="
+        + commitSizeMessage
+        + ", commitSize="
+        + commitSize
+        + ", acceptMessage="
+        + acceptMessage
+        + ", branches="
+        + branches
+        + ", dryRun="
+        + dryRun
+        + ", dryRunMessage="
+        + dryRunMessage
+        + ", excludeMergeCommits="
+        + excludeMergeCommits
+        + ", excludeTagCommits="
+        + excludeTagCommits
+        + ", groups="
+        + groups
+        + ", rejectMessage="
+        + rejectMessage
+        + ", requireMatchingAuthorEmail="
+        + requireMatchingAuthorEmail
+        + ", requireMatchingCommitterEmail="
+        + requireMatchingCommitterEmail
+        + ", requireMatchingAuthorEmailMessage="
+        + requireMatchingAuthorEmailMessage
+        + ", requireMatchingAuthorName="
+        + requireMatchingAuthorName
+        + ", requireMatchingAuthorNameSlug="
+        + requireMatchingAuthorNameSlug
+        + ", requireMatchingCommitterName="
+        + requireMatchingCommitterName
+        + ", requireMatchingCommitterNameSlug="
+        + requireMatchingCommitterNameSlug
+        + ", requireMatchingAuthorNameMessage="
+        + requireMatchingAuthorNameMessage
+        + ", requireOnlyOneIssue="
+        + requireOnlyOneIssue
+        + ", requireOnlyOneIssueMessage="
+        + requireOnlyOneIssueMessage
+        + ", branchRejectionRegexp="
+        + branchRejectionRegexp
+        + ", branchRejectionRegexpMessage="
+        + branchRejectionRegexpMessage
+        + ", allowServiceUsers="
+        + allowServiceUsers
+        + ", requireMatchingAuthorEmailRegexp="
+        + requireMatchingAuthorEmailRegexp
+        + ", jqlCheck="
+        + jqlCheck
+        + ", jqlCheckMessage="
+        + jqlCheckMessage
+        + ", jqlCheckQuery="
+        + jqlCheckQuery
+        + ", commitRegexp="
+        + commitRegexp
+        + ", requireMatchingAuthorEmailInBitbucket="
+        + requireMatchingAuthorEmailInBitbucket
+        + ", requireMatchingAuthorNameInBitbucket="
+        + requireMatchingAuthorNameInBitbucket
+        + ", requireMatchingAuthorNameInBitbucketSlug="
+        + requireMatchingAuthorNameInBitbucketSlug
+        + ", shouldCheckPullRequests="
+        + shouldCheckPullRequests
+        + ", shouldCheckPullRequestsMessage="
+        + shouldCheckPullRequestsMessage
+        + ", ignoreUsersPattern="
+        + ignoreUsersPattern
+        + "]";
   }
 }

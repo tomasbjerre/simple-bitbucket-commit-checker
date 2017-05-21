@@ -16,14 +16,14 @@ public class ExceptionTest {
 
   @Before
   public void before() {
-    beforeLogger = SbccPreReceiveRepositoryHook.getLogger();
+    beforeLogger = SbccRepositoryHook.getLogger();
     Logger mockLogger = mock(Logger.class);
-    SbccPreReceiveRepositoryHook.setLogger(mockLogger);
+    SbccRepositoryHook.setLogger(mockLogger);
   }
 
   @After
   public void after() {
-    SbccPreReceiveRepositoryHook.setLogger(beforeLogger);
+    SbccRepositoryHook.setLogger(beforeLogger);
   }
 
   @Test

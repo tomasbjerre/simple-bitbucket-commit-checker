@@ -6,7 +6,7 @@ Changelog of Simple Bitbucket Commit Checker.
 ### No issue
   Building for 5.0
   
-  [deaa6804f03d11b](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/deaa6804f03d11b) Tomas Bjerre *2017-05-14 08:01:27*
+  [dab3a8ccb231fdd](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/dab3a8ccb231fdd) Tomas Bjerre *2017-05-14 08:11:11*
 
   doc
   

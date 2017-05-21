@@ -11,12 +11,12 @@ import static com.google.common.io.Resources.getResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static se.bjurr.sbcc.JqlValidator.setJiraClient;
+import static se.bjurr.sbcc.SbccRepositoryHook.PR_REJECT_DEFAULT_MSG;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_ACCEPT;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_MATCH;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_MESSAGE;
@@ -24,8 +24,8 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_REGEXP;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -35,20 +35,26 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 
+import se.bjurr.sbcc.JiraClient;
+import se.bjurr.sbcc.SbccRepositoryHook;
+import se.bjurr.sbcc.SbccUserAdminService;
+import se.bjurr.sbcc.commits.ChangeSetsService;
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.settings.SbccGroup;
+import se.bjurr.sbcc.settings.SbccSettings;
+
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
-import com.atlassian.bitbucket.hook.HookResponse;
+import com.atlassian.bitbucket.hook.ScmHookDetails;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookContext;
+import com.atlassian.bitbucket.hook.repository.RepositoryHookResult;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookService;
-import com.atlassian.bitbucket.pull.PullRequest;
-import com.atlassian.bitbucket.pull.PullRequestRef;
 import com.atlassian.bitbucket.repository.MinimalRef;
 import com.atlassian.bitbucket.repository.RefChange;
 import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.RefType;
 import com.atlassian.bitbucket.repository.Repository;
-import com.atlassian.bitbucket.scm.pull.MergeRequest;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.setting.SettingsBuilder;
 import com.atlassian.bitbucket.user.ApplicationUser;
@@ -61,17 +67,6 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.io.Resources;
-
-import se.bjurr.sbcc.JiraClient;
-import se.bjurr.sbcc.ResultsCallable;
-import se.bjurr.sbcc.SbccPreReceiveRepositoryHook;
-import se.bjurr.sbcc.SbccRepositoryMergeRequestCheck;
-import se.bjurr.sbcc.SbccUserAdminService;
-import se.bjurr.sbcc.SbccUserAdminServiceImpl;
-import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.settings.SbccGroup;
-import se.bjurr.sbcc.settings.SbccSettings;
 
 public class RefChangeBuilder {
   public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
@@ -94,18 +89,11 @@ public class RefChangeBuilder {
   private final ChangeSetsService changeSetService;
 
   private String fromHash = "e2bc4ed00386fafe00100738f739b9f29c9f4beb";
-  private final SbccPreReceiveRepositoryHook hook;
-  private final HookResponse hookResponse;
+  private final SbccRepositoryHook hook;
   private final Map<String, String> jiraJsonResponses = newHashMap();
 
-  private final SbccRepositoryMergeRequestCheck mergeHook;
   private final List<SbccChangeSet> newChangesets;
-  private final OutputStream outputAll = newOutputStream();
-  private final PrintWriter printWriterReject = new PrintWriter(this.outputAll);
-  private final PrintWriter printWriterStandard = new PrintWriter(this.outputAll);
-  private String prMessage;
-  private String prSummary;
-  private boolean prWasAccepted;
+  private String outputAll = null;
   private RefChange refChange;
   private String refId = "refs/heads/master";
   private final RepositoryHookContext repositoryHookContext;
@@ -118,6 +106,7 @@ public class RefChangeBuilder {
   private Boolean wasAccepted = null;
 
   @Captor private ArgumentCaptor<Map<String, ?>> mapCaptor;
+  private RepositoryHookResult repoHookResponse;
 
   @SuppressWarnings("unchecked")
   private RefChangeBuilder() throws Throwable {
@@ -139,17 +128,17 @@ public class RefChangeBuilder {
     this.settings = mock(Settings.class);
     this.repositoryHookContext = mock(RepositoryHookContext.class);
     when(this.repositoryHookContext.getSettings()).thenReturn(this.settings);
-    final Repository repository = mock(Repository.class);
-    when(this.repositoryHookContext.getRepository()).thenReturn(repository);
     this.changeSetService = mock(ChangeSetsService.class);
     this.bitbucketAuthenticationContext = mock(AuthenticationContext.class);
-    this.sbccUserAdminService = mock(SbccUserAdminServiceImpl.class);
+    this.sbccUserAdminService = mock(SbccUserAdminService.class);
     this.hook =
-        new SbccPreReceiveRepositoryHook(
+        new SbccRepositoryHook(
             this.changeSetService,
             this.bitbucketAuthenticationContext,
             this.applicationLinkService,
-            this.sbccUserAdminService);
+            this.sbccUserAdminService,
+            securityService,
+            repositoryHookService);
     this.hook.setHookName("");
     final PluginSettingsFactory pluginSettingsFactory = mock(PluginSettingsFactory.class);
     this.repositoryHookService = mock(RepositoryHookService.class);
@@ -170,18 +159,6 @@ public class RefChangeBuilder {
     when(escalatedSecurityContext.call(operation)).thenReturn(this.settings);
     when(this.securityService.withPermission(REPO_ADMIN, "Retrieving settings"))
         .thenReturn(escalatedSecurityContext);
-    this.mergeHook =
-        new SbccRepositoryMergeRequestCheck(
-            this.changeSetService,
-            this.bitbucketAuthenticationContext,
-            this.applicationLinkService,
-            this.sbccUserAdminService,
-            pluginSettingsFactory,
-            this.repositoryHookService,
-            this.securityService);
-    this.hookResponse = mock(HookResponse.class);
-    when(this.hookResponse.out()).thenReturn(this.printWriterStandard);
-    when(this.hookResponse.err()).thenReturn(this.printWriterReject);
     this.bitbucketUser = mock(ApplicationUser.class);
     when(this.bitbucketAuthenticationContext.getCurrentUser()).thenReturn(this.bitbucketUser);
   }
@@ -196,9 +173,6 @@ public class RefChangeBuilder {
             ArgumentMatchers.eq(this.fromHash),
             ArgumentMatchers.eq(this.toHash)))
         .thenReturn(this.newChangesets);
-    when(this.changeSetService.getNewChangeSets(
-            ArgumentMatchers.any(SbccSettings.class), ArgumentMatchers.any(PullRequest.class)))
-        .thenReturn(this.newChangesets);
     return this;
   }
 
@@ -209,7 +183,7 @@ public class RefChangeBuilder {
   }
 
   public String getOutputAll() {
-    return this.outputAll.toString();
+    return this.outputAll;
   }
 
   public RefChangeBuilder hasNoOutput() {
@@ -234,67 +208,26 @@ public class RefChangeBuilder {
     return this;
   }
 
-  public RefChangeBuilder hasTrimmedPrPrintOut(final String printOut) {
-    assertEquals(
-        printOut.trim().replaceAll("\n", " "), this.prMessage.trim().replaceAll("\n", " "));
-    return this;
-  }
-
-  public RefChangeBuilder hasTrimmedPrSummary(final String summary) {
-    assertEquals(summary.trim().replaceAll("\n", " "), this.prSummary.trim().replaceAll("\n", " "));
-    return this;
-  }
-
-  public RefChangeBuilder prWasAccepted() {
-    assertTrue("Pull request was not accepted", this.prWasAccepted);
-    return this;
-  }
-
-  public RefChangeBuilder prWasRejected() {
-    assertFalse("Pull request was not rejected", this.prWasAccepted);
-    return this;
-  }
-
   public RefChangeBuilder run() throws IOException {
     checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
     this.hook.setChangesetsService(this.changeSetService);
-    this.wasAccepted =
-        this.hook.onReceive(
-            this.repositoryHookContext, newArrayList(this.refChange), this.hookResponse);
-    this.printWriterReject.flush();
-    this.printWriterStandard.flush();
-    return this;
-  }
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter scmHookDetailsOut = new PrintWriter(stringWriter);
+    ScmHookDetails scmHookDetails = mock(ScmHookDetails.class);
+    when(scmHookDetails.out()).thenReturn(scmHookDetailsOut);
+    Repository repository = mock(Repository.class);
 
-  public RefChangeBuilder runPullRequest() throws IOException {
-    checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
-    this.mergeHook.setChangesetsService(this.changeSetService);
-    this.mergeHook.setResultsCallback(
-        new ResultsCallable() {
-          @Override
-          public void report(
-              final boolean isAccepted, final String summaryParam, final String messageParam) {
-            RefChangeBuilder.this.prWasAccepted = isAccepted;
-            RefChangeBuilder.this.prSummary = summaryParam;
-            RefChangeBuilder.this.prMessage = messageParam;
-          }
-        });
-    when(this.repositoryHookService.getSettings(
-            ArgumentMatchers.any(Repository.class), ArgumentMatchers.anyString()))
-        .thenReturn(this.settings);
-    final Repository repository = mock(Repository.class);
-    final MergeRequest mergeRequest = mock(MergeRequest.class);
-    final PullRequest pullRequest = mock(PullRequest.class);
-    final PullRequestRef fromRef = mock(PullRequestRef.class);
-    final PullRequestRef toRef = mock(PullRequestRef.class);
-    when(mergeRequest.getPullRequest()).thenReturn(pullRequest);
-    when(mergeRequest.getPullRequest().getFromRef()).thenReturn(fromRef);
-    when(mergeRequest.getPullRequest().getFromRef().getId()).thenReturn(this.refId);
-    when(mergeRequest.getPullRequest().getFromRef().getLatestCommit()).thenReturn(this.fromHash);
-    when(mergeRequest.getPullRequest().getFromRef().getRepository()).thenReturn(repository);
-    when(mergeRequest.getPullRequest().getToRef()).thenReturn(toRef);
-    when(mergeRequest.getPullRequest().getToRef().getLatestCommit()).thenReturn(this.toHash);
-    this.mergeHook.check(mergeRequest);
+    repoHookResponse =
+        this.hook.performChecks(newArrayList(this.refChange), scmHookDetails, repository);
+    this.wasAccepted = repoHookResponse.isAccepted();
+    this.outputAll = stringWriter.toString();
+    if (!repoHookResponse.getVetoes().isEmpty()) {
+      String vetoSummary = repoHookResponse.getVetoes().get(0).getSummaryMessage();
+      assertEquals(PR_REJECT_DEFAULT_MSG, vetoSummary);
+      String vetoDetail = repoHookResponse.getVetoes().get(0).getDetailedMessage();
+      assertEquals("", this.outputAll);
+      this.outputAll = vetoDetail;
+    }
     return this;
   }
 
@@ -489,22 +422,6 @@ public class RefChangeBuilder {
     return this;
   }
 
-  private OutputStream newOutputStream() {
-    return new OutputStream() {
-      private final StringBuilder string = new StringBuilder();
-
-      @Override
-      public String toString() {
-        return this.string.toString();
-      }
-
-      @Override
-      public void write(final int b) throws IOException {
-        this.string.append((char) b);
-      }
-    };
-  }
-
   private RefChange newRefChange() {
     final RefChange refChange =
         new RefChange() {
@@ -533,10 +450,6 @@ public class RefChangeBuilder {
                 return null;
               }
             };
-          }
-
-          public String getRefId() {
-            return RefChangeBuilder.this.refId;
           }
 
           @Override
