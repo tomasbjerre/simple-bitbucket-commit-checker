@@ -92,7 +92,6 @@ public class SbccRepositoryHook {
 
       Optional<Settings> rawSettingsOpt = findSettings(repository);
       if (!rawSettingsOpt.isPresent()) {
-        hookResponse.append("There was an error when checking commit, more info in server log.");
         return acceptedResponse(responseWriter, hookResponse);
       }
       final SbccSettings settings =
@@ -175,18 +174,20 @@ public class SbccRepositoryHook {
                   new Operation<Settings, Exception>() {
                     @Override
                     public Settings perform() throws Exception {
-                        RepositoryHook hook = repositoryHookService.getByKey(repository, HOOK_SETTINGS_KEY);
-                        if (!hook.isEnabled() || !hook.isEnabled()) {
-                            return null;
-                          }
+                      RepositoryHook hook =
+                          repositoryHookService.getByKey(repository, HOOK_SETTINGS_KEY);
+                      if (!hook.isEnabled() || !hook.isEnabled()) {
+                        return null;
+                      }
                       return repositoryHookService.getSettings(repository, HOOK_SETTINGS_KEY);
                     }
                   });
       if (settings == null) {
-		return empty();
-  	}
+        return empty();
+      }
       SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
-      SbccSettings abccSettings = SbccSettings.sscSettings(new RenderingSettings(settings, sbccRenderer));
+      SbccSettings abccSettings =
+          SbccSettings.sscSettings(new RenderingSettings(settings, sbccRenderer));
       logger.log(INFO, "Using settings:\n" + abccSettings);
       return Optional.of(settings);
     } catch (Exception e) {

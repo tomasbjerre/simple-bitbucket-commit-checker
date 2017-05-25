@@ -50,6 +50,6 @@ public class ExceptionTest {
         .run()
         .wasAccepted()
         .hasTrimmedFlatOutput(
-            "Simple Bitbucket Commit Checker X.X  There was an error when checking commit, more info in server log.");
+            "Simple Bitbucket Commit Checker X.X");
   }
 }
