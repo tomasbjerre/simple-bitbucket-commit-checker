@@ -6,7 +6,13 @@ Changelog of Simple Bitbucket Commit Checker.
 ### No issue
   doc
   
-  [709aba165039bfe](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/709aba165039bfe) Tomas Bjerre *2017-05-25 17:40:41*
+  [103999ba8b9b953](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/103999ba8b9b953) Tomas Bjerre *2017-05-25 19:39:29*
+
+## 3.1
+### No issue
+  Avoid printing error in response when disabled
+  
+  [5217bb5ead2e06d](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/5217bb5ead2e06d) Tomas Bjerre *2017-05-25 19:29:33*
 
 ## 3.0
 ### GitHub [#70](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/70) In-browser editing bypasses hooks
@@ -437,8 +443,4 @@ Reformating code
 * Very basic functionality is in place
   
   [bc5bc000d26f738](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/bc5bc000d26f738) Tomas Bjerre *2015-02-26 19:19:50*
-
-  Initial commit
-  
-  [4c809b09492f6a1](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/4c809b09492f6a1) Tomas Bjerre *2015-02-24 22:52:56*
 

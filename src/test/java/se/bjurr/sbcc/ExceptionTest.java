@@ -49,7 +49,6 @@ public class ExceptionTest {
         .build()
         .run()
         .wasAccepted()
-        .hasTrimmedFlatOutput(
-            "Simple Bitbucket Commit Checker X.X");
+        .hasTrimmedFlatOutput("Simple Bitbucket Commit Checker X.X");
   }
 }

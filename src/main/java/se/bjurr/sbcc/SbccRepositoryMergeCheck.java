@@ -61,42 +61,43 @@ public class SbccRepositoryMergeCheck implements RepositoryMergeCheck {
     Repository repositoryWithSettings = request.getToRef().getRepository();
     Optional<Settings> settings = repositoryHook.findSettings(repositoryWithSettings);
 
-    if (settings.isPresent()) {
-      try {
-        boolean shouldCheckPr = SbccSettings.sscSettings(settings.get()).shouldCheckPullRequests();
-        if (!shouldCheckPr) {
-          return accepted();
-        }
-      } catch (ValidationException e) {
-        logger.log(SEVERE, "Could not read settings", e);
+    if (!settings.isPresent()) {
+      return accepted();
+    }
+
+    try {
+      boolean shouldCheckPr = SbccSettings.sscSettings(settings.get()).shouldCheckPullRequests();
+      if (!shouldCheckPr) {
         return accepted();
       }
-      List<RefChange> refChanges = new ArrayList<>();
-      RefChange refChange =
-          new RefChange() {
-            @Override
-            public RefChangeType getType() {
-              return ADD;
-            }
-
-            @Override
-            public String getToHash() {
-              return pullRequest.getFromRef().getLatestCommit();
-            }
-
-            @Override
-            public MinimalRef getRef() {
-              return pullRequest.getFromRef();
-            }
-
-            @Override
-            public String getFromHash() {
-              return pullRequest.getToRef().getLatestCommit();
-            }
-          };
-      refChanges.add(refChange);
-      return repositoryHook.performChecks(refChanges, scmHookDetails, repositoryWithCommits);
+    } catch (ValidationException e) {
+      logger.log(SEVERE, "Could not read settings", e);
+      return accepted();
     }
-    return accepted();
+    List<RefChange> refChanges = new ArrayList<>();
+    RefChange refChange =
+        new RefChange() {
+          @Override
+          public RefChangeType getType() {
+            return ADD;
+          }
+
+          @Override
+          public String getToHash() {
+            return pullRequest.getFromRef().getLatestCommit();
+          }
+
+          @Override
+          public MinimalRef getRef() {
+            return pullRequest.getFromRef();
+          }
+
+          @Override
+          public String getFromHash() {
+            return pullRequest.getToRef().getLatestCommit();
+          }
+        };
+    refChanges.add(refChange);
+    return repositoryHook.performChecks(refChanges, scmHookDetails, repositoryWithCommits);
   }
 }
