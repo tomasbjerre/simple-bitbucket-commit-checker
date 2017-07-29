@@ -6,7 +6,7 @@ Changelog of Simple Bitbucket Commit Checker.
 ### No issue
   Reverting custom JS/CSS changes from atlassian-plugin.xml
   
-  [60ad08096c2b3bd](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/60ad08096c2b3bd) Tomas Bjerre *2017-07-29 17:32:41*
+  [346177353229e1b](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/346177353229e1b) Tomas Bjerre *2017-07-29 17:35:24*
 
   Namespacing CSS and JS
 
