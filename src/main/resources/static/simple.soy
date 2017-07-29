@@ -1,6 +1,5 @@
 {namespace se.bjurr}
 
-
 /**
  * @param config
  * @param errors
@@ -32,7 +31,7 @@
         {param errorTexts: $errors ? $errors['branches'] : null /}
     {/call}
 
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.textField}
             {param id: 'branchRejectionRegexp' /}
             {param labelContent: 'Check branch name' /}
@@ -71,7 +70,7 @@
         {param descriptionText: 'Exclude tag commits from being checked.' /}
     {/call}
 
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'Check pull requests' /}
             {param fields: [[
@@ -102,7 +101,7 @@
         {param errorTexts: $errors ? $errors['ignoreUsersPattern'] : null /}
     {/call}
     
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Author Email' /}
             {param fields: [[
@@ -152,7 +151,7 @@
         {/call}
     </div>
 
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'Require Matching Author Name' /}
             {param fields: [[
@@ -223,7 +222,7 @@
         {/call}
     </div>
 
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'Dry run' /}
             {param fields: [[
@@ -264,7 +263,7 @@
     
     <h3>Issue validation</h3>
 
-    <div class="sbcc fieldGroup">
+    <div class="fieldGroup">
         {call aui.form.checkboxField}
             {param legendContent: 'JQL' /}
             {param fields: [[
@@ -302,7 +301,7 @@
     </div>
 
     <div class="issues">
-        <div class="sbcc left">
+        <div class="left">
             <div class="buttons">
                 {call aui.form.input}
                     {param extraClasses: 'newGroup' /}
@@ -334,7 +333,7 @@
 {template .group}
 <div class="group fieldGroup" data-index="{$group}">
     <h4>Group #{$group}</h4>
-    <div class="sbcc left">
+    <div class="left">
         {call aui.form.input}
             {param extraClasses: 'removeGroup' /}
             {param value: 'Remove group' /}
@@ -386,7 +385,7 @@
         {param descriptionText: 'Message to to committer, explaining the group. Like "An issue needs to be specified" or "Dont mention \'fixing review comments\', mention what you actually changed instead."' /}
         {param errorTexts: $errors ? $errors['groupMessage['+$group+']'] : null /}
     {/call}
-    <div class="sbcc left">
+    <div class="left">
         {call aui.form.input}
             {param extraClasses: 'newRule' /}
             {param value: 'New rule' /}
@@ -417,7 +416,7 @@
  * @param rule
  */
 {template .rule}
-<div class="sbcc rule" data-index="{$rule}">
+<div class="rule" data-index="{$rule}">
     <h5>Group #{$group}, Rule #{$rule}</h5>
     <div class="buttons">
         {call aui.form.input}
