@@ -1,22 +1,22 @@
-textarea, input[type=text] {
+textarea.sbcc, input[type=text].sbcc {
     max-width: 100% !important;
 }
 
-.rule {
+.sbcc.rule {
     border: 1px;
     border-color: black;
     border-style: dotted;
     padding: 10px;
 }
 
-.group {
+.sbcc.group {
     border: 1px;
     border-color: black;
     border-style: solid;
     padding: 10px;
 }
 
-.fieldGroup {
+.sbcc.fieldGroup {
     border: 1px solid #ccc;
     border-radius: 3px;
     margin: 10px 0 20px 0;
@@ -25,7 +25,7 @@ textarea, input[type=text] {
     padding-bottom: 10px !important;
 }
 
-.left {
+.sbcc.left {
     padding: 10px;
 }
 

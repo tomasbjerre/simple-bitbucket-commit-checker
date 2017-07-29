@@ -17,7 +17,8 @@
     <resource type="download" name="sbcc.css" location="/css/sbcc.css"/>
     <resource type="download" name="sbcc.js" location="/js/sbcc.js"/>
     <resource type="download" name="images/" location="/images"/>
-    <context>atl.general</context>
+    <!-- Docs say this should work, but does not: bitbucket.page.repository.settings.hooks -->
+    <context>atl.admin</context>
   </web-resource>
 
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
