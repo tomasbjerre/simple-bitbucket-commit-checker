@@ -26,6 +26,7 @@ import com.atlassian.bitbucket.scm.git.command.revlist.GitRevListBuilder;
 import com.google.common.base.Optional;
 
 public class ChangeSetsService {
+  private static final String FIRST_COMMIT = "0000000000000000000000000000000000000000";
   private static Logger logger = getLogger(ChangeSetsService.class.getName());
 
   private final ScmService scmService;
@@ -61,7 +62,8 @@ public class ChangeSetsService {
       String fromHash,
       String toHash) {
 
-    Optional<GitScmCommandBuilder> gitScmCommandBuilder = findGitScmCommandBuilder(repository);
+    final Optional<GitScmCommandBuilder> gitScmCommandBuilder =
+        findGitScmCommandBuilder(repository);
     if (!gitScmCommandBuilder.isPresent()) {
       return newArrayList();
     }
@@ -78,14 +80,20 @@ public class ChangeSetsService {
       String toHash,
       Optional<GitScmCommandBuilder> gitScmCommandBuilder,
       SbccSettings settings) {
-    GitRevListBuilder revListBuilder =
+    final GitRevListBuilder revListBuilder =
         gitScmCommandBuilder
             .get() //
             .revList() //
-            .format(FORMAT) //
-            .revs("^" + fromHash, toHash);
+            .format(FORMAT);
+    if (fromHash.equals(FIRST_COMMIT)) {
+      revListBuilder //
+          .revs(toHash);
+    } else {
+      revListBuilder //
+          .revs("^" + fromHash, toHash);
+    }
 
-    List<SbccChangeSet> found =
+    final List<SbccChangeSet> found =
         revListBuilder //
             .build(new RevListOutputHandler(settings)) //
             .call();
@@ -103,7 +111,7 @@ public class ChangeSetsService {
       return new ArrayList<>();
     }
 
-    SbccChangeSet sbccChangeSet =
+    final SbccChangeSet sbccChangeSet =
         gitScmCommandBuilder
             .get() //
             .catFile() //
