@@ -72,7 +72,7 @@ atlas-package
 Run Bitbucket, with the plugin, on localhost:
 ```
 export MAVEN_OPTS=-Dplugin.resource.directories=`pwd`/src/main/resources
-mvn bitbucket:run
+atlas-mvn bitbucket:run
 ```
 
 You can also remote debug on port 5005 with:
@@ -84,6 +84,6 @@ Make a release:
 
 https://developer.atlassian.com/docs/common-coding-tasks/development-cycle/packaging-and-releasing-your-plugin
 ```
-mvn release:prepare
-mvn release:perform
+atlas-mvn release:prepare
+atlas-mvn release:perform
 ```

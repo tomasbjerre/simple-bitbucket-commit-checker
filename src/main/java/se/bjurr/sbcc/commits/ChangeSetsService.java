@@ -87,7 +87,7 @@ public class ChangeSetsService {
             .format(FORMAT);
     if (fromHash.equals(FIRST_COMMIT)) {
       revListBuilder //
-          .revs(toHash);
+          .revs(toHash, "--not", "--all");
     } else {
       revListBuilder //
           .revs("^" + fromHash, toHash);
@@ -99,7 +99,9 @@ public class ChangeSetsService {
             .call();
 
     if (found != null) {
-      logger.log(INFO, "Found " + found.size() + " commits to " + toHash);
+      for (final SbccChangeSet sbccChangeSet : found) {
+        logger.log(INFO, "Checking " + sbccChangeSet.getId());
+      }
       return found;
     }
     return newArrayList();

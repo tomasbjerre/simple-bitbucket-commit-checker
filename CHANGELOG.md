@@ -2,11 +2,11 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
+## 3.2
 ### GitHub [#71](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/71) Hook Validation is not working when creating a new branch. Allowing invalid users to create branch without validating the regexp and user details(email and slug)
   Checking all commits in new branches
   
-  [877e2d5c1a2c086](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/877e2d5c1a2c086) Tomas Bjerre *2017-07-29 14:02:46*
+  [560dca0f06fbba6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/560dca0f06fbba6) Tomas Bjerre *2017-07-29 14:03:19*
 
 ### No issue
   doc
