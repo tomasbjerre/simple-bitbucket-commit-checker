@@ -42,6 +42,10 @@
       <directory location="/static/" />
     </config-form>
     <validator>se.bjurr.sbcc.ConfigValidator</validator>
+    <scopes>
+      <scope>project</scope>
+      <scope>repository</scope>
+    </scopes>
   </repository-hook>
 
   <repository-merge-check key="repository-merge-check" class="se.bjurr.sbcc.SbccRepositoryMergeCheck" configurable="false"/>

@@ -4,6 +4,16 @@ Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
 ### No issue
+  Project level config
+  
+  [ec2cf7e67ce1ace](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/ec2cf7e67ce1ace) Tomas Bjerre *2017-07-29 17:58:18*
+
+## 3.4
+### No issue
+  BBS 5.2.2
+  
+  [00a75e9ec56c133](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/00a75e9ec56c133) Tomas Bjerre *2017-07-29 17:39:21*
+
   Reverting custom JS/CSS changes from atlassian-plugin.xml
   
   [346177353229e1b](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/346177353229e1b) Tomas Bjerre *2017-07-29 17:35:24*
