@@ -172,7 +172,6 @@ public class RefChangeBuilder {
             ArgumentMatchers.any(Repository.class),
             ArgumentMatchers.eq(this.refId),
             ArgumentMatchers.eq(this.type),
-            ArgumentMatchers.eq(this.fromHash),
             ArgumentMatchers.eq(this.toHash)))
         .thenReturn(this.newChangesets);
     return this;
@@ -213,20 +212,20 @@ public class RefChangeBuilder {
   public RefChangeBuilder run() throws IOException {
     checkNotNull(this.refChange, "do 'throwing' or 'build' before.");
     this.hook.setChangesetsService(this.changeSetService);
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter scmHookDetailsOut = new PrintWriter(stringWriter);
-    ScmHookDetails scmHookDetails = mock(ScmHookDetails.class);
+    final StringWriter stringWriter = new StringWriter();
+    final PrintWriter scmHookDetailsOut = new PrintWriter(stringWriter);
+    final ScmHookDetails scmHookDetails = mock(ScmHookDetails.class);
     when(scmHookDetails.out()).thenReturn(scmHookDetailsOut);
-    Repository repository = mock(Repository.class);
+    final Repository repository = mock(Repository.class);
 
     repoHookResponse =
         this.hook.performChecks(newArrayList(this.refChange), scmHookDetails, repository);
     this.wasAccepted = repoHookResponse.isAccepted();
     this.outputAll = stringWriter.toString();
     if (!repoHookResponse.getVetoes().isEmpty()) {
-      String vetoSummary = repoHookResponse.getVetoes().get(0).getSummaryMessage();
+      final String vetoSummary = repoHookResponse.getVetoes().get(0).getSummaryMessage();
       assertEquals(PR_REJECT_DEFAULT_MSG, vetoSummary);
-      String vetoDetail = repoHookResponse.getVetoes().get(0).getDetailedMessage();
+      final String vetoDetail = repoHookResponse.getVetoes().get(0).getDetailedMessage();
       assertEquals("", this.outputAll);
       this.outputAll = vetoDetail;
     }
@@ -240,7 +239,6 @@ public class RefChangeBuilder {
             ArgumentMatchers.any(Repository.class),
             ArgumentMatchers.any(String.class),
             ArgumentMatchers.any(RefChangeType.class),
-            ArgumentMatchers.any(String.class),
             ArgumentMatchers.any(String.class)))
         .thenThrow(ioException);
     return this;

@@ -78,9 +78,9 @@ public class RefChangeValidator {
             + refChangeType);
     if (compile(settings.getBranches().or(".*")).matcher(refId).find()) {
       if (refChangeType != DELETE) {
-        List<SbccChangeSet> refChangeSets =
+        final List<SbccChangeSet> refChangeSets =
             changesetsService.getNewChangeSets(
-                settings, fromRepository, refId, refChangeType, fromHash, toHash);
+                settings, fromRepository, refId, refChangeType, toHash);
         validateRefChange(refChangeVerificationResult, refId, fromHash, toHash, refChangeSets);
       }
     }
@@ -93,7 +93,7 @@ public class RefChangeValidator {
       String toHash,
       List<SbccChangeSet> refChangeSets)
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
-    SbccRefChangeVerificationResult refChangeVerificationResults =
+    final SbccRefChangeVerificationResult refChangeVerificationResults =
         validateRefChange(refChangeSets, settings, refId, fromHash, toHash);
     if (refChangeVerificationResults.hasReportables()) {
       refChangeVerificationResult.add(refChangeVerificationResults);

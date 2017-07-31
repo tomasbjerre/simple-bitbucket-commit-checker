@@ -26,7 +26,6 @@ import com.atlassian.bitbucket.scm.git.command.revlist.GitRevListBuilder;
 import com.google.common.base.Optional;
 
 public class ChangeSetsService {
-  private static final String FIRST_COMMIT = "0000000000000000000000000000000000000000";
   private static Logger logger = getLogger(ChangeSetsService.class.getName());
 
   private final ScmService scmService;
@@ -40,10 +39,9 @@ public class ChangeSetsService {
       Repository repository,
       String refId,
       RefChangeType type,
-      String fromHash,
       String toHash)
       throws IOException {
-    return getNewChangesets(settings, repository, refId, type, fromHash, toHash);
+    return getNewChangesets(settings, repository, refId, type, toHash);
   }
 
   private Optional<GitScmCommandBuilder> findGitScmCommandBuilder(Repository repository) {
@@ -59,7 +57,6 @@ public class ChangeSetsService {
       Repository repository,
       String refId,
       RefChangeType type,
-      String fromHash,
       String toHash) {
 
     final Optional<GitScmCommandBuilder> gitScmCommandBuilder =
@@ -71,12 +68,11 @@ public class ChangeSetsService {
     if (refId.startsWith(TAGS.getPath())) {
       return getTag(type, toHash, gitScmCommandBuilder);
     } else {
-      return getCommits(fromHash, toHash, gitScmCommandBuilder, settings);
+      return getCommits( toHash, gitScmCommandBuilder, settings);
     }
   }
 
   private List<SbccChangeSet> getCommits(
-      String fromHash,
       String toHash,
       Optional<GitScmCommandBuilder> gitScmCommandBuilder,
       SbccSettings settings) {
@@ -84,14 +80,8 @@ public class ChangeSetsService {
         gitScmCommandBuilder
             .get() //
             .revList() //
-            .format(FORMAT);
-    if (fromHash.equals(FIRST_COMMIT)) {
-      revListBuilder //
-          .revs(toHash, "--not", "--all");
-    } else {
-      revListBuilder //
-          .revs("^" + fromHash, toHash);
-    }
+            .format(FORMAT) //
+            .revs(toHash, "--not", "--all");
 
     final List<SbccChangeSet> found =
         revListBuilder //
