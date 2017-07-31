@@ -4,9 +4,21 @@ Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
 ### No issue
+  doc
+  
+  [3d7d5593c560f59](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3d7d5593c560f59) Tomas Bjerre *2017-07-31 09:07:48*
+
+## 3.6
+### GitHub [#73](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/73) Hook is validating all old commits with user slug/email. Not able to push the changes after preforming  local merge from master to branch.
+  Only validate new commits
+  
+  [c6adf1650476f66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/c6adf1650476f66) Tomas Bjerre *2017-07-31 07:44:12*
+
+## 3.5
+### No issue
   Project level config
   
-  [ec2cf7e67ce1ace](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/ec2cf7e67ce1ace) Tomas Bjerre *2017-07-29 17:58:18*
+  [9cfe3d9c5c6a0d7](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/9cfe3d9c5c6a0d7) Tomas Bjerre *2017-07-29 17:58:32*
 
 ## 3.4
 ### No issue

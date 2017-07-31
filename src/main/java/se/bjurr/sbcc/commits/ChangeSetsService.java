@@ -35,11 +35,7 @@ public class ChangeSetsService {
   }
 
   public List<SbccChangeSet> getNewChangeSets(
-      SbccSettings settings,
-      Repository repository,
-      String refId,
-      RefChangeType type,
-      String toHash)
+      SbccSettings settings, Repository repository, String refId, RefChangeType type, String toHash)
       throws IOException {
     return getNewChangesets(settings, repository, refId, type, toHash);
   }
@@ -68,14 +64,12 @@ public class ChangeSetsService {
     if (refId.startsWith(TAGS.getPath())) {
       return getTag(type, toHash, gitScmCommandBuilder);
     } else {
-      return getCommits( toHash, gitScmCommandBuilder, settings);
+      return getCommits(toHash, gitScmCommandBuilder, settings);
     }
   }
 
   private List<SbccChangeSet> getCommits(
-      String toHash,
-      Optional<GitScmCommandBuilder> gitScmCommandBuilder,
-      SbccSettings settings) {
+      String toHash, Optional<GitScmCommandBuilder> gitScmCommandBuilder, SbccSettings settings) {
     final GitRevListBuilder revListBuilder =
         gitScmCommandBuilder
             .get() //
