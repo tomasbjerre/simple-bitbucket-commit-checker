@@ -2,11 +2,15 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
+## 3.7
 ### No issue
+  move CSS and JS into /static so they get loaded automatically when the form is displayed
+  
+  [72a36c45b2df50a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/72a36c45b2df50a) Lucy Bain *2017-08-02 03:49:28*
+
   doc
   
-  [3d7d5593c560f59](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3d7d5593c560f59) Tomas Bjerre *2017-07-31 09:07:48*
+  [067804308b6e877](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/067804308b6e877) Tomas Bjerre *2017-07-31 09:07:59*
 
 ## 3.6
 ### GitHub [#73](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/73) Hook is validating all old commits with user slug/email. Not able to push the changes after preforming  local merge from master to branch.
