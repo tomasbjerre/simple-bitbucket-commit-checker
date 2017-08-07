@@ -22,10 +22,13 @@ public class UserValidator {
 
   private boolean shouldIgnoreByUserNamePattern() {
     return settings.getIgnoreUsersPattern().isPresent()
-        && matches(settings.getIgnoreUsersPattern().get(), currentUser.getName());
+        && (currentUser == null
+            || matches(settings.getIgnoreUsersPattern().get(), currentUser.getName()));
   }
 
   private boolean shouldIgnoreServiceUser() {
-    return settings.allowServiceUsers() && currentUser.getType().equals(SERVICE);
+    return settings.allowServiceUsers()
+        && currentUser != null
+        && currentUser.getType().equals(SERVICE);
   }
 }

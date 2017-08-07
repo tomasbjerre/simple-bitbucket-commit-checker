@@ -2,6 +2,12 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### No issue
+  doc
+  
+  [975020fd5483f13](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/975020fd5483f13) Tomas Bjerre *2017-08-03 17:27:46*
+
 ## 3.7
 ### No issue
   move CSS and JS into /static so they get loaded automatically when the form is displayed

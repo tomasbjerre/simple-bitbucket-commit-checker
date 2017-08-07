@@ -3,6 +3,7 @@ package se.bjurr.sbcc;
 import static com.atlassian.bitbucket.hook.repository.RepositoryHookResult.accepted;
 import static com.atlassian.bitbucket.repository.RefChangeType.ADD;
 import static java.util.logging.Level.SEVERE;
+import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.settings.SbccSettings;
 import se.bjurr.sbcc.settings.ValidationException;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
@@ -55,27 +55,29 @@ public class SbccRepositoryMergeCheck implements RepositoryMergeCheck {
   @Override
   public RepositoryHookResult preUpdate(
       PreRepositoryHookContext context, PullRequestMergeHookRequest request) {
-    PullRequest pullRequest = request.getPullRequest();
-    ScmHookDetails scmHookDetails = request.getScmHookDetails().orElse(null);
-    Repository repositoryWithCommits = request.getFromRef().getRepository();
-    Repository repositoryWithSettings = request.getToRef().getRepository();
-    Optional<Settings> settings = repositoryHook.findSettings(repositoryWithSettings);
+    final PullRequest pullRequest = request.getPullRequest();
+    final ScmHookDetails scmHookDetails = request.getScmHookDetails().orElse(null);
+    final Repository repositoryWithCommits = request.getFromRef().getRepository();
+    final Repository repositoryWithSettings = request.getToRef().getRepository();
+    final Optional<Settings> settings = repositoryHook.findSettings(repositoryWithSettings);
 
     if (!settings.isPresent()) {
       return accepted();
     }
 
     try {
-      boolean shouldCheckPr = SbccSettings.sscSettings(settings.get()).shouldCheckPullRequests();
+      final boolean shouldCheckPr =
+          sscSettings(settings.get()) //
+              .shouldCheckPullRequests();
       if (!shouldCheckPr) {
         return accepted();
       }
-    } catch (ValidationException e) {
+    } catch (final ValidationException e) {
       logger.log(SEVERE, "Could not read settings", e);
       return accepted();
     }
-    List<RefChange> refChanges = new ArrayList<>();
-    RefChange refChange =
+    final List<RefChange> refChanges = new ArrayList<>();
+    final RefChange refChange =
         new RefChange() {
           @Override
           public RefChangeType getType() {

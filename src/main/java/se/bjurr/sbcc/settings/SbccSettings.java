@@ -163,7 +163,7 @@ public class SbccSettings {
       if (!isNullOrEmpty(settings.getString(SETTING_SIZE))) {
         sbccSettings.withCheckCommitSize(parseInt(settings.getString(SETTING_SIZE)));
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ValidationException(SETTING_SIZE, "Not an integer!");
     }
     for (int g = 0; g < 1000; g++) {
@@ -228,7 +228,7 @@ public class SbccSettings {
   }
 
   private void withIgnoreUsersPattern(String string) {
-    this.ignoreUsersPattern = emptyToNull(string);
+    this.ignoreUsersPattern = emptyToNull(nullToEmpty(string).trim());
   }
 
   private SbccSettings withShouldCheckPullRequestsMessage(String string) {
