@@ -6,6 +6,17 @@ Changelog of Simple Bitbucket Commit Checker.
 ### No issue
   doc
   
+  [ff8d85e84248698](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/ff8d85e84248698) Tomas Bjerre *2017-08-07 18:42:00*
+
+## 3.8
+### GitHub [#75](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/75) NPE from se.bjurr.sbcc.UserValidator.shouldIgnoreServiceUser(UserValidator.java:29)
+  Avoiding NPE when user not authenticated
+  
+  [f52c2a58275ae79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f52c2a58275ae79) Tomas Bjerre *2017-08-07 18:39:41*
+
+### No issue
+  doc
+  
   [975020fd5483f13](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/975020fd5483f13) Tomas Bjerre *2017-08-03 17:27:46*
 
 ## 3.7
