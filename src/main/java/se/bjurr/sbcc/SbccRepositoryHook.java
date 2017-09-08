@@ -117,7 +117,8 @@ public class SbccRepositoryHook {
       for (final RefChange refChange : refChanges) {
         final boolean isTag = isTag(refChange.getRef().getId());
         final Boolean shouldExcludeTagCommits = settings.shouldExcludeTagCommits();
-        if (isTag && shouldExcludeTagCommits) {
+        final boolean isNote = ChangeSetsService.isNote(refChange.getRef().getId());
+        if (isNote || isTag && shouldExcludeTagCommits) {
           continue;
         }
         refChangeValidator.validateRefChange(

@@ -75,6 +75,10 @@ public class ChangeSetsService {
     return refId.startsWith(TAGS.getPath());
   }
 
+  public static boolean isNote(String refId) {
+    return refId.startsWith("refs/notes/");
+  }
+
   private List<SbccChangeSet> getCommits(
       String toHash, Optional<GitScmCommandBuilder> gitScmCommandBuilder, SbccSettings settings) {
     final GitRevListBuilder revListBuilder =
