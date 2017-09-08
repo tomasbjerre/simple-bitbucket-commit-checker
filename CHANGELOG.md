@@ -2,7 +2,12 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
+## 3.9
+### GitHub [#76](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/76) Unable to push notes when sbcc plugin is enabled
+  Ignoring notes
+  
+  [6315af70c235fc6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/6315af70c235fc6) Tomas Bjerre *2017-09-08 15:19:43*
+
 ### GitHub [#77](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/77) Unable to push tags when sbcc is enabled
   Avoid branch check for tag commits
   
