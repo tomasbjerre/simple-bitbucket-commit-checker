@@ -4,8 +4,8 @@ import static com.google.common.base.Joiner.on;
 import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -13,13 +13,15 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.atlassian.bitbucket.io.LineReader;
-import com.atlassian.bitbucket.io.LineReaderOutputHandler;
-import com.atlassian.bitbucket.scm.CommandOutputHandler;
-
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccPerson;
 import se.bjurr.sbcc.settings.SbccSettings;
+
+import com.atlassian.bitbucket.io.LineReader;
+import com.atlassian.bitbucket.io.LineReaderOutputHandler;
+import com.atlassian.bitbucket.scm.CommandOutputHandler;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 
 public class RevListOutputHandler extends LineReaderOutputHandler
     implements CommandOutputHandler<List<SbccChangeSet>> {
@@ -66,8 +68,14 @@ public class RevListOutputHandler extends LineReaderOutputHandler
   private final SbccSettings settings;
 
   public RevListOutputHandler(SbccSettings settings) {
-    super(Charset.forName("UTF-8"));
+    super(Charsets.UTF_8);
     this.settings = settings;
+  }
+
+  @VisibleForTesting
+  RevListOutputHandler() {
+    super(Charsets.UTF_8);
+    settings = null;
   }
 
   @Nullable
@@ -78,39 +86,58 @@ public class RevListOutputHandler extends LineReaderOutputHandler
 
   @Override
   protected void processReader(LineReader lineReader) throws IOException {
+    settings.shouldExcludeMergeCommits();
+
+    final List<String> lines = new ArrayList<>();
     String line;
     while ((line = lineReader.readLine()) != null) {
+      lines.add(line);
+    }
 
+    final Iterator<String> linesItr = lines.iterator();
+    final List<SbccChangeSet> newCommits =
+        getSbccChangeSet(linesItr, settings.shouldExcludeMergeCommits());
+    commits.addAll(newCommits);
+  }
+
+  @VisibleForTesting
+  List<SbccChangeSet> getSbccChangeSet(
+      Iterator<String> linesItr, boolean shouldExcludeMergeCommits) {
+    final List<SbccChangeSet> commits = new ArrayList<>();
+    while (linesItr.hasNext()) {
+      String line = linesItr.next();
       if (!line.startsWith("commit ")) {
         throw new RuntimeException("unexpected line: " + line);
       }
 
-      line = lineReader.readLine();
+      line = linesItr.next();
 
-      String[] commitData = line.split(OUTPUT_NEW_LINE);
+      final String[] commitData = line.split(OUTPUT_NEW_LINE);
       try {
-        String ref = commitData[0];
+        final String ref = commitData[0];
 
-        boolean isMerge = commitData[1].contains(" ");
+        final boolean isMerge = commitData[1].contains(" ");
 
-        if (isMerge && settings.shouldExcludeMergeCommits()) {
-          while ((line = lineReader.readLine()) != null && !line.equals(OUTPUT_END)) {
+        if (isMerge && shouldExcludeMergeCommits) {
+          while (linesItr.hasNext()
+              && (line = linesItr.next()) != null
+              && !line.equals(OUTPUT_END)) {
             // Read the rest of this object before continuing with next object
           }
           continue;
         }
 
-        String committerName = commitData[2];
-        String committerEmail = commitData[3];
-        SbccPerson committer = new SbccPerson(committerName, committerEmail);
+        final String committerName = commitData[2];
+        final String committerEmail = commitData[3];
+        final SbccPerson committer = new SbccPerson(committerName, committerEmail);
 
-        String authorName = commitData[4];
-        String authorEmail = commitData[5];
-        SbccPerson author = new SbccPerson(authorName, authorEmail);
+        final String authorName = commitData[4];
+        final String authorEmail = commitData[5];
+        final SbccPerson author = new SbccPerson(authorName, authorEmail);
 
-        String message = parseMessage(lineReader);
+        final String message = parseMessage(linesItr);
 
-        SbccChangeSet sbccChangeSet =
+        final SbccChangeSet sbccChangeSet =
             changeSetBuilder() //
                 .withCommitter(committer) //
                 .withAuthor(author) //
@@ -118,17 +145,18 @@ public class RevListOutputHandler extends LineReaderOutputHandler
                 .withMessage(message) //
                 .build();
         commits.add(sbccChangeSet);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         logger.error("Unable to parse commit, commit data found:\n" + on('\n').join(commitData), e);
       }
     }
+    return commits;
   }
 
-  private String parseMessage(LineReader lineReader) throws IOException {
+  private String parseMessage(Iterator<String> linesItr) throws IOException {
     String message = "";
 
     String line;
-    while ((line = lineReader.readLine()) != null && !line.equals(OUTPUT_END)) {
+    while (linesItr.hasNext() && (line = linesItr.next()) != null && !line.equals(OUTPUT_END)) {
       if (!message.isEmpty()) {
         message += "\n";
       }
