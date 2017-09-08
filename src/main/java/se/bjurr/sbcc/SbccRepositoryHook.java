@@ -6,6 +6,7 @@ import static com.atlassian.bitbucket.permission.Permission.REPO_ADMIN;
 import static java.util.Optional.empty;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
+import static se.bjurr.sbcc.commits.ChangeSetsService.isTag;
 import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
 import java.io.PrintWriter;
@@ -87,10 +88,10 @@ public class SbccRepositoryHook {
     }
     try {
 
-      StringBuilder hookResponse = new StringBuilder();
-      SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
+      final StringBuilder hookResponse = new StringBuilder();
+      final SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
 
-      Optional<Settings> rawSettingsOpt = findSettings(repository);
+      final Optional<Settings> rawSettingsOpt = findSettings(repository);
       if (!rawSettingsOpt.isPresent()) {
         return acceptedResponse(responseWriter, hookResponse);
       }
@@ -102,7 +103,7 @@ public class SbccRepositoryHook {
         return accepted();
       }
 
-      RefChangeValidator refChangeValidator =
+      final RefChangeValidator refChangeValidator =
           new RefChangeValidator(
               repository,
               settings,
@@ -114,6 +115,11 @@ public class SbccRepositoryHook {
 
       final SbccVerificationResult refChangeVerificationResults = new SbccVerificationResult();
       for (final RefChange refChange : refChanges) {
+        final boolean isTag = isTag(refChange.getRef().getId());
+        final Boolean shouldExcludeTagCommits = settings.shouldExcludeTagCommits();
+        if (isTag && shouldExcludeTagCommits) {
+          continue;
+        }
         refChangeValidator.validateRefChange(
             refChangeVerificationResults,
             refChange.getType(),
@@ -122,7 +128,7 @@ public class SbccRepositoryHook {
             refChange.getToHash());
       }
 
-      String printOut =
+      final String printOut =
           new SbccPrinter(settings, sbccRenderer)
               .printVerificationResults(refChangeVerificationResults);
 
@@ -135,7 +141,7 @@ public class SbccRepositoryHook {
         if (refChangeVerificationResults.isAccepted()) {
           return acceptedResponse(responseWriter, hookResponse);
         } else {
-          String summary =
+          final String summary =
               settings
                   .getShouldCheckPullRequestsMessage() //
                   .or(PR_REJECT_DEFAULT_MSG);
@@ -167,14 +173,14 @@ public class SbccRepositoryHook {
 
   public Optional<Settings> findSettings(final Repository repository) {
     try {
-      Settings settings =
+      final Settings settings =
           this.securityService
               .withPermission(REPO_ADMIN, "Retrieving settings")
               .call(
                   new Operation<Settings, Exception>() {
                     @Override
                     public Settings perform() throws Exception {
-                      RepositoryHook hook =
+                      final RepositoryHook hook =
                           repositoryHookService.getByKey(repository, HOOK_SETTINGS_KEY);
                       if (!hook.isEnabled() || !hook.isEnabled()) {
                         return null;
@@ -185,12 +191,12 @@ public class SbccRepositoryHook {
       if (settings == null) {
         return empty();
       }
-      SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
-      SbccSettings abccSettings =
+      final SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
+      final SbccSettings abccSettings =
           SbccSettings.sscSettings(new RenderingSettings(settings, sbccRenderer));
       logger.log(INFO, "Using settings:\n" + abccSettings);
       return Optional.of(settings);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.log(SEVERE, "Tried to get settings for \"" + HOOK_SETTINGS_KEY + "\"", e);
       return empty();
     }

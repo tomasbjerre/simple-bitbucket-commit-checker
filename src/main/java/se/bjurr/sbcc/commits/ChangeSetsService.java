@@ -61,11 +61,18 @@ public class ChangeSetsService {
       return newArrayList();
     }
 
-    if (refId.startsWith(TAGS.getPath())) {
+    if (isTag(refId)) {
+      if (settings.shouldExcludeTagCommits()) {
+        return new ArrayList<>();
+      }
       return getTag(type, toHash, gitScmCommandBuilder);
     } else {
       return getCommits(toHash, gitScmCommandBuilder, settings);
     }
+  }
+
+  public static boolean isTag(String refId) {
+    return refId.startsWith(TAGS.getPath());
   }
 
   private List<SbccChangeSet> getCommits(

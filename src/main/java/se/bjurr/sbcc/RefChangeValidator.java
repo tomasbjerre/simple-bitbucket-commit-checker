@@ -5,6 +5,7 @@ import static java.util.logging.Level.INFO;
 import static java.util.regex.Pattern.compile;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketEmail;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketName;
+import static se.bjurr.sbcc.commits.ChangeSetsService.isTag;
 
 import java.io.IOException;
 import java.util.List;
@@ -109,7 +110,12 @@ public class RefChangeValidator {
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
     final SbccRefChangeVerificationResult refChangeVerificationResult =
         new SbccRefChangeVerificationResult(refId, fromHash, toHash);
-    refChangeVerificationResult.setBranchValidationResult(validateBranchName(refId));
+
+    if (!isTag(refId)) {
+      final boolean validateBranchName = validateBranchName(refId);
+      refChangeVerificationResult.setBranchValidationResult(validateBranchName);
+    }
+
     for (final SbccChangeSet sbccChangeSet : sbccChangeSets) {
       sbccRenderer.setSbccChangeSet(sbccChangeSet);
       logger.fine(
