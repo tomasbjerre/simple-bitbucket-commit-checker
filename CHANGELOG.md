@@ -2,6 +2,17 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### GitHub [#79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/79) JQL does not work, Bitbucket v5.4.0
+  Debug loggin in Jira client
+  
+  [e1b897c48cf0b08](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/e1b897c48cf0b08) Tomas Bjerre *2017-11-05 08:23:22*
+
+### No issue
+  Doc
+  
+  [89fec3e10e4d153](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/89fec3e10e4d153) Tomas Bjerre *2017-09-08 15:22:56*
+
 ## 3.9
 ### GitHub [#76](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/76) Unable to push notes when sbcc plugin is enabled
   Ignoring notes

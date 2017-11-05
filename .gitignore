@@ -5,3 +5,5 @@ target
 *~
 sdk
 .okhttpcache
+.idea
+*.iml

@@ -13,8 +13,12 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JiraClient {
+  private Logger logger = LoggerFactory.getLogger(JiraClient.class);
+
   public int getNumberOfJqlResults(
       ApplicationLinkService applicationLinkService, String jqlCheckQuery)
       throws CredentialsRequiredException, UnsupportedEncodingException, ResponseException {
@@ -30,10 +34,14 @@ public class JiraClient {
   @VisibleForTesting
   protected String invokeJira(ApplicationLinkService applicationLinkService, String jqlCheckQuery)
       throws UnsupportedEncodingException, ResponseException, CredentialsRequiredException {
-    return applicationLinkService
-        .getPrimaryApplicationLink(JiraApplicationType.class)
-        .createAuthenticatedRequestFactory()
-        .createRequest(GET, "/rest/api/2/search?jql=" + encode(jqlCheckQuery, UTF_8.name()))
-        .execute();
+    String restPath = "/rest/api/2/search?jql=" + encode(jqlCheckQuery, UTF_8.name());
+    String json =
+        applicationLinkService
+            .getPrimaryApplicationLink(JiraApplicationType.class)
+            .createAuthenticatedRequestFactory()
+            .createRequest(GET, restPath)
+            .execute();
+    logger.debug(restPath + "\n\n <<< " + json);
+    return json;
   }
 }
