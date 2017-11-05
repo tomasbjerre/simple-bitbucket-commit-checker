@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.bjurr.sbcc</groupId>
 	<artifactId>sbcc</artifactId>
-	<version>3.10</version>
+	<version>3.11-SNAPSHOT</version>
 	<organization>
 		<name>Tomas Bjerre</name>
 		<url>http://bjurr.se/</url>
@@ -15,7 +15,7 @@
 	<scm>
 		<developerConnection>scm:git:git@github.com:tomasbjerre/simple-bitbucket-commit-checker.git</developerConnection>
 		<url>https://github.com/tomasbjerre/simple-bitbucket-commit-checker</url>
-		<tag>sbcc-3.10</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
 		<repository>

@@ -6,7 +6,7 @@ Changelog of Simple Bitbucket Commit Checker.
 ### GitHub [#79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/79) JQL does not work, Bitbucket v5.4.0
   Debug loggin in Jira client
   
-  [e1b897c48cf0b08](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/e1b897c48cf0b08) Tomas Bjerre *2017-11-05 08:23:22*
+  [4854ebbae4a625a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/4854ebbae4a625a) Tomas Bjerre *2017-11-05 08:23:43*
 
 ### No issue
   Doc
