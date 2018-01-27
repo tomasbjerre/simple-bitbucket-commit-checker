@@ -2,17 +2,17 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
-### GitHub [#81](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/81) Works for tags?
+## 3.11
+### GitHub
   Optionally checking annotated tags 
 
  * The setting was always false.
  * Checking the tag with same rules as for commits.
   
-  [3a90c707b748ab1](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3a90c707b748ab1) Tomas Bjerre *2018-01-27 12:27:54*
+  [7d791bf1ff855bf](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/7d791bf1ff855bf) Tomas Bjerre *2018-01-27 12:28:27*
 
 ## 3.10
-### GitHub [#79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/79) JQL does not work, Bitbucket v5.4.0
+### GitHub
   Debug loggin in Jira client
   
   [4854ebbae4a625a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/4854ebbae4a625a) Tomas Bjerre *2017-11-05 08:23:43*
@@ -23,12 +23,12 @@ Changelog of Simple Bitbucket Commit Checker.
   [89fec3e10e4d153](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/89fec3e10e4d153) Tomas Bjerre *2017-09-08 15:22:56*
 
 ## 3.9
-### GitHub [#76](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/76) Unable to push notes when sbcc plugin is enabled
+### GitHub
   Ignoring notes
   
   [6315af70c235fc6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/6315af70c235fc6) Tomas Bjerre *2017-09-08 15:19:43*
 
-### GitHub [#77](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/77) Unable to push tags when sbcc is enabled
+### GitHub
   Avoid branch check for tag commits
   
   [b4e7b0e195f1a29](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/b4e7b0e195f1a29) Tomas Bjerre *2017-09-08 15:07:55*
@@ -39,7 +39,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [a63ec6ea3e2651f](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/a63ec6ea3e2651f) Tomas Bjerre *2017-08-07 18:42:09*
 
 ## 3.8
-### GitHub [#75](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/75) NPE from se.bjurr.sbcc.UserValidator.shouldIgnoreServiceUser(UserValidator.java:29)
+### GitHub
   Avoiding NPE when user not authenticated
   
   [f52c2a58275ae79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f52c2a58275ae79) Tomas Bjerre *2017-08-07 18:39:41*
@@ -60,7 +60,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [067804308b6e877](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/067804308b6e877) Tomas Bjerre *2017-07-31 09:07:59*
 
 ## 3.6
-### GitHub [#73](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/73) Hook is validating all old commits with user slug/email. Not able to push the changes after preforming  local merge from master to branch.
+### GitHub
   Only validate new commits
   
   [c6adf1650476f66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/c6adf1650476f66) Tomas Bjerre *2017-07-31 07:44:12*
@@ -98,7 +98,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [d6dc5ea3b83c1e3](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/d6dc5ea3b83c1e3) Tomas Bjerre *2017-07-29 15:21:47*
 
 ## 3.2
-### GitHub [#71](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/71) Hook Validation is not working when creating a new branch. Allowing invalid users to create branch without validating the regexp and user details(email and slug)
+### GitHub
   Checking all commits in new branches
   
   [560dca0f06fbba6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/560dca0f06fbba6) Tomas Bjerre *2017-07-29 14:03:19*
@@ -115,7 +115,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [5217bb5ead2e06d](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/5217bb5ead2e06d) Tomas Bjerre *2017-05-25 19:29:33*
 
 ## 3.0
-### GitHub [#70](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/70) In-browser editing bypasses hooks
+### GitHub
   Using PreRepositoryHook
   
   [156a937c51aa032](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/156a937c51aa032) Tomas Bjerre *2017-05-25 17:37:24*
@@ -130,7 +130,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [02f3c7f17d125f6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/02f3c7f17d125f6) Tomas Bjerre *2017-04-20 18:48:59*
 
 ## 2.14
-### GitHub [#69](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/69) Requires to have option to validate commiter name with bitbucket user slug
+### GitHub
   Check committer name for Bitbucket user slug 
 
  * Require that the commit committer name matches the Bitbucket users slug.
@@ -138,13 +138,13 @@ Changelog of Simple Bitbucket Commit Checker.
   [0b61bfa5ab0a1bb](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/0b61bfa5ab0a1bb) Tomas Bjerre *2017-04-20 18:40:51*
 
 ## 2.13
-### GitHub [#68](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/68) Require Matching Author Name validates against only Stash &quot;username(userid)&quot; field
+### GitHub
   Correcting rejection message
   
   [1336678f5b3d043](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/1336678f5b3d043) Tomas Bjerre *2017-04-14 21:21:09*
 
 ## 2.12
-### GitHub [#68](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/68) Require Matching Author Name validates against only Stash &quot;username(userid)&quot; field
+### GitHub
   Check author for user slug 
 
  * Require that the commit authors name matches the Bitbucket users slug.
@@ -158,13 +158,13 @@ Changelog of Simple Bitbucket Commit Checker.
   [514864e5af3eba3](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/514864e5af3eba3) Tomas Bjerre *2017-03-21 16:55:59*
 
 ## 2.11
-### GitHub [#67](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/67) Newline character in output
+### GitHub
   Using LF for newline
   
   [56fae7d678718f4](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/56fae7d678718f4) Tomas Bjerre *2017-03-21 16:52:37*
 
 ## 2.10
-### GitHub [#66](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/66) Support Git 2.11 and Bitbucket Server 4.13 or higher
+### GitHub
   Support Git 2.11 and Bitbucket Server 4.13 or higher 
 
  * Removing support for file size and commit diff checks. Cannot easily implement it after Atlassian platform changes.
@@ -182,7 +182,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [6f42f9b9f54f7f7](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/6f42f9b9f54f7f7) Tomas Bjerre *2016-11-11 06:46:30*
 
 ## 2.9
-### GitHub [#61](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/61) Using message variables in Regex
+### GitHub
   Variables in all string configurations 
 
  * So that a user can be rejected if branch does not match /heads/dev/${BITBUCKET_USER_SLUG}/.+
@@ -195,7 +195,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [8054ab7a0a4f923](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/8054ab7a0a4f923) Johan Wärlander *2016-10-17 08:31:41*
 
 ## 2.8
-### GitHub [#59](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/59) Error when pushing deleted files
+### GitHub
   Ignoring filesize check on deleted files
   
   [919ea69497d2445](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/919ea69497d2445) Tomas Bjerre *2016-10-13 15:09:37*
@@ -210,13 +210,13 @@ Changelog of Simple Bitbucket Commit Checker.
   [fa396c1ace1951a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fa396c1ace1951a) Tomas Bjerre *2016-07-10 06:57:25*
 
 ## 2.7
-### GitHub [#55](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/55) size-checker is checking files not part of the pushed change-set
+### GitHub
   Only checking changed files for size
   
   [a58018f1da837c5](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/a58018f1da837c5) Tomas Bjerre *2016-06-23 13:47:31*
 
 ## 2.6
-### GitHub [#53](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/53) Slow in big instalaltions, with alot of users
+### GitHub
   Caching file sizes
   
   [426e5f26c94fc31](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/426e5f26c94fc31) Tomas Bjerre *2016-06-22 16:50:48*
@@ -227,19 +227,19 @@ Changelog of Simple Bitbucket Commit Checker.
   [4c25126469090bf](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/4c25126469090bf) Tomas Bjerre *2016-06-21 19:46:07*
 
 ## 2.5
-### GitHub [#49](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/49) Case insensitive email addresses for commit author
+### GitHub
   Checking email/name in commits with UserService  
 
  * Was loading all users from user service in a cache, every 5 minutes. This was causing performance issues and is now using https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.1/api/reference/com/atlassian/bitbucket/user/UserService.html#findUserByNameOrEmail(java.lang.String) instead.
   
   [b1553b16018fe50](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/b1553b16018fe50) Tomas Bjerre *2016-06-21 16:58:01*
 
-### GitHub [#51](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/51) Question: What defines what a &quot;service user&quot; is for the Accept Service Users checkbox?
+### GitHub
   Adding link to explain service user
   
   [3679e3201f56d37](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3679e3201f56d37) Tomas Bjerre *2016-04-20 19:03:49*
 
-### GitHub [#53](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/53) Slow in big instalaltions, with alot of users
+### GitHub
   Checking email/name in commits with UserService  
 
  * Was loading all users from user service in a cache, every 5 minutes. This was causing performance issues and is now using https://developer.atlassian.com/static/javadoc/bitbucket-server/4.0.1/api/reference/com/atlassian/bitbucket/user/UserService.html#findUserByNameOrEmail(java.lang.String) instead.
@@ -252,7 +252,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [323af977ada196f](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/323af977ada196f) Tomas Bjerre *2016-04-19 18:57:47*
 
 ## 2.4
-### GitHub [#49](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/49) Case insensitive email addresses for commit author
+### GitHub
   Case insensitive email for committer and author
   
   [61be31c87654ea3](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/61be31c87654ea3) Tomas Bjerre *2016-03-01 17:49:04*
@@ -263,13 +263,13 @@ Changelog of Simple Bitbucket Commit Checker.
   [54e7e47fe773619](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/54e7e47fe773619) Tomas Bjerre *2016-02-24 18:17:54*
 
 ## 2.3
-### GitHub [#48](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/48) Excluding a user
+### GitHub
   Optionally ignore users if there username matches a regular expression
   
   [249461408b8b6a1](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/249461408b8b6a1) Tomas Bjerre *2015-12-20 19:24:49*
 
 ## 2.2
-### GitHub [#45](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/45) sscc checking non-existing SHA
+### GitHub
   Checking if object from treeWalker exists before loading it
   
   [7f3bd03f7daf9b6](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/7f3bd03f7daf9b6) Tomas Bjerre *2015-11-18 15:35:04*
@@ -319,26 +319,26 @@ Changelog of Simple Bitbucket Commit Checker.
   [87d4b985c33b634](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/87d4b985c33b634) Tomas Bjerre *2015-08-30 11:29:17*
 
 ## 1.13
-### GitHub [#43](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/43) Variables: COMMITTER/AUTHOR_EMAIL/NAME
+### GitHub
   Adding committer and author variables
   
   [08d7541a3158693](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/08d7541a3158693) Tomas Bjerre *2015-08-29 17:20:51*
 
 ## 1.12
-### GitHub [#42](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/42) Regex check to enforce branch names should apply when pushing new branch only
+### GitHub
   Checking branch name, even if no commits are pushed
   
   [bd22a29f1eb992a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/bd22a29f1eb992a) Tomas Bjerre *2015-08-24 18:56:58*
 
 ## 1.11
-### GitHub [#41](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/41) &quot;An error occured&quot; is shown every time users see a Pull Request
+### GitHub
   "An error occured" is shown every time users see a Pull Request 
 * Fixed by using SecurityService to get hook settings with ADMIN permissions as evaluated permission
   
   [948bcc9d8944a6a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/948bcc9d8944a6a) Tomas Bjerre *2015-07-31 08:10:16*
 
 ## 1.10
-### GitHub [#35](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/35) Forks are not checked
+### GitHub
   Checking pull requests
   
   [5905c1e6563d7ca](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/5905c1e6563d7ca) Tomas Bjerre *2015-06-22 09:41:42*
@@ -347,7 +347,7 @@ Changelog of Simple Bitbucket Commit Checker.
   
   [3b9af58497d0c76](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3b9af58497d0c76) Tomas Bjerre *2015-06-21 21:42:04*
 
-### GitHub [#36](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/36) Check pull requests
+### GitHub
   Checking forks
   
   [3b9af58497d0c76](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3b9af58497d0c76) Tomas Bjerre *2015-06-21 21:42:04*
@@ -358,7 +358,7 @@ Changelog of Simple Bitbucket Commit Checker.
   [f4dd5da91bc05e7](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f4dd5da91bc05e7) Tomas Bjerre *2015-06-13 07:14:12*
 
 ## 1.9
-### GitHub [#34](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/34) Check that author/committer exists
+### GitHub
   Can check that author name and/or email exists for any user in Stash
   
   [1303758230cd57a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/1303758230cd57a) Tomas Bjerre *2015-06-10 21:29:59*
@@ -371,13 +371,13 @@ Changelog of Simple Bitbucket Commit Checker.
   [feb4c2de904cd57](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/feb4c2de904cd57) Tomas Bjerre *2015-06-10 16:47:14*
 
 ## 1.8
-### GitHub [#27](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/27) JQL check
+### GitHub
   Check JQL query
   
   [33b341f32e37417](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/33b341f32e37417) Tomas Bjerre *2015-06-06 12:50:40*
 
 ## 1.7
-### GitHub [#31](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/31) Rule: Allow email to equal rendered string
+### GitHub
   Allow email to equal rendered string
   
   [76f472eb54f8047](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/76f472eb54f8047) Tomas Bjerre *2015-06-03 16:19:35*
@@ -388,29 +388,29 @@ Changelog of Simple Bitbucket Commit Checker.
   [9ed9b249609fb7f](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/9ed9b249609fb7f) Tomas Bjerre *2015-06-03 10:08:48*
 
 ## 1.6
-### GitHub [#30](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/30) Rule: Check Committer
+### GitHub
   Reporting if committer or author name was faulty
   
   [891ab293beed1e0](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/891ab293beed1e0) Tomas Bjerre *2015-06-03 10:02:01*
 
 ## 1.5
-### GitHub [#28](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/28) Allow specific usertypes to bypass checks
+### GitHub
   Allow specific usertypes to bypass checks
   
   [8547c2676b54f2a](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/8547c2676b54f2a) Tomas Bjerre *2015-06-02 18:18:33*
 
-### GitHub [#30](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/30) Rule: Check Committer
+### GitHub
   Check Committer
   
   [252a89b8972c693](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/252a89b8972c693) Tomas Bjerre *2015-06-02 17:27:48*
 
-### GitHub [#32](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/32) Rule: Reject based on branch name
+### GitHub
   Reject based on branch name
   
   [14000fdfb821c84](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/14000fdfb821c84) Tomas Bjerre *2015-06-02 16:04:08*
 
 ## 1.4
-### GitHub [#29](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/29) Code is checking committer, not author, of commits
+### GitHub
   Checking author against author instead of committer. Committer is the one pushing the commit
   
   [f02cb7462d58006](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/f02cb7462d58006) Tomas Bjerre *2015-06-01 15:44:07*
