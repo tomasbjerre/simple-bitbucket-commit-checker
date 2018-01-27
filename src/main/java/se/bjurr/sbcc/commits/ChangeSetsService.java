@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.RefService;
 import com.atlassian.bitbucket.repository.Repository;
@@ -25,22 +22,29 @@ import com.atlassian.bitbucket.scm.git.command.GitScmCommandBuilder;
 import com.atlassian.bitbucket.scm.git.command.revlist.GitRevListBuilder;
 import com.google.common.base.Optional;
 
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.settings.SbccSettings;
+
 public class ChangeSetsService {
   private static Logger logger = getLogger(ChangeSetsService.class.getName());
 
   private final ScmService scmService;
 
-  public ChangeSetsService(RefService refService, ScmService scmService) {
+  public ChangeSetsService(final RefService refService, final ScmService scmService) {
     this.scmService = scmService;
   }
 
   public List<SbccChangeSet> getNewChangeSets(
-      SbccSettings settings, Repository repository, String refId, RefChangeType type, String toHash)
+      final SbccSettings settings,
+      final Repository repository,
+      final String refId,
+      final RefChangeType type,
+      final String toHash)
       throws IOException {
     return getNewChangesets(settings, repository, refId, type, toHash);
   }
 
-  private Optional<GitScmCommandBuilder> findGitScmCommandBuilder(Repository repository) {
+  private Optional<GitScmCommandBuilder> findGitScmCommandBuilder(final Repository repository) {
     if (!GitScm.ID.equals(repository.getScmId())) {
       logger.log(WARNING, "SCM " + repository.getScmId() + " not supported");
       return Optional.absent();
@@ -49,11 +53,11 @@ public class ChangeSetsService {
   }
 
   private List<SbccChangeSet> getNewChangesets(
-      SbccSettings settings,
-      Repository repository,
-      String refId,
-      RefChangeType type,
-      String toHash) {
+      final SbccSettings settings,
+      final Repository repository,
+      final String refId,
+      final RefChangeType type,
+      final String toHash) {
 
     final Optional<GitScmCommandBuilder> gitScmCommandBuilder =
         findGitScmCommandBuilder(repository);
@@ -61,26 +65,28 @@ public class ChangeSetsService {
       return newArrayList();
     }
 
+    final List<SbccChangeSet> result = new ArrayList<>();
     if (isTag(refId)) {
-      if (settings.shouldExcludeTagCommits()) {
-        return new ArrayList<>();
+      if (!settings.shouldExcludeTagCommits()) {
+        result.addAll(getTag(type, toHash, gitScmCommandBuilder));
       }
-      return getTag(type, toHash, gitScmCommandBuilder);
-    } else {
-      return getCommits(toHash, gitScmCommandBuilder, settings);
     }
+    result.addAll(getCommits(toHash, gitScmCommandBuilder, settings));
+    return result;
   }
 
-  public static boolean isTag(String refId) {
+  public static boolean isTag(final String refId) {
     return refId.startsWith(TAGS.getPath());
   }
 
-  public static boolean isNote(String refId) {
+  public static boolean isNote(final String refId) {
     return refId.startsWith("refs/notes/");
   }
 
   private List<SbccChangeSet> getCommits(
-      String toHash, Optional<GitScmCommandBuilder> gitScmCommandBuilder, SbccSettings settings) {
+      final String toHash,
+      final Optional<GitScmCommandBuilder> gitScmCommandBuilder,
+      final SbccSettings settings) {
     final GitRevListBuilder revListBuilder =
         gitScmCommandBuilder
             .get() //
@@ -103,7 +109,9 @@ public class ChangeSetsService {
   }
 
   private List<SbccChangeSet> getTag(
-      RefChangeType type, String toHash, Optional<GitScmCommandBuilder> gitScmCommandBuilder) {
+      final RefChangeType type,
+      final String toHash,
+      final Optional<GitScmCommandBuilder> gitScmCommandBuilder) {
     if (type == DELETE) {
       return new ArrayList<>();
     }
@@ -118,7 +126,7 @@ public class ChangeSetsService {
             .call();
 
     if (sbccChangeSet != null) {
-      newArrayList(sbccChangeSet);
+      return newArrayList(sbccChangeSet);
     }
 
     return newArrayList();

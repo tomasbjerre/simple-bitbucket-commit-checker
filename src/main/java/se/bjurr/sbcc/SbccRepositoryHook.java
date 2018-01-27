@@ -14,10 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.data.SbccVerificationResult;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.ScmHookDetails;
@@ -31,8 +27,12 @@ import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
 import com.google.common.annotations.VisibleForTesting;
 
+import se.bjurr.sbcc.commits.ChangeSetsService;
+import se.bjurr.sbcc.data.SbccVerificationResult;
+import se.bjurr.sbcc.settings.SbccSettings;
+
 public class SbccRepositoryHook {
-  public static final String PR_REJECT_DEFAULT_MSG = "At least one commit is not ok";
+  public static final String PR_REJECT_DEFAULT_MSG = "At least one change is not ok";
   private static final String HOOK_SETTINGS_KEY = "se.bjurr.sscc.sscc:pre-receive-repository-hook";
   private static Logger logger = Logger.getLogger(SbccRepositoryHook.class.getName());
 
@@ -42,7 +42,7 @@ public class SbccRepositoryHook {
   }
 
   @VisibleForTesting
-  public static void setLogger(Logger logger) {
+  public static void setLogger(final Logger logger) {
     SbccRepositoryHook.logger = logger;
   }
 
@@ -61,12 +61,12 @@ public class SbccRepositoryHook {
   private final RepositoryHookService repositoryHookService;
 
   public SbccRepositoryHook(
-      ChangeSetsService changesetsService,
-      AuthenticationContext bitbucketAuthenticationContext,
-      ApplicationLinkService applicationLinkService,
-      SbccUserAdminService sbccUserAdminService,
-      SecurityService securityService,
-      RepositoryHookService repositoryHookService) {
+      final ChangeSetsService changesetsService,
+      final AuthenticationContext bitbucketAuthenticationContext,
+      final ApplicationLinkService applicationLinkService,
+      final SbccUserAdminService sbccUserAdminService,
+      final SecurityService securityService,
+      final RepositoryHookService repositoryHookService) {
     this.hookName = "Simple Bitbucket Commit Checker";
     this.changesetsService = changesetsService;
     this.bitbucketAuthenticationContext = bitbucketAuthenticationContext;
@@ -77,7 +77,9 @@ public class SbccRepositoryHook {
   }
 
   public RepositoryHookResult performChecks(
-      List<RefChange> refChanges, ScmHookDetails scmHookDetails, Repository repository) {
+      final List<RefChange> refChanges,
+      final ScmHookDetails scmHookDetails,
+      final Repository repository) {
 
     PrintWriter responseWriter = null;
     if (scmHookDetails != null) {
@@ -164,7 +166,7 @@ public class SbccRepositoryHook {
   }
 
   private RepositoryHookResult acceptedResponse(
-      PrintWriter responseWriter, StringBuilder hookResponse) {
+      final PrintWriter responseWriter, final StringBuilder hookResponse) {
     if (responseWriter != null) {
       responseWriter.print(hookResponse.toString());
     }
@@ -209,12 +211,12 @@ public class SbccRepositoryHook {
   }
 
   @VisibleForTesting
-  public void setChangesetsService(ChangeSetsService changesetsService) {
+  public void setChangesetsService(final ChangeSetsService changesetsService) {
     this.changesetsService = changesetsService;
   }
 
   @VisibleForTesting
-  public void setHookName(String hookName) {
+  public void setHookName(final String hookName) {
     this.hookName = hookName;
   }
 }

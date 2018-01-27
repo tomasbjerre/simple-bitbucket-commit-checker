@@ -14,6 +14,7 @@ public class SbccChangeSetBuilder {
   private SbccPerson committer;
   private String id;
   private String message;
+  private boolean tag;
 
   private SbccChangeSetBuilder() {}
 
@@ -22,26 +23,32 @@ public class SbccChangeSetBuilder {
         this.id,
         firstNonNull(this.committer, DEFAULT_COMMITTER),
         firstNonNull(this.author, DEFAULT_AUTHOR),
-        this.message);
+        this.message,
+        tag);
   }
 
-  public SbccChangeSetBuilder withAuthor(SbccPerson author) {
+  public SbccChangeSetBuilder withAuthor(final SbccPerson author) {
     this.author = author;
     return this;
   }
 
-  public SbccChangeSetBuilder withCommitter(SbccPerson committer) {
+  public SbccChangeSetBuilder withCommitter(final SbccPerson committer) {
     this.committer = committer;
     return this;
   }
 
-  public SbccChangeSetBuilder withId(String id) {
+  public SbccChangeSetBuilder withId(final String id) {
     this.id = id;
     return this;
   }
 
-  public SbccChangeSetBuilder withMessage(String message) {
+  public SbccChangeSetBuilder withMessage(final String message) {
     this.message = message;
+    return this;
+  }
+
+  public SbccChangeSetBuilder withTag(final boolean tag) {
+    this.tag = tag;
     return this;
   }
 }

@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
-import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;
-import se.bjurr.sbcc.data.SbccVerificationResult;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.sal.api.net.ResponseException;
+
+import se.bjurr.sbcc.commits.ChangeSetsService;
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;
+import se.bjurr.sbcc.data.SbccVerificationResult;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class RefChangeValidator {
   private static Logger logger = Logger.getLogger(RefChangeValidator.class.getName());
@@ -40,13 +40,13 @@ public class RefChangeValidator {
   private final Repository fromRepository;
 
   public RefChangeValidator(
-      Repository fromRepository,
-      SbccSettings settings,
-      ChangeSetsService changesetsService,
-      AuthenticationContext bitbucketAuthenticationContext,
-      SbccRenderer sbccRenderer,
-      ApplicationLinkService applicationLinkService,
-      SbccUserAdminService sbccUserAdminService) {
+      final Repository fromRepository,
+      final SbccSettings settings,
+      final ChangeSetsService changesetsService,
+      final AuthenticationContext bitbucketAuthenticationContext,
+      final SbccRenderer sbccRenderer,
+      final ApplicationLinkService applicationLinkService,
+      final SbccUserAdminService sbccUserAdminService) {
     this.fromRepository = fromRepository;
     this.settings = settings;
     this.changesetsService = changesetsService;
@@ -59,10 +59,10 @@ public class RefChangeValidator {
 
   public void validateRefChange(
       final SbccVerificationResult refChangeVerificationResult,
-      RefChangeType refChangeType,
-      String refId,
-      String fromHash,
-      String toHash)
+      final RefChangeType refChangeType,
+      final String refId,
+      final String fromHash,
+      final String toHash)
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
     logger.log(
         INFO,
@@ -89,10 +89,10 @@ public class RefChangeValidator {
 
   private void validateRefChange(
       final SbccVerificationResult refChangeVerificationResult,
-      String refId,
-      String fromHash,
-      String toHash,
-      List<SbccChangeSet> refChangeSets)
+      final String refId,
+      final String fromHash,
+      final String toHash,
+      final List<SbccChangeSet> refChangeSets)
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
     final SbccRefChangeVerificationResult refChangeVerificationResults =
         validateRefChange(refChangeSets, settings, refId, fromHash, toHash);
@@ -102,11 +102,11 @@ public class RefChangeValidator {
   }
 
   private SbccRefChangeVerificationResult validateRefChange(
-      List<SbccChangeSet> sbccChangeSets,
-      SbccSettings settings,
-      String refId,
-      String fromHash,
-      String toHash)
+      final List<SbccChangeSet> sbccChangeSets,
+      final SbccSettings settings,
+      final String refId,
+      final String fromHash,
+      final String toHash)
       throws IOException, CredentialsRequiredException, ResponseException, ExecutionException {
     final SbccRefChangeVerificationResult refChangeVerificationResult =
         new SbccRefChangeVerificationResult(refId, fromHash, toHash);
@@ -130,6 +130,11 @@ public class RefChangeValidator {
               + sbccChangeSet.getCommitter().getEmailAddress()
               + " "
               + sbccChangeSet.getCommitter().getName());
+
+      if (sbccChangeSet.isTag() && settings.shouldExcludeTagCommits()) {
+        continue;
+      }
+
       refChangeVerificationResult.setGroupsResult(
           sbccChangeSet,
           commitMessageValidator.validateChangeSetForGroups(settings, sbccChangeSet));
@@ -163,7 +168,7 @@ public class RefChangeValidator {
     return refChangeVerificationResult;
   }
 
-  private boolean validateBranchName(String branchName) {
+  private boolean validateBranchName(final String branchName) {
     return compile(settings.getBranchRejectionRegexp().or(".*")).matcher(branchName).find();
   }
 }

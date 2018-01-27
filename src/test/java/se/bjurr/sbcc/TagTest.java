@@ -2,6 +2,7 @@ package se.bjurr.sbcc;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static se.bjurr.sbcc.SBCCTestConstants.COMMIT_MESSAGE_JIRA_INC;
 import static se.bjurr.sbcc.SBCCTestConstants.COMMIT_MESSAGE_NO_ISSUE;
 import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_BRANCH_REJECTION_REGEXP;
@@ -92,5 +93,65 @@ public class TagTest {
         .build() //
         .run() //
         .wasRejected();
+  }
+
+  @Test
+  public void testThatBitbucketDoesNotIgnoreTagMessageCheckWhenTagsAreNotExcludedReject()
+      throws IOException {
+    refChangeBuilder() //
+        .withGroupAcceptingOnlyBothJiraAndIncInEachCommit()
+        .withBitbucketUserSlug("tomasbjerre")
+        .withChangeSet(
+            changeSetBuilder() //
+                .withId("1") //
+                .withMessage("") //
+                .withAuthor(new SbccPerson("Some Name", "emailAddress")) //
+                .build()) //
+        .withSetting(SETTING_EXCLUDE_TAG_COMMITS, FALSE) //
+        .withRefId("refs/tags/123") //
+        .build() //
+        .run() //
+        .wasRejected() //
+        .hasTrimmedFlatOutput(
+            "refs/tags/123 e2bc4ed003 -> af35d5c1a4   1 Some Name <emailAddress> >>>   - You need to specity JIRA and INC   JIRA: ((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)   Incident, INC: INC");
+  }
+
+  @Test
+  public void
+      testThatBitbucketDoesNotIgnoreTagMessageCheckWhenTagsAreNotExcludedRejectIgnoredIfDisabled()
+          throws IOException {
+    refChangeBuilder() //
+        .withGroupAcceptingOnlyBothJiraAndIncInEachCommit()
+        .withBitbucketUserSlug("tomasbjerre")
+        .withChangeSet(
+            changeSetBuilder() //
+                .withId("1") //
+                .withMessage("") //
+                .withAuthor(new SbccPerson("Some Name", "emailAddress")) //
+                .build()) //
+        .withSetting(SETTING_EXCLUDE_TAG_COMMITS, TRUE) //
+        .withRefId("refs/tags/123") //
+        .build() //
+        .run() //
+        .wasAccepted();
+  }
+
+  @Test
+  public void testThatBitbucketDoesNotIgnoreTagMessageCheckWhenTagsAreNotExcludedAccept()
+      throws IOException {
+    refChangeBuilder() //
+        .withGroupAcceptingOnlyBothJiraAndIncInEachCommit()
+        .withBitbucketUserSlug("tomasbjerre")
+        .withChangeSet(
+            changeSetBuilder() //
+                .withId("1") //
+                .withMessage(COMMIT_MESSAGE_JIRA_INC) //
+                .withAuthor(new SbccPerson("Some Name", "emailAddress")) //
+                .build()) //
+        .withSetting(SETTING_EXCLUDE_TAG_COMMITS, FALSE) //
+        .withRefId("refs/tags/123") //
+        .build() //
+        .run() //
+        .wasAccepted();
   }
 }

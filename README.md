@@ -29,7 +29,7 @@ Available in [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/s
 * Check that branch name matches specific regexp.
   * You may use variables here to make sure user *tomas* can only commit to `dev/tomas/.+` with a regexp like `refs/heads/dev/${BITBUCKET_USER_SLUG}/.+`.
 * Exclude merge commits.
-* Exclude tag commits.
+* Optionally check annotated tag commits.
 * Check commits in pull requests
 * Show a general reject message.
 * Show a general accept message.

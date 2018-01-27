@@ -21,7 +21,7 @@ public class AnnotatedTagOutputHandler extends LineReaderOutputHandler
 
   private SbccChangeSet sbccChangeSet = null;
 
-  public AnnotatedTagOutputHandler(String ref) {
+  public AnnotatedTagOutputHandler(final String ref) {
     super(Charset.forName("UTF-8"));
   }
 
@@ -32,16 +32,18 @@ public class AnnotatedTagOutputHandler extends LineReaderOutputHandler
   }
 
   @Override
-  protected void processReader(LineReader lineReader) throws IOException {
+  protected void processReader(final LineReader lineReader) throws IOException {
     String line;
 
     SbccPerson tagger = new SbccPerson("", "");
     boolean isTag = false;
     String message = null;
+    String ref = null;
 
     while ((line = lineReader.readLine()) != null) {
       if (line.startsWith("tag ")) {
         isTag = true;
+        ref = line;
       } else if (line.startsWith("tagger ")) {
         tagger = parseTagger(line);
       } else if (line.isEmpty()) {
@@ -54,25 +56,27 @@ public class AnnotatedTagOutputHandler extends LineReaderOutputHandler
           changeSetBuilder() //
               .withCommitter(tagger) //
               .withAuthor(tagger) //
-              .withMessage(message) //
+              .withId(ref) //
+              .withMessage(message) //'
+              .withTag(true) //
               .build();
     }
   }
 
-  private SbccPerson parseTagger(String line) {
-    Pattern pattern = Pattern.compile("^tagger (.*)\\s*<([^>]*)> .*$");
-    Matcher matcher = pattern.matcher(line);
+  private SbccPerson parseTagger(final String line) {
+    final Pattern pattern = Pattern.compile("^tagger (.*)\\s*<([^>]*)> .*$");
+    final Matcher matcher = pattern.matcher(line);
     if (matcher.matches()) {
-      String name = matcher.group(1).trim();
-      String email = matcher.group(2).trim();
+      final String name = matcher.group(1).trim();
+      final String email = matcher.group(2).trim();
       return new SbccPerson(name, email);
     } else {
       return new SbccPerson("", "");
     }
   }
 
-  private String parseMessage(LineReader lineReader) throws IOException {
-    StringBuilder message = new StringBuilder();
+  private String parseMessage(final LineReader lineReader) throws IOException {
+    final StringBuilder message = new StringBuilder();
 
     String line;
     while ((line = lineReader.readLine()) != null) {

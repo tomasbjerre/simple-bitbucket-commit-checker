@@ -3,6 +3,15 @@
 Changelog of Simple Bitbucket Commit Checker.
 
 ## Unreleased
+### GitHub [#81](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/81) Works for tags?
+  Optionally checking annotated tags 
+
+ * The setting was always false.
+ * Checking the tag with same rules as for commits.
+  
+  [3a90c707b748ab1](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/3a90c707b748ab1) Tomas Bjerre *2018-01-27 12:27:54*
+
+## 3.10
 ### GitHub [#79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/79) JQL does not work, Bitbucket v5.4.0
   Debug loggin in Jira client
   

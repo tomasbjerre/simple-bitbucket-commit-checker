@@ -108,7 +108,7 @@ public class SbccSettings {
   private String shouldCheckPullRequestsMessage;
   private String ignoreUsersPattern;
 
-  public static SbccSettings sscSettings(Settings settings) throws ValidationException {
+  public static SbccSettings sscSettings(final Settings settings) throws ValidationException {
     final SbccSettings sbccSettings = new SbccSettings();
     sbccSettings
         .withAcceptMessage( //
@@ -210,28 +210,29 @@ public class SbccSettings {
   }
 
   private SbccSettings withRequireMatchingAuthorNameInBitbucketSlug(
-      Boolean requireMatchingAuthorNameInBitbucketSlug) {
+      final Boolean requireMatchingAuthorNameInBitbucketSlug) {
     this.requireMatchingAuthorNameInBitbucketSlug =
         firstNonNull(requireMatchingAuthorNameInBitbucketSlug, FALSE);
     return this;
   }
 
-  private SbccSettings withRequireMatchingAuthorNameSlug(Boolean requireMatchingAuthorNameSlug) {
+  private SbccSettings withRequireMatchingAuthorNameSlug(
+      final Boolean requireMatchingAuthorNameSlug) {
     this.requireMatchingAuthorNameSlug = firstNonNull(requireMatchingAuthorNameSlug, FALSE);
     return this;
   }
 
   private SbccSettings withRequireMatchingCommitterNameSlug(
-      Boolean requireMatchingCommitterNameSlug) {
+      final Boolean requireMatchingCommitterNameSlug) {
     this.requireMatchingCommitterNameSlug = firstNonNull(requireMatchingCommitterNameSlug, FALSE);
     return this;
   }
 
-  private void withIgnoreUsersPattern(String string) {
+  private void withIgnoreUsersPattern(final String string) {
     this.ignoreUsersPattern = emptyToNull(nullToEmpty(string).trim());
   }
 
-  private SbccSettings withShouldCheckPullRequestsMessage(String string) {
+  private SbccSettings withShouldCheckPullRequestsMessage(final String string) {
     this.shouldCheckPullRequestsMessage = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
@@ -240,22 +241,22 @@ public class SbccSettings {
     return fromNullable(shouldCheckPullRequestsMessage);
   }
 
-  private SbccSettings withJqlCheck(Boolean b) {
+  private SbccSettings withJqlCheck(final Boolean b) {
     this.jqlCheck = firstNonNull(b, FALSE);
     return this;
   }
 
-  private SbccSettings withJqlCheckMessage(String string) {
+  private SbccSettings withJqlCheckMessage(final String string) {
     this.jqlCheckMessage = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withCommitRegexp(String string) {
+  private SbccSettings withCommitRegexp(final String string) {
     this.commitRegexp = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withJqlCheckQuery(String string) {
+  private SbccSettings withJqlCheckQuery(final String string) {
     this.jqlCheckQuery = nullToEmpty(string).trim();
     return this;
   }
@@ -276,47 +277,48 @@ public class SbccSettings {
     return jqlCheckQuery;
   }
 
-  private SbccSettings withRequireMatchingAuthorEmailRegexp(String string) {
+  private SbccSettings withRequireMatchingAuthorEmailRegexp(final String string) {
     this.requireMatchingAuthorEmailRegexp = emptyToNull(string);
     return this;
   }
 
-  private SbccSettings withAllowServiceUsers(Boolean allowServiceUsers) {
+  private SbccSettings withAllowServiceUsers(final Boolean allowServiceUsers) {
     this.allowServiceUsers = firstNonNull(allowServiceUsers, FALSE);
     return this;
   }
 
-  private SbccSettings withCheckCommitDiffRegexp(String string) {
+  private SbccSettings withCheckCommitDiffRegexp(final String string) {
     this.commitDiffRegexp = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withCheckCommitDiffRegexpMessage(String string) {
+  private SbccSettings withCheckCommitDiffRegexpMessage(final String string) {
     this.commitDiffRegexpMessage = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withBranchRejectionRegexp(String string) {
+  private SbccSettings withBranchRejectionRegexp(final String string) {
     this.branchRejectionRegexp = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withBranchRejectionRegexpMessage(String string) {
+  private SbccSettings withBranchRejectionRegexpMessage(final String string) {
     this.branchRejectionRegexpMessage = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private SbccSettings withCheckCommitSize(int commitSize) {
+  private SbccSettings withCheckCommitSize(final int commitSize) {
     this.commitSize = commitSize;
     return this;
   }
 
-  private SbccSettings withCheckCommitSizeMessage(String string) {
+  private SbccSettings withCheckCommitSizeMessage(final String string) {
     this.commitSizeMessage = emptyToNull(nullToEmpty(string).trim());
     return this;
   }
 
-  private static String validateRegExp(String field, String regexp) throws ValidationException {
+  private static String validateRegExp(final String field, final String regexp)
+      throws ValidationException {
     if (regexp == null) {
       return null;
     }
@@ -419,53 +421,53 @@ public class SbccSettings {
     return fromNullable(commitSizeMessage);
   }
 
-  private SbccSettings withAcceptMessage(String acceptMessage) {
+  private SbccSettings withAcceptMessage(final String acceptMessage) {
     this.acceptMessage = emptyToNull(acceptMessage);
     return this;
   }
 
-  private SbccSettings withBranches(String branches) {
+  private SbccSettings withBranches(final String branches) {
     this.branches = emptyToNull(branches);
     return this;
   }
 
-  private SbccSettings withDryRun(Boolean dryRun) {
+  private SbccSettings withDryRun(final Boolean dryRun) {
     this.dryRun = firstNonNull(dryRun, FALSE);
     return this;
   }
 
-  private SbccSettings withDryRunMessage(String dryRunMessage) {
+  private SbccSettings withDryRunMessage(final String dryRunMessage) {
     this.dryRunMessage = emptyToNull(dryRunMessage);
     return this;
   }
 
-  private SbccSettings withExcludeMergeCommits(Boolean excludeMergeCommits) {
+  private SbccSettings withExcludeMergeCommits(final Boolean excludeMergeCommits) {
     this.excludeMergeCommits = firstNonNull(excludeMergeCommits, TRUE);
     return this;
   }
 
-  private SbccSettings withExcludeTagCommits(Boolean excludeTagCommits) {
-    this.excludeTagCommits = firstNonNull(excludeTagCommits, TRUE);
+  private SbccSettings withExcludeTagCommits(final Boolean excludeTagCommits) {
+    this.excludeTagCommits = firstNonNull(excludeTagCommits, FALSE);
     return this;
   }
 
-  private SbccSettings withGroup(SbccGroup sbccGroup) {
+  private SbccSettings withGroup(final SbccGroup sbccGroup) {
     this.groups.add(sbccGroup);
     return this;
   }
 
-  private SbccSettings withRejectMessage(String rejectMessage) {
+  private SbccSettings withRejectMessage(final String rejectMessage) {
     this.rejectMessage = emptyToNull(rejectMessage);
     return this;
   }
 
-  private SbccSettings withRequireMatchingAuthorEmail(Boolean requireMatchingAuthorEmail) {
+  private SbccSettings withRequireMatchingAuthorEmail(final Boolean requireMatchingAuthorEmail) {
     this.requireMatchingAuthorEmail = firstNonNull(requireMatchingAuthorEmail, FALSE);
     return this;
   }
 
   private SbccSettings withRequireMatchingAuthorEmailInBitbucket(
-      Boolean requireMatchingAuthorEmailInBitbucket) {
+      final Boolean requireMatchingAuthorEmailInBitbucket) {
     this.requireMatchingAuthorEmailInBitbucket =
         firstNonNull(requireMatchingAuthorEmailInBitbucket, FALSE);
     return this;
@@ -475,24 +477,25 @@ public class SbccSettings {
     return requireMatchingAuthorEmailInBitbucket;
   }
 
-  private SbccSettings withRequireMatchingCommitterEmail(Boolean requireMatchingCommitterEmail) {
+  private SbccSettings withRequireMatchingCommitterEmail(
+      final Boolean requireMatchingCommitterEmail) {
     this.requireMatchingCommitterEmail = firstNonNull(requireMatchingCommitterEmail, FALSE);
     return this;
   }
 
   private SbccSettings withRequireMatchingAuthorEmailMessage(
-      String requireMatchingAuthorEmailMessage) {
+      final String requireMatchingAuthorEmailMessage) {
     this.requireMatchingAuthorEmailMessage = emptyToNull(requireMatchingAuthorEmailMessage);
     return this;
   }
 
-  private SbccSettings withRequireMatchingAuthorName(Boolean requireMatchingAuthorName) {
+  private SbccSettings withRequireMatchingAuthorName(final Boolean requireMatchingAuthorName) {
     this.requireMatchingAuthorName = firstNonNull(requireMatchingAuthorName, FALSE);
     return this;
   }
 
   private SbccSettings withRequireMatchingAuthorNameInBitbucket(
-      Boolean requireMatchingAuthorNameInBitbucket) {
+      final Boolean requireMatchingAuthorNameInBitbucket) {
     this.requireMatchingAuthorNameInBitbucket =
         firstNonNull(requireMatchingAuthorNameInBitbucket, FALSE);
     return this;
@@ -514,13 +517,14 @@ public class SbccSettings {
     return requireMatchingCommitterNameSlug;
   }
 
-  private SbccSettings withRequireMatchingCommitterName(Boolean requireMatchingCommitterName) {
+  private SbccSettings withRequireMatchingCommitterName(
+      final Boolean requireMatchingCommitterName) {
     this.requireMatchingCommitterName = firstNonNull(requireMatchingCommitterName, FALSE);
     return this;
   }
 
   private SbccSettings withRequireMatchingAuthorNameMessage(
-      String requireMatchingAuthorNameMessage) {
+      final String requireMatchingAuthorNameMessage) {
     this.requireMatchingAuthorNameMessage = emptyToNull(requireMatchingAuthorNameMessage);
     return this;
   }
@@ -537,7 +541,7 @@ public class SbccSettings {
     return allowServiceUsers;
   }
 
-  private SbccSettings withShouldCheckPullRequests(Boolean shouldCheckPullRequests) {
+  private SbccSettings withShouldCheckPullRequests(final Boolean shouldCheckPullRequests) {
     this.shouldCheckPullRequests = firstNonNull(shouldCheckPullRequests, FALSE);
     return this;
   }
