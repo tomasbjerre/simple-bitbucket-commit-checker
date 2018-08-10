@@ -111,7 +111,7 @@ public class RefChangeValidator {
     final SbccRefChangeVerificationResult refChangeVerificationResult =
         new SbccRefChangeVerificationResult(refId, fromHash, toHash);
 
-    if (!isTag(refId)) {
+    if (!settings.shouldExcludeTagCommits() || !isTag(refId)) {
       final boolean validateBranchName = validateBranchName(refId);
       refChangeVerificationResult.setBranchValidationResult(validateBranchName);
     }
