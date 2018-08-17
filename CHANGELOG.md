@@ -2,6 +2,12 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 3.12
+### GitHub [#89](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/89) add logging to support triage of connection issues
+  Logging exception thrown when invoking Jira
+  
+  [e1c5b204a3cbc79](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/e1c5b204a3cbc79) Tomas Bjerre *2018-08-17 17:16:56*
+
 ## 3.11
 ### GitHub [#81](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/81) Works for tags?
   Optionally checking annotated tags 
