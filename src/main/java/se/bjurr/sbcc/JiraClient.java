@@ -27,6 +27,7 @@ public class JiraClient {
       JsonObject response = new JsonParser().parse(json).getAsJsonObject();
       return response.get("issues").getAsJsonArray().size();
     } catch (Exception e) {
+      logger.error(e.getMessage(), e);
       return 0;
     }
   }
