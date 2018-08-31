@@ -3,10 +3,8 @@ package se.bjurr.sbcc;
 import static se.bjurr.sbcc.settings.SbccGroup.Accept.ACCEPT;
 import static se.bjurr.sbcc.settings.SbccGroup.Accept.SHOW_MESSAGE;
 
-import java.util.Map;
-
 import com.google.common.base.Optional;
-
+import java.util.Map;
 import se.bjurr.sbcc.SbccRenderer.SBCCVariable;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccChangeSetVerificationResult;

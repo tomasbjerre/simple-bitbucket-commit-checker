@@ -2,9 +2,8 @@ package se.bjurr.sbcc;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import java.util.Map;
-
 import com.atlassian.bitbucket.setting.Settings;
+import java.util.Map;
 
 public class RenderingSettings implements Settings {
 

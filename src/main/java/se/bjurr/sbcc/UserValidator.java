@@ -2,9 +2,9 @@ package se.bjurr.sbcc;
 
 import static com.atlassian.bitbucket.user.UserType.SERVICE;
 import static java.util.regex.Pattern.matches;
-import se.bjurr.sbcc.settings.SbccSettings;
 
 import com.atlassian.bitbucket.user.ApplicationUser;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class UserValidator {
 

@@ -11,9 +11,7 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_REQUIRE_MATCHING_AUTHO
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
-
 import org.junit.Test;
-
 import se.bjurr.sbcc.data.SbccPerson;
 
 public class TagTest {

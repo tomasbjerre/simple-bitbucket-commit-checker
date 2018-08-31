@@ -4,9 +4,8 @@ import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.emptyToNull;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
+import java.util.List;
 
 public class SbccGroup implements Comparable<SbccGroup> {
   public enum Accept {

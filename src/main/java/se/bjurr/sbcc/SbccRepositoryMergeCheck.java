@@ -5,14 +5,6 @@ import static com.atlassian.bitbucket.repository.RefChangeType.ADD;
 import static java.util.logging.Level.SEVERE;
 import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.Logger;
-
-import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.settings.ValidationException;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.ScmHookDetails;
@@ -28,6 +20,12 @@ import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.user.SecurityService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
+import se.bjurr.sbcc.commits.ChangeSetsService;
+import se.bjurr.sbcc.settings.ValidationException;
 
 public class SbccRepositoryMergeCheck implements RepositoryMergeCheck {
   private static Logger logger = Logger.getLogger(SbccRepositoryMergeCheck.class.getName());

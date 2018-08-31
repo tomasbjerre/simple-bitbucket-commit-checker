@@ -4,13 +4,11 @@ import static com.google.common.collect.Maps.newTreeMap;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;
-
 import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccMatch;
-
-import com.google.common.base.Optional;
 
 public class SbccRefChangeVerificationResult {
   private final Map<SbccChangeSet, SbccChangeSetVerificationResult> sbccChangeSets = newTreeMap();

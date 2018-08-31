@@ -6,7 +6,6 @@ import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

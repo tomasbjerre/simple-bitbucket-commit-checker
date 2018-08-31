@@ -35,12 +35,9 @@ import static se.bjurr.sbcc.util.RefChangeBuilder.JIRA_REGEXP;
 import static se.bjurr.sbcc.util.RefChangeBuilder.JIRA_RESPONSE_EMPTY;
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
-import java.io.IOException;
-
-import org.junit.Test;
-
 import com.google.common.io.Resources;
-
+import java.io.IOException;
+import org.junit.Test;
 import se.bjurr.sbcc.data.SbccPerson;
 import se.bjurr.sbcc.settings.SbccGroup;
 

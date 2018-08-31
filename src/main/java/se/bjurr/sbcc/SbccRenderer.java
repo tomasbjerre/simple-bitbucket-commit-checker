@@ -10,12 +10,10 @@ import static se.bjurr.sbcc.SbccCommon.getBitbucketName;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketUser;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketUserSlug;
 
-import java.util.List;
-import java.util.regex.Matcher;
-
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.google.common.base.Optional;
-
+import java.util.List;
+import java.util.regex.Matcher;
 import se.bjurr.sbcc.data.SbccChangeSet;
 
 public class SbccRenderer {

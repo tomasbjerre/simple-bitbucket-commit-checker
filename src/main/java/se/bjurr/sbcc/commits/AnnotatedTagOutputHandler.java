@@ -2,17 +2,14 @@ package se.bjurr.sbcc.commits;
 
 import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 
+import com.atlassian.bitbucket.io.LineReader;
+import com.atlassian.bitbucket.io.LineReaderOutputHandler;
+import com.atlassian.bitbucket.scm.CommandOutputHandler;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
-
-import com.atlassian.bitbucket.io.LineReader;
-import com.atlassian.bitbucket.io.LineReaderOutputHandler;
-import com.atlassian.bitbucket.scm.CommandOutputHandler;
-
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccPerson;
 
@@ -57,7 +54,7 @@ public class AnnotatedTagOutputHandler extends LineReaderOutputHandler
               .withCommitter(tagger) //
               .withAuthor(tagger) //
               .withId(ref) //
-              .withMessage(message) //'
+              .withMessage(message) // '
               .withTag(true) //
               .build();
     }

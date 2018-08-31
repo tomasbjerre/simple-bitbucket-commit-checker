@@ -3,20 +3,16 @@ package se.bjurr.sbcc.commits;
 import static com.google.common.base.Joiner.on;
 import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 
+import com.atlassian.bitbucket.io.LineReader;
+import com.atlassian.bitbucket.io.LineReaderOutputHandler;
+import com.atlassian.bitbucket.scm.CommandOutputHandler;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.bitbucket.io.LineReader;
-import com.atlassian.bitbucket.io.LineReaderOutputHandler;
-import com.atlassian.bitbucket.scm.CommandOutputHandler;
-
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccPerson;
 import se.bjurr.sbcc.settings.SbccSettings;

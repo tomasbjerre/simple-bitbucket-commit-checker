@@ -6,13 +6,11 @@ import static com.google.common.collect.Maps.newTreeMap;
 import static java.lang.Boolean.TRUE;
 import static se.bjurr.sbcc.settings.SbccGroup.Accept.ACCEPT;
 
+import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;
-
 import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccMatch;
-
-import com.google.common.base.Optional;
 
 public class SbccChangeSetVerificationResult {
   private Map<SbccGroup, SbccMatch> groupsResult = newTreeMap();

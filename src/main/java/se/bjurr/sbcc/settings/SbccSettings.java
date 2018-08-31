@@ -14,11 +14,10 @@ import static java.util.regex.Pattern.compile;
 import static se.bjurr.sbcc.settings.SbccGroup.sbccGroup;
 import static se.bjurr.sbcc.settings.SbccRule.sbccRule;
 
-import java.util.List;
-import java.util.regex.PatternSyntaxException;
-
 import com.atlassian.bitbucket.setting.Settings;
 import com.google.common.base.Optional;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 public class SbccSettings {
   public static final String SETTING_ACCEPT_MESSAGE = "acceptMessage";

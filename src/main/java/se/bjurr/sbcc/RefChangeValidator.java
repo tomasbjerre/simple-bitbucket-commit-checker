@@ -7,18 +7,16 @@ import static se.bjurr.sbcc.SbccCommon.getBitbucketEmail;
 import static se.bjurr.sbcc.SbccCommon.getBitbucketName;
 import static se.bjurr.sbcc.commits.ChangeSetsService.isTag;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.sal.api.net.ResponseException;
-
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 import se.bjurr.sbcc.commits.ChangeSetsService;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.data.SbccRefChangeVerificationResult;

@@ -23,26 +23,6 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_MESSAGE;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_REGEXP;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-
-import se.bjurr.sbcc.JiraClient;
-import se.bjurr.sbcc.SbccRepositoryHook;
-import se.bjurr.sbcc.SbccUserAdminService;
-import se.bjurr.sbcc.commits.ChangeSetsService;
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.settings.SbccGroup;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
@@ -67,6 +47,23 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.io.Resources;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import se.bjurr.sbcc.JiraClient;
+import se.bjurr.sbcc.SbccRepositoryHook;
+import se.bjurr.sbcc.SbccUserAdminService;
+import se.bjurr.sbcc.commits.ChangeSetsService;
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.settings.SbccGroup;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class RefChangeBuilder {
   public static final String JIRA_REGEXP = "((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)";
@@ -356,7 +353,8 @@ public class RefChangeBuilder {
     return this.withSetting(
             SETTING_GROUP_ACCEPT + "[0]", SbccGroup.Accept.SHOW_MESSAGE.toString()) //
         .withSetting(SETTING_GROUP_MATCH + "[0]", SbccGroup.Match.NONE.toString()) //
-        .withSetting(SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
+        .withSetting(
+            SETTING_GROUP_MESSAGE + "[0]", "Thanks for not specifying a Jira or INC =)") //
         .withSetting(SETTING_RULE_REGEXP + "[0][0]", JIRA_REGEXP) //
         .withSetting(SETTING_RULE_MESSAGE + "[0][0]", "JIRA") //
         .withSetting(SETTING_RULE_REGEXP + "[0][1]", "INC") //

@@ -9,11 +9,6 @@ import static java.util.logging.Level.SEVERE;
 import static se.bjurr.sbcc.commits.ChangeSetsService.isTag;
 import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.Logger;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.ScmHookDetails;
@@ -26,7 +21,10 @@ import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
 import com.google.common.annotations.VisibleForTesting;
-
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
 import se.bjurr.sbcc.commits.ChangeSetsService;
 import se.bjurr.sbcc.data.SbccVerificationResult;
 import se.bjurr.sbcc.settings.SbccSettings;

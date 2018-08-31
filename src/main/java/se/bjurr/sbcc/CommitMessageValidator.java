@@ -14,12 +14,10 @@ import static se.bjurr.sbcc.settings.SbccGroup.Match.ALL;
 import static se.bjurr.sbcc.settings.SbccGroup.Match.NONE;
 import static se.bjurr.sbcc.settings.SbccGroup.Match.ONE;
 
+import com.atlassian.bitbucket.auth.AuthenticationContext;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import com.atlassian.bitbucket.auth.AuthenticationContext;
-
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.settings.SbccGroup;
 import se.bjurr.sbcc.settings.SbccMatch;

@@ -14,17 +14,14 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_MESSAGE;
 import static se.bjurr.sbcc.settings.SbccSettings.SETTING_RULE_REGEXP;
 import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.setting.SettingsValidationErrors;
-
+import java.util.List;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
 import se.bjurr.sbcc.ConfigValidator;
 
 public class ConfigValidatorTest {

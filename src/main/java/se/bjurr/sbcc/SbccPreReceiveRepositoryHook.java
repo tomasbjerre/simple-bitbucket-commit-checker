@@ -2,10 +2,6 @@ package se.bjurr.sbcc;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.List;
-
-import se.bjurr.sbcc.commits.ChangeSetsService;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.ScmHookDetails;
@@ -17,6 +13,8 @@ import com.atlassian.bitbucket.hook.repository.RepositoryHookService;
 import com.atlassian.bitbucket.repository.RefChange;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.user.SecurityService;
+import java.util.List;
+import se.bjurr.sbcc.commits.ChangeSetsService;
 
 public class SbccPreReceiveRepositoryHook implements PreRepositoryHook<RepositoryHookRequest> {
 

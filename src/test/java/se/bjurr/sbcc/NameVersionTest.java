@@ -4,7 +4,6 @@ import static se.bjurr.sbcc.data.SbccChangeSetBuilder.changeSetBuilder;
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
-
 import org.junit.Test;
 
 public class NameVersionTest {

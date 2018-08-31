@@ -4,8 +4,6 @@ import static com.atlassian.sal.api.net.Request.MethodType.GET;
 import static com.google.common.base.Charsets.UTF_8;
 import static java.net.URLEncoder.encode;
 
-import java.io.UnsupportedEncodingException;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
@@ -13,6 +11,7 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.UnsupportedEncodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

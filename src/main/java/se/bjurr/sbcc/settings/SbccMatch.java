@@ -1,7 +1,6 @@
 package se.bjurr.sbcc.settings;
 
 import java.util.List;
-
 import se.bjurr.sbcc.settings.SbccGroup.Match;
 
 public class SbccMatch {

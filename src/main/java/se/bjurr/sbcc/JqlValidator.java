@@ -4,16 +4,14 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-
-import se.bjurr.sbcc.data.SbccChangeSet;
-import se.bjurr.sbcc.settings.SbccSettings;
-
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.annotations.VisibleForTesting;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import se.bjurr.sbcc.data.SbccChangeSet;
+import se.bjurr.sbcc.settings.SbccSettings;
 
 public class JqlValidator {
   private final SbccSettings settings;

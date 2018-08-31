@@ -9,7 +9,6 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_BRANCH_REJECTION_REGEX
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
-
 import org.junit.Test;
 
 public class BranchesTest {

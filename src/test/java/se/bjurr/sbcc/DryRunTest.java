@@ -8,7 +8,6 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_DRY_RUN_MESSAGE;
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
-
 import org.junit.Test;
 
 public class DryRunTest {

@@ -8,11 +8,6 @@ import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 import static se.bjurr.sbcc.commits.RevListOutputHandler.FORMAT;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import com.atlassian.bitbucket.repository.RefChangeType;
 import com.atlassian.bitbucket.repository.RefService;
 import com.atlassian.bitbucket.repository.Repository;
@@ -21,7 +16,10 @@ import com.atlassian.bitbucket.scm.git.GitScm;
 import com.atlassian.bitbucket.scm.git.command.GitScmCommandBuilder;
 import com.atlassian.bitbucket.scm.git.command.revlist.GitRevListBuilder;
 import com.google.common.base.Optional;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import se.bjurr.sbcc.data.SbccChangeSet;
 import se.bjurr.sbcc.settings.SbccSettings;
 

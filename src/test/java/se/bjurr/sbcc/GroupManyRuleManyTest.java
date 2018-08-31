@@ -9,9 +9,7 @@ import static se.bjurr.sbcc.settings.SbccSettings.SETTING_GROUP_MESSAGE;
 import static se.bjurr.sbcc.util.RefChangeBuilder.refChangeBuilder;
 
 import java.io.IOException;
-
 import org.junit.Test;
-
 import se.bjurr.sbcc.settings.SbccGroup;
 
 public class GroupManyRuleManyTest {
