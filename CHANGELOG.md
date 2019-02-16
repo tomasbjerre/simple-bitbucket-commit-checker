@@ -2,6 +2,17 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## Unreleased
+### GitHub [#95](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/95) Bitbucket Server 6
+  Bitbucket Server 6
+  
+  [c0c4032e2f0dfa2](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/c0c4032e2f0dfa2) Tomas Bjerre *2019-02-16 08:17:41*
+
+### No issue
+  Updating fmt-plugin
+  
+  [fa6aa68ecdab89e](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/fa6aa68ecdab89e) Tomas Bjerre *2018-08-31 07:01:46*
+
 ## 3.12
 ### GitHub [#89](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/89) add logging to support triage of connection issues
   Logging exception thrown when invoking Jira

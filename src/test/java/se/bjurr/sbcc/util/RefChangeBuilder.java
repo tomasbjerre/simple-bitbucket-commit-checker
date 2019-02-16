@@ -30,6 +30,7 @@ import com.atlassian.bitbucket.hook.ScmHookDetails;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookContext;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookResult;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookService;
+import com.atlassian.bitbucket.hook.repository.RepositoryHookSettings;
 import com.atlassian.bitbucket.repository.MinimalRef;
 import com.atlassian.bitbucket.repository.RefChange;
 import com.atlassian.bitbucket.repository.RefChangeType;
@@ -129,10 +130,14 @@ public class RefChangeBuilder {
     this.bitbucketAuthenticationContext = mock(AuthenticationContext.class);
     this.sbccUserAdminService = mock(SbccUserAdminService.class);
 
-    this.securityService = mock(SecurityService.class);
+    final RepositoryHookSettings repositoryHookSettings = mock(RepositoryHookSettings.class);
+    when(repositoryHookSettings.getSettings()).thenReturn(settings);
+
     final EscalatedSecurityContext escalatedSecurityContext = mock(EscalatedSecurityContext.class);
     final Operation<Object, RuntimeException> operation = ArgumentMatchers.any(Operation.class);
-    when(escalatedSecurityContext.call(operation)).thenReturn(this.settings);
+    when(escalatedSecurityContext.call(operation)).thenReturn(repositoryHookSettings);
+
+    this.securityService = mock(SecurityService.class);
     when(this.securityService.withPermission(REPO_ADMIN, "Retrieving settings"))
         .thenReturn(escalatedSecurityContext);
 

@@ -12,11 +12,14 @@ import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.hook.ScmHookDetails;
+import com.atlassian.bitbucket.hook.repository.GetRepositoryHookSettingsRequest;
 import com.atlassian.bitbucket.hook.repository.RepositoryHook;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookResult;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookService;
+import com.atlassian.bitbucket.hook.repository.RepositoryHookSettings;
 import com.atlassian.bitbucket.repository.RefChange;
 import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.scope.RepositoryScope;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
@@ -174,19 +177,25 @@ public class SbccRepositoryHook {
 
   public Optional<Settings> findSettings(final Repository repository) {
     try {
-      final Settings settings =
+      final RepositoryHookSettings settings =
           this.securityService
               .withPermission(REPO_ADMIN, "Retrieving settings")
               .call(
-                  new Operation<Settings, Exception>() {
+                  new Operation<RepositoryHookSettings, Exception>() {
                     @Override
-                    public Settings perform() throws Exception {
+                    public RepositoryHookSettings perform() throws Exception {
+
                       final RepositoryHook hook =
-                          repositoryHookService.getByKey(repository, HOOK_SETTINGS_KEY);
+                          repositoryHookService.getByKey(
+                              new RepositoryScope(repository), HOOK_SETTINGS_KEY);
                       if (!hook.isEnabled() || !hook.isEnabled()) {
                         return null;
                       }
-                      return repositoryHookService.getSettings(repository, HOOK_SETTINGS_KEY);
+                      final GetRepositoryHookSettingsRequest req =
+                          new GetRepositoryHookSettingsRequest.Builder(
+                                  new RepositoryScope(repository), HOOK_SETTINGS_KEY)
+                              .build();
+                      return repositoryHookService.getSettings(req);
                     }
                   });
       if (settings == null) {
@@ -194,9 +203,9 @@ public class SbccRepositoryHook {
       }
       final SbccRenderer sbccRenderer = new SbccRenderer(this.bitbucketAuthenticationContext);
       final SbccSettings abccSettings =
-          SbccSettings.sscSettings(new RenderingSettings(settings, sbccRenderer));
+          SbccSettings.sscSettings(new RenderingSettings(settings.getSettings(), sbccRenderer));
       logger.log(INFO, "Using settings:\n" + abccSettings);
-      return Optional.of(settings);
+      return Optional.of(settings.getSettings());
     } catch (final Exception e) {
       logger.log(SEVERE, "Tried to get settings for \"" + HOOK_SETTINGS_KEY + "\"", e);
       return empty();

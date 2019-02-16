@@ -16,6 +16,7 @@ import static se.bjurr.sbcc.settings.SbccSettings.sscSettings;
 
 import com.atlassian.bitbucket.auth.AuthenticationContext;
 import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.scope.RepositoryScope;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.setting.SettingsValidationErrors;
 import java.util.List;
@@ -47,6 +48,7 @@ public class ConfigValidatorTest {
   @Before
   public void before() {
     this.settings = mock(Settings.class);
+    this.repository = mock(Repository.class);
     when(this.settings.getBoolean(anyString())).thenReturn(null);
     when(this.settings.getString(anyString())).thenReturn(null);
     this.authenticationContext = mock(AuthenticationContext.class);
@@ -56,7 +58,7 @@ public class ConfigValidatorTest {
   @Test
   public void testThatBranchesCanBeEmpty() {
     when(this.settings.getString(SETTING_BRANCHES)).thenReturn("");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals("", on(",").join(this.fieldErrors.keySet()));
     assertEquals("", on(",").join(this.fieldErrors.values()));
   }
@@ -64,7 +66,7 @@ public class ConfigValidatorTest {
   @Test
   public void testThatBranchesMustHaveAValidRegexp() {
     when(this.settings.getString(SETTING_BRANCHES)).thenReturn("[notok");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals(SETTING_BRANCHES, on(",").join(this.fieldErrors.keySet()));
     assertEquals(
         "Invalid Regexp: Unclosed character class near index 5 [notok      ^",
@@ -78,7 +80,7 @@ public class ConfigValidatorTest {
     when(this.settings.getString(SETTING_GROUP_MATCH + "[0]"))
         .thenReturn(SbccGroup.Match.ALL.toString());
     when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("[notok");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals("ruleRegexp[0][0]", on(",").join(this.fieldErrors.keySet()));
     assertEquals(
         "Invalid Regexp: Unclosed character class near index 5 [notok      ^",
@@ -92,7 +94,7 @@ public class ConfigValidatorTest {
     when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]"))
         .thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString().toLowerCase());
     when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals("", on(",").join(this.fieldErrors.keySet()));
     assertEquals("", on(",").join(this.fieldErrors.values()));
     assertEquals("ok", sscSettings(this.settings).getGroups().get(0).getRules().get(0).getRegexp());
@@ -103,7 +105,7 @@ public class ConfigValidatorTest {
     when(this.settings.getString(SETTING_GROUP_MATCH + "[0]"))
         .thenReturn(SbccGroup.Match.ALL.toString());
     when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals(SETTING_GROUP_ACCEPT + "[0]", on(",").join(this.fieldErrors.keySet()));
     assertEquals(
         "Cannot add a rule group without acceptance criteria!",
@@ -115,7 +117,7 @@ public class ConfigValidatorTest {
     when(this.settings.getString(SETTING_GROUP_ACCEPT + "[0]"))
         .thenReturn(SbccGroup.Accept.SHOW_MESSAGE.toString());
     when(this.settings.getString(SETTING_RULE_REGEXP + "[0][0]")).thenReturn("ok");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals(SETTING_GROUP_MATCH + "[0]", on(",").join(this.fieldErrors.keySet()));
     assertEquals(
         "Cannot add a rule group without matching criteria!",
@@ -129,13 +131,13 @@ public class ConfigValidatorTest {
     when(this.settings.getString(SETTING_GROUP_MATCH + "[0]"))
         .thenReturn(SbccGroup.Match.ALL.toString());
     when(this.settings.getString(SETTING_RULE_MESSAGE + "[0][0]")).thenReturn("A Message");
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
     assertEquals("ruleRegexp[0][0]", on(",").join(this.fieldErrors.keySet()));
     assertEquals("Cannot add a rule without regexp!", on(",").join(this.fieldErrors.values()));
   }
 
   @Test
   public void testThatValidationDoesNotFailIfNoValuesAreEntered() {
-    this.configValidator.validate(this.settings, this.errors, this.repository);
+    this.configValidator.validate(this.settings, this.errors, new RepositoryScope(this.repository));
   }
 }
