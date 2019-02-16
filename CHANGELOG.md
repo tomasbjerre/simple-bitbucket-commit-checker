@@ -2,11 +2,11 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
-## Unreleased
+## 4.0
 ### GitHub [#95](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/95) Bitbucket Server 6
   Bitbucket Server 6
   
-  [c0c4032e2f0dfa2](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/c0c4032e2f0dfa2) Tomas Bjerre *2019-02-16 08:17:41*
+  [6d4c7ad96f0b077](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/6d4c7ad96f0b077) Tomas Bjerre *2019-02-16 09:32:10*
 
 ### No issue
   Updating fmt-plugin
