@@ -1,3 +1,11 @@
+This plugin is no longer in Marketplace and is not very well maintained. 
+
+See: https://community.developer.atlassian.com/t/eula-and-data-center-for-free-apps/26062
+
+You may want to use this one: https://github.com/sford/yet-another-commit-checker
+
+---
+
 # Simple Bitbucket Commit Checker [![Build Status](https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker.svg?branch=master)](https://travis-ci.org/tomasbjerre/simple-bitbucket-commit-checker)
 Simple, and easy to use, commit checker for Atlassian Bitbucket. There are many commit checkers out there. This plugin aims at being simple and user friendly. The admin GUI ([here](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_upper.png) and [here](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/admin_lower.png)) allows the Bitbucket administrator to add custom messages for each rejection reason. [Here](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatRejectResponseLooksGood.txt) is a sample reject message and [here](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/blob/master/src/test/resources/testProdThatSuccessResponseLooksGood.txt) is a sample accept message. [This](https://raw.githubusercontent.com/tomasbjerre/simple-bitbucket-commit-checker/master/sandbox/config_and_reject.png) is a screenshot of a push being rejected.
 
