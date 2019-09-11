@@ -14,7 +14,6 @@ import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.scm.ScmService;
 import com.atlassian.bitbucket.scm.git.GitScm;
 import com.atlassian.bitbucket.scm.git.command.GitScmCommandBuilder;
-import com.atlassian.bitbucket.scm.git.command.revlist.GitRevListBuilder;
 import com.google.common.base.Optional;
 import java.io.IOException;
 import java.util.ArrayList;

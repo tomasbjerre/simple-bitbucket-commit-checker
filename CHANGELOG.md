@@ -2,6 +2,21 @@
 
 Changelog of Simple Bitbucket Commit Checker.
 
+## 4.1
+### GitHub [#96](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/96) ERROR on Bitbucket Server 6.6.0
+  Fix for issue  (breakage thanks to Bitbucket 6.6.x no longer accepting "--not" as a revList() reference)
+  
+  [aadbf0703087522](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/aadbf0703087522) G. Sylvie Davies *2019-09-11 06:59:42*
+
+### No issue
+  openjdk8
+  
+  [cb88c8dd8bb79bd](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/cb88c8dd8bb79bd) Tomas Bjerre *2019-09-11 13:41:56*
+
+  doc
+  
+  [db76dea9e5c24cb](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/commit/db76dea9e5c24cb) Tomas Bjerre *2019-09-04 14:28:07*
+
 ## 4.0
 ### GitHub [#95](https://github.com/tomasbjerre/simple-bitbucket-commit-checker/issues/95) Bitbucket Server 6
   Bitbucket Server 6

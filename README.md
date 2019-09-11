@@ -2,7 +2,10 @@ This plugin is no longer in Marketplace and is not very well maintained.
 
 See: https://community.developer.atlassian.com/t/eula-and-data-center-for-free-apps/26062
 
-You may want to use this one: https://github.com/sford/yet-another-commit-checker
+You may want to use:
+
+ * https://github.com/sford/yet-another-commit-checker
+ * https://marketplace.atlassian.com/apps/1217635/control-freak-for-bitbucket-server?hosting=server&tab=overview
 
 ---
 
