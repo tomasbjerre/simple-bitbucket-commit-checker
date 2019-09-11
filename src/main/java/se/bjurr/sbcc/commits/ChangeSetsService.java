@@ -85,12 +85,14 @@ public class ChangeSetsService {
       final String toHash,
       final Optional<GitScmCommandBuilder> gitScmCommandBuilder,
       final SbccSettings settings) {
-    final GitRevListBuilder revListBuilder =
+    final GitScmCommandBuilder revListBuilder =
         gitScmCommandBuilder
             .get() //
-            .revList() //
-            .format(FORMAT) //
-            .revs(toHash, "--not", "--all");
+            .command("rev-list") //
+            .argument("--pretty=" + FORMAT) //
+            .argument(toHash) //
+            .argument("--not") //
+            .argument("--all");
 
     final List<SbccChangeSet> found =
         revListBuilder //
