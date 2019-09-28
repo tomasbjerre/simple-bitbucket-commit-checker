@@ -6,9 +6,16 @@
 	<artifactId>sbcc</artifactId>
 	<version>4.2-SNAPSHOT</version>
 	<organization>
-		<name>Tomas Bjerre</name>
-		<url>http://bjurr.se/</url>
+		<name>Tomas Bjerre AB</name>
+		<url>https://tomasbjerreab.se/</url>
 	</organization>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<name>sbcc</name>
 	<description>This is the Simple Bitbucket Commit Checker plugin for Atlassian Bitbucket. See https://github.com/tomasbjerre/simple-bitbucket-commit-checker for documentation and source code.</description>
 	<packaging>atlassian-plugin</packaging>
